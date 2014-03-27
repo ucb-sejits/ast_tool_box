@@ -4,18 +4,24 @@ from PySide import QtGui
 import types
 import ast
 
-# Tree column indices
-COL_NODE = 0
-COL_FIELD = 1
-COL_CLASS = 2
-COL_VALUE = 3
-COL_POS = 4
-COL_HIGHLIGHT = 5
-
 DEBUGGING = False
 
 
+class AstTreeItem(QtGui.QTreeWidgetItem):
+    def __init__(self, parent, source_node=None):
+        super(AstTreeItem, self).__init__(parent)
+        self.ast_node = source_node
+
+
 class AstTreeWidget(QtGui.QTreeWidget):
+    # Tree column indices
+    COL_NODE = 0
+    COL_FIELD = 1
+    COL_CLASS = 2
+    COL_VALUE = 3
+    COL_POS = 4
+    COL_HIGHLIGHT = 5
+
     def __init__(self):
         super(AstTreeWidget, self).__init__()
 
@@ -23,14 +29,29 @@ class AstTreeWidget(QtGui.QTreeWidget):
         self.setHeaderLabels(
             ["Node", "Field", "Class", "Value", "Line : Col", "Highlight"]
         )
-        self.header().resizeSection(COL_NODE, 250)
-        self.header().resizeSection(COL_FIELD, 80)
-        self.header().resizeSection(COL_CLASS, 80)
-        self.header().resizeSection(COL_VALUE, 80)
-        self.header().resizeSection(COL_POS, 80)
-        self.header().resizeSection(COL_HIGHLIGHT, 100)
-        self.setColumnHidden(COL_HIGHLIGHT, not DEBUGGING)
+        self.header().resizeSection(AstTreeWidget.COL_NODE, 250)
+        self.header().resizeSection(AstTreeWidget.COL_FIELD, 80)
+        self.header().resizeSection(AstTreeWidget.COL_CLASS, 80)
+        self.header().resizeSection(AstTreeWidget.COL_VALUE, 80)
+        self.header().resizeSection(AstTreeWidget.COL_POS, 80)
+        self.header().resizeSection(AstTreeWidget.COL_HIGHLIGHT, 100)
+        self.setColumnHidden(AstTreeWidget.COL_HIGHLIGHT, not DEBUGGING)
         self.header().setStretchLastSection(True)
+
+        self.make_root_action = QtGui.QAction(
+            "&Make this node be root",
+            self,
+            statusTip="This node will be made the current root in this window",
+            triggered=self.make_root
+        )
+
+    def contextMenuEvent(self, event):
+        menu = QtGui.QMenu(self)
+        menu.addAction(self.make_root_action)
+        menu.exec_(event.globalPos())
+
+    def make_root(self):
+        self.make_tree_from(self.currentItem().ast_node)
 
     def make_tree_from(self, syntax_tree, file_name="", display_depth=1):
         """
@@ -44,12 +65,13 @@ class AstTreeWidget(QtGui.QTreeWidget):
         state = {'from': '? : ?', 'to': '1 : 0'}
 
         def add_node(ast_node, parent_item, field_label):
-            """ Helper function that recursively adds nodes.
-
+            """
+            Helper function that recursively adds nodes.
                 :param parent_item: The parent QTreeWidgetItem to which this node will be added
                 :param field_label: Labels how this node is known to the parent
             """
-            node_item = QtGui.QTreeWidgetItem(parent_item)
+            node_item = AstTreeItem(parent_item)
+            node_item.ast_node = ast_node
 
             if hasattr(ast_node, 'lineno'):
                 position_str = "{:d} : {:d}".format(ast_node.lineno, ast_node.col_offset)
@@ -60,8 +82,8 @@ class AstTreeWidget(QtGui.QTreeWidget):
                 if position_str != state['to']:
                     state['from'] = state['to']
                     state['to'] = position_str
-                    for elem in to_be_updated:
-                        elem.setText(COL_HIGHLIGHT, "{} : {}".format(state['from'], state['to']))
+                    for node in to_be_updated:
+                        node.setText(AstTreeWidget.COL_HIGHLIGHT, "{} : {}".format(state['from'], state['to']))
                     to_be_updated[:] = [node_item]
                 else:
                     to_be_updated.append(node_item)
@@ -69,27 +91,27 @@ class AstTreeWidget(QtGui.QTreeWidget):
                 to_be_updated.append(node_item)
                 position_str = ""
 
-            # Recursively descent the AST
+            # Recursively descend the AST
             if isinstance(ast_node, ast.AST):
                 value_str = ''
                 node_str = "{} = {}".format(field_label, class_name(ast_node))
                 for key, val in ast.iter_fields(ast_node):
                     add_node(val, node_item, key)
             # elif type(ast_node) == types.ListType or type(ast_node) == types.TupleType:
-            elif isinstance(ast_node, types.ListType) or isinstance(ast_node,types.TupleType):
+            elif isinstance(ast_node, types.ListType) or isinstance(ast_node, types.TupleType):
                 value_str = ''
                 node_str = "{} = {}".format(field_label, class_name(ast_node))
-                for idx, elem in enumerate(ast_node):
-                    add_node(elem, node_item, "{}[{:d}]".format(field_label, idx))
+                for idx, node in enumerate(ast_node):
+                    add_node(node, node_item, "{}[{:d}]".format(field_label, idx))
             else:
                 value_str = repr(ast_node)
                 node_str = "{} = {}".format(field_label, value_str)
 
-            node_item.setText(COL_NODE, node_str)
-            node_item.setText(COL_FIELD, field_label)
-            node_item.setText(COL_CLASS, class_name(ast_node))
-            node_item.setText(COL_VALUE, value_str)
-            node_item.setText(COL_POS, position_str)
+            node_item.setText(AstTreeWidget.COL_NODE, node_str)
+            node_item.setText(AstTreeWidget.COL_FIELD, field_label)
+            node_item.setText(AstTreeWidget.COL_CLASS, class_name(ast_node))
+            node_item.setText(AstTreeWidget.COL_VALUE, value_str)
+            node_item.setText(AstTreeWidget.COL_POS, position_str)
 
         # End of helper function
 
@@ -100,10 +122,9 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
         # Fill highlight column for remainder of nodes
         for elem in to_be_updated:
-            elem.setText(COL_HIGHLIGHT, "{} : {}".format(state['to'], "... : ..."))
+            elem.setText(AstTreeWidget.COL_HIGHLIGHT, "{} : {}".format(state['to'], "... : ..."))
 
 
 def class_name(obj):
     """ Returns the class name of an object"""
     return obj.__class__.__name__
-

@@ -5,7 +5,6 @@ from __future__ import print_function
 
 import sys
 import logging
-import types
 import ast
 import traceback
 
@@ -22,14 +21,6 @@ PROGRAM_NAME = 'astview'
 PROGRAM_VERSION = '1.0.0'
 ABOUT_MESSAGE = u"""%(prog)s version %(version)s
 """ % {"prog": PROGRAM_NAME, "version": PROGRAM_VERSION}
-
-# Tree column indices
-COL_NODE = 0
-COL_FIELD = 1
-COL_CLASS = 2
-COL_VALUE = 3
-COL_POS = 4
-COL_HIGHLIGHT = 5
 
 
 def logging_basic_config(level):
@@ -210,24 +201,8 @@ class AstViewer(QtGui.QMainWindow):
         central_layout = QtGui.QHBoxLayout()
         central_splitter.setLayout(central_layout)
 
-        # Tree widget
-        # self.ast_tree = QtGui.QTreeWidget()
-        # self.ast_tree.setColumnCount(2)
-        #
-        # self.ast_tree.setHeaderLabels(["Node", "Field", "Class", "Value",
-        #                                "Line : Col", "Highlight"])
-        # self.ast_tree.header().resizeSection(COL_NODE, 250)
-        # self.ast_tree.header().resizeSection(COL_FIELD, 80)
-        # self.ast_tree.header().resizeSection(COL_CLASS, 80)
-        # self.ast_tree.header().resizeSection(COL_VALUE, 80)
-        # self.ast_tree.header().resizeSection(COL_POS, 80)
-        # self.ast_tree.header().resizeSection(COL_HIGHLIGHT, 100)
-        # self.ast_tree.setColumnHidden(COL_HIGHLIGHT, not DEBUGGING)
-
+        # Create base tree widget
         self.ast_tree = AstTreeWidget()
-
-        # Don't stretch last column, it doesn't play nice when columns are
-        # hidden and then shown again. 
         central_layout.addWidget(self.ast_tree)
 
         # Editor widget
@@ -323,81 +298,18 @@ class AstViewer(QtGui.QMainWindow):
             QtGui.QMessageBox.warning(self, 'error', msg)
 
     def _fill_ast_tree_widget(self):
-        # """ Populates the tree widget.
-        # """
-        # self.ast_tree.clear()
-        #
-        # # State we keep during the recursion.
-        # # Is needed to populate the selection column.
-        # to_be_updated = list([])
-        # state = {'from': '? : ?', 'to': '1 : 0'}
-        #
-        # def add_node(ast_node, parent_item, field_label):
-        #     """ Helper function that recursively adds nodes.
-        #
-        #         :param parent_item: The parent QTreeWidgetItem to which this node will be added
-        #         :param field_label: Labels how this node is known to the parent
-        #     """
-        #     node_item = QtGui.QTreeWidgetItem(parent_item)
-        #
-        #     if hasattr(ast_node, 'lineno'):
-        #         position_str = "{:d} : {:d}".format(ast_node.lineno, ast_node.col_offset)
-        #
-        #         # If we find a new position string we set the items found since the last time
-        #         # to 'old_line : old_col : new_line : new_col' and reset the list
-        #         # of to-be-updated nodes
-        #         if position_str != state['to']:
-        #             state['from'] = state['to']
-        #             state['to'] = position_str
-        #             for elem in to_be_updated:
-        #                 elem.setText(COL_HIGHLIGHT, "{} : {}".format(state['from'], state['to']))
-        #             to_be_updated[:] = [node_item]
-        #         else:
-        #             to_be_updated.append(node_item)
-        #     else:
-        #         to_be_updated.append(node_item)
-        #         position_str = ""
-        #
-        #     # Recursively descent the AST
-        #     if isinstance(ast_node, ast.AST):
-        #         value_str = ''
-        #         node_str = "{} = {}".format(field_label, class_name(ast_node))
-        #         for key, val in ast.iter_fields(ast_node):
-        #             add_node(val, node_item, key)
-        #     elif type(ast_node) == types.ListType or type(ast_node) == types.TupleType:
-        #         value_str = ''
-        #         node_str = "{} = {}".format(field_label, class_name(ast_node))
-        #         for idx, elem in enumerate(ast_node):
-        #             add_node(elem, node_item, "{}[{:d}]".format(field_label, idx))
-        #     else:
-        #         value_str = repr(ast_node)
-        #         node_str = "{} = {}".format(field_label, value_str)
-        #
-        #     node_item.setText(COL_NODE, node_str)
-        #     node_item.setText(COL_FIELD, field_label)
-        #     node_item.setText(COL_CLASS, class_name(ast_node))
-        #     node_item.setText(COL_VALUE, value_str)
-        #     node_item.setText(COL_POS, position_str)
-        #
-        # # End of helper function
-
+        """
+        Populates the tree widget.
+        """
         syntax_tree = ast.parse(self._source_code, filename=self._file_name, mode=self._mode)
-        #logger.debug(ast.dump(syntax_tree))
-
         self.ast_tree.make_tree_from(syntax_tree)
-        # add_node(syntax_tree, self.ast_tree, '"{}"'.format(self._file_name))
-        # self.ast_tree.expandToDepth(1)
-
-        # Fill highlight column for remainder of nodes
-        # for elem in to_be_updated:
-        #     elem.setText(COL_HIGHLIGHT, "{} : {}".format(state['to'], "... : ..."))
 
 
     @QtCore.Slot(QtGui.QTreeWidgetItem, QtGui.QTreeWidgetItem)
     def highlight_node(self, current_item, _previous_item):
         """ Highlights the node if it has line:col information.
         """
-        highlight_str = current_item.text(COL_HIGHLIGHT)
+        highlight_str = current_item.text(AstTreeWidget.COL_HIGHLIGHT)
         from_line_str, from_col_str, to_line_str, to_col_str = highlight_str.split(":")
 
         try:
@@ -447,7 +359,7 @@ class AstViewer(QtGui.QMainWindow):
         items = self.ast_tree.findItems(
             self.search_box.text(),
             QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive,
-            column=COL_NODE
+            column=AstTreeWidget.COL_NODE
         )
         print( "Found %d items" % len(items))
         if len(items) > 0:
@@ -460,22 +372,22 @@ class AstViewer(QtGui.QMainWindow):
     @QtCore.Slot(int)
     def show_field_column(self, checked):
         """ Shows or hides the field column"""
-        self.ast_tree.setColumnHidden(COL_FIELD, not checked)
+        self.ast_tree.setColumnHidden(AstTreeWidget.COL_FIELD, not checked)
 
     @QtCore.Slot(int)
     def show_class_column(self, checked):
         """ Shows or hides the class column"""
-        self.ast_tree.setColumnHidden(COL_CLASS, not checked)
+        self.ast_tree.setColumnHidden(AstTreeWidget.COL_CLASS, not checked)
 
     @QtCore.Slot(int)
     def show_value_column(self, checked):
         """ Shows or hides the value column"""
-        self.ast_tree.setColumnHidden(COL_VALUE, not checked)
+        self.ast_tree.setColumnHidden(AstTreeWidget.COL_VALUE, not checked)
 
     @QtCore.Slot(int)
     def show_pos_column(self, checked):
         """ Shows or hides the line:col column"""
-        self.ast_tree.setColumnHidden(COL_POS, not checked)
+        self.ast_tree.setColumnHidden(AstTreeWidget.COL_POS, not checked)
 
     def my_test(self):
         """ Function for testing """
@@ -498,4 +410,3 @@ class AstViewer(QtGui.QMainWindow):
 
 if __name__ == '__main__':
     sys.exit(view(source_code="print a + 5 + 6  / 3.7", mode='eval', width=800, height=600))
-    
