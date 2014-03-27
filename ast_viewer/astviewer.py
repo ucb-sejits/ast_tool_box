@@ -18,9 +18,11 @@ logger = logging.getLogger(__name__)
 
 DEBUGGING = False
 
-PROGRAM_NAME = 'ast_viewer'
-ABOUT_MESSAGE = u"""%(prog)s version %(version)s
-""" % {"program": PROGRAM_NAME, "version": ast_viewer.__version__}
+PROGRAM_NAME = 'astview'
+PROGRAM_VERSION = '1.0.0'
+ABOUT_MESSAGE = u"""
+%(prog)s version %(version)s
+""" % {"prog": PROGRAM_NAME, "version": ast_viewer.__version__}
 
 
 def logging_basic_config(level):
@@ -40,23 +42,26 @@ def check_class(obj, target_class, allow_none=False):
 
 
 def get_qapplication_instance():
-    """
-    Returns the QApplication instance. Creates one if it doesn't exist.
+    """ Returns the QApplication instance. Creates one if it doesn't exist.
     """
     app = QtGui.QApplication.instance()
     if app is None:
         app = QtGui.QApplication(sys.argv)
+        app.setStyle(QtGui.QMacStyle)
+        QtGui.QApplication.setStyle(QtGui.QMacStyle)
     check_class(app, QtGui.QApplication)
     return app
 
 
 def view(*args, **kwargs):
-    """ Opens an AstViewer window
-    """
+    """ Opens an AstViewer window"""
     app = get_qapplication_instance()
 
     window = AstViewer(*args, **kwargs)
     window.show()
+    window.activateWindow()
+    if sys.platform == "darwin":
+        window.raise_()
 
     logger.info("Starting the AST viewer...")
     exit_code = app.exec_()
@@ -141,6 +146,7 @@ class AstViewer(QtGui.QMainWindow):
             on_changed=self.search_box_changed
         )
         self.tool_bar.addWidget(self.search_box)
+        self.search_box.setFocus()
 
     def _setup_actions(self):
         """ Creates the MainWindow actions.
