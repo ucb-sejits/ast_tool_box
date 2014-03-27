@@ -2,6 +2,7 @@ __author__ = 'Chick Markley'
 
 from PySide import QtGui
 import types
+import ast
 
 # Tree column indices
 COL_NODE = 0
@@ -31,7 +32,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
         self.setColumnHidden(COL_HIGHLIGHT, not DEBUGGING)
         self.header().setStretchLastSection(True)
 
-    def make_tree_from(self, ast):
+    def make_tree_from(self, syntax_tree, file_name="", display_depth=1):
         """
         Populates the tree widget.
         """
@@ -92,10 +93,10 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
         # End of helper function
 
-        syntax_tree = ast.parse(self._source_code, filename=self._file_name, mode=self._mode)
+        #syntax_tree = ast.parse(self._source_code, filename=self._file_name, mode=self._mode)
         #logger.debug(ast.dump(syntax_tree))
-        add_node(syntax_tree, self.ast_tree, '"{}"'.format(self._file_name))
-        self.ast_tree.expandToDepth(1)
+        add_node(syntax_tree, self, '"{}"'.format(file_name))
+        self.expandToDepth(display_depth)
 
         # Fill highlight column for remainder of nodes
         for elem in to_be_updated:

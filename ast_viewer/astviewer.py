@@ -259,7 +259,8 @@ class AstViewer(QtGui.QMainWindow):
         self._file_name = ""
         self._source_code = ""
         self.editor.clear()
-        self._fill_ast_tree_widget()
+        # self._fill_ast_tree_widget()
+        self.ast_tree.make_tree_from()
 
 
     def open_file(self, file_name=None):
@@ -322,72 +323,74 @@ class AstViewer(QtGui.QMainWindow):
             QtGui.QMessageBox.warning(self, 'error', msg)
 
     def _fill_ast_tree_widget(self):
-        """ Populates the tree widget.
-        """
-        self.ast_tree.clear()
-
-        # State we keep during the recursion.
-        # Is needed to populate the selection column.
-        to_be_updated = list([])
-        state = {'from': '? : ?', 'to': '1 : 0'}
-
-        def add_node(ast_node, parent_item, field_label):
-            """ Helper function that recursively adds nodes.
-
-                :param parent_item: The parent QTreeWidgetItem to which this node will be added
-                :param field_label: Labels how this node is known to the parent
-            """
-            node_item = QtGui.QTreeWidgetItem(parent_item)
-
-            if hasattr(ast_node, 'lineno'):
-                position_str = "{:d} : {:d}".format(ast_node.lineno, ast_node.col_offset)
-
-                # If we find a new position string we set the items found since the last time
-                # to 'old_line : old_col : new_line : new_col' and reset the list 
-                # of to-be-updated nodes                 
-                if position_str != state['to']:
-                    state['from'] = state['to']
-                    state['to'] = position_str
-                    for elem in to_be_updated:
-                        elem.setText(COL_HIGHLIGHT, "{} : {}".format(state['from'], state['to']))
-                    to_be_updated[:] = [node_item]
-                else:
-                    to_be_updated.append(node_item)
-            else:
-                to_be_updated.append(node_item)
-                position_str = ""
-
-            # Recursively descent the AST 
-            if isinstance(ast_node, ast.AST):
-                value_str = ''
-                node_str = "{} = {}".format(field_label, class_name(ast_node))
-                for key, val in ast.iter_fields(ast_node):
-                    add_node(val, node_item, key)
-            elif type(ast_node) == types.ListType or type(ast_node) == types.TupleType:
-                value_str = ''
-                node_str = "{} = {}".format(field_label, class_name(ast_node))
-                for idx, elem in enumerate(ast_node):
-                    add_node(elem, node_item, "{}[{:d}]".format(field_label, idx))
-            else:
-                value_str = repr(ast_node)
-                node_str = "{} = {}".format(field_label, value_str)
-
-            node_item.setText(COL_NODE, node_str)
-            node_item.setText(COL_FIELD, field_label)
-            node_item.setText(COL_CLASS, class_name(ast_node))
-            node_item.setText(COL_VALUE, value_str)
-            node_item.setText(COL_POS, position_str)
-
-        # End of helper function
+        # """ Populates the tree widget.
+        # """
+        # self.ast_tree.clear()
+        #
+        # # State we keep during the recursion.
+        # # Is needed to populate the selection column.
+        # to_be_updated = list([])
+        # state = {'from': '? : ?', 'to': '1 : 0'}
+        #
+        # def add_node(ast_node, parent_item, field_label):
+        #     """ Helper function that recursively adds nodes.
+        #
+        #         :param parent_item: The parent QTreeWidgetItem to which this node will be added
+        #         :param field_label: Labels how this node is known to the parent
+        #     """
+        #     node_item = QtGui.QTreeWidgetItem(parent_item)
+        #
+        #     if hasattr(ast_node, 'lineno'):
+        #         position_str = "{:d} : {:d}".format(ast_node.lineno, ast_node.col_offset)
+        #
+        #         # If we find a new position string we set the items found since the last time
+        #         # to 'old_line : old_col : new_line : new_col' and reset the list
+        #         # of to-be-updated nodes
+        #         if position_str != state['to']:
+        #             state['from'] = state['to']
+        #             state['to'] = position_str
+        #             for elem in to_be_updated:
+        #                 elem.setText(COL_HIGHLIGHT, "{} : {}".format(state['from'], state['to']))
+        #             to_be_updated[:] = [node_item]
+        #         else:
+        #             to_be_updated.append(node_item)
+        #     else:
+        #         to_be_updated.append(node_item)
+        #         position_str = ""
+        #
+        #     # Recursively descent the AST
+        #     if isinstance(ast_node, ast.AST):
+        #         value_str = ''
+        #         node_str = "{} = {}".format(field_label, class_name(ast_node))
+        #         for key, val in ast.iter_fields(ast_node):
+        #             add_node(val, node_item, key)
+        #     elif type(ast_node) == types.ListType or type(ast_node) == types.TupleType:
+        #         value_str = ''
+        #         node_str = "{} = {}".format(field_label, class_name(ast_node))
+        #         for idx, elem in enumerate(ast_node):
+        #             add_node(elem, node_item, "{}[{:d}]".format(field_label, idx))
+        #     else:
+        #         value_str = repr(ast_node)
+        #         node_str = "{} = {}".format(field_label, value_str)
+        #
+        #     node_item.setText(COL_NODE, node_str)
+        #     node_item.setText(COL_FIELD, field_label)
+        #     node_item.setText(COL_CLASS, class_name(ast_node))
+        #     node_item.setText(COL_VALUE, value_str)
+        #     node_item.setText(COL_POS, position_str)
+        #
+        # # End of helper function
 
         syntax_tree = ast.parse(self._source_code, filename=self._file_name, mode=self._mode)
         #logger.debug(ast.dump(syntax_tree))
-        add_node(syntax_tree, self.ast_tree, '"{}"'.format(self._file_name))
-        self.ast_tree.expandToDepth(1)
+
+        self.ast_tree.make_tree_from(syntax_tree)
+        # add_node(syntax_tree, self.ast_tree, '"{}"'.format(self._file_name))
+        # self.ast_tree.expandToDepth(1)
 
         # Fill highlight column for remainder of nodes
-        for elem in to_be_updated:
-            elem.setText(COL_HIGHLIGHT, "{} : {}".format(state['to'], "... : ..."))
+        # for elem in to_be_updated:
+        #     elem.setText(COL_HIGHLIGHT, "{} : {}".format(state['to'], "... : ..."))
 
 
     @QtCore.Slot(QtGui.QTreeWidgetItem, QtGui.QTreeWidgetItem)
