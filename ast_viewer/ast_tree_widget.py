@@ -44,14 +44,29 @@ class AstTreeWidget(QtGui.QTreeWidget):
             statusTip="This node will be made the current root in this window",
             triggered=self.make_root
         )
+        self.expand_descendants_action = QtGui.QAction(
+            "&Expand all children",
+            self,
+            statusTip="Expand all descendant nodes",
+            triggered=self.expand_descendants
+        )
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
         menu.addAction(self.make_root_action)
+        menu.addAction(self.expand_descendants_action)
         menu.exec_(event.globalPos())
 
     def make_root(self):
         self.make_tree_from(self.currentItem().ast_node)
+
+    def expand_descendants(self, item=None):
+        if item is None:
+            item = self.currentItem()
+        item.setExpanded(True)
+        # print("at_node %s children count %d" % (item, item.childCount()))
+        for child_index in range(item.childCount()):
+            self.expand_descendants(item.child(child_index))
 
     def make_tree_from(self, syntax_tree, file_name="", display_depth=1):
         """
