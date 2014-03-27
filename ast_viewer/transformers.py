@@ -2,13 +2,13 @@ from __future__ import print_function
 
 __author__ = 'Chick Markley'
 
-import sys
 import ast
-import inspect
+
 
 class NodeTransformerManager(object):
     def __init__(self):
         self.all_transformers = {}
+        self.all_transformers_by_name = {}
 
     def get_node_transformers(self, module_name):
         """Use module_name to discover some transformers"""
@@ -26,9 +26,13 @@ class NodeTransformerManager(object):
             print("found %s" % clazz)
 
             self.all_transformers[package + clazz] = subclass
+            self.all_transformers_by_name[clazz] = subclass
+
+    def get_instance(self, transformer_name):
+        clazz = self.all_transformers_by_name[transformer_name]
+        return clazz()
 
 if __name__ == '__main__':
     ntm = NodeTransformerManager()
 
     ntm.get_node_transformers('ctree.transformations')
-

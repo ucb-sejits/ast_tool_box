@@ -7,5 +7,8 @@ setup(
     author_email="titusjan@gmail.com",
     py_modules=['astviewer'],
     scripts=['pyastviewer'],
-    requires=['PySide (>=1.1.2)'],
+    requires=[
+        'PySide (>=1.1.2)',
+        'nose',
+    ],
 )
