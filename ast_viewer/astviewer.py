@@ -12,6 +12,7 @@ import traceback
 from PySide import QtCore, QtGui
 
 from ast_viewer.search_widget import SearchLineEdit
+from ast_viewer.ast_tree_widget import AstTreeWidget
 
 logger = logging.getLogger(__name__)
 
@@ -111,6 +112,9 @@ class AstViewer(QtGui.QMainWindow):
         if mode not in valid_modes:
             raise ValueError("Mode must be one of: {}".format(valid_modes))
 
+        # default references to later instantiated stuff
+        self.ast_tree = None
+
         # Models
         self._file_name = '<source>'
         self._source_code = source_code
@@ -207,22 +211,23 @@ class AstViewer(QtGui.QMainWindow):
         central_splitter.setLayout(central_layout)
 
         # Tree widget
-        self.ast_tree = QtGui.QTreeWidget()
-        self.ast_tree.setColumnCount(2)
+        # self.ast_tree = QtGui.QTreeWidget()
+        # self.ast_tree.setColumnCount(2)
+        #
+        # self.ast_tree.setHeaderLabels(["Node", "Field", "Class", "Value",
+        #                                "Line : Col", "Highlight"])
+        # self.ast_tree.header().resizeSection(COL_NODE, 250)
+        # self.ast_tree.header().resizeSection(COL_FIELD, 80)
+        # self.ast_tree.header().resizeSection(COL_CLASS, 80)
+        # self.ast_tree.header().resizeSection(COL_VALUE, 80)
+        # self.ast_tree.header().resizeSection(COL_POS, 80)
+        # self.ast_tree.header().resizeSection(COL_HIGHLIGHT, 100)
+        # self.ast_tree.setColumnHidden(COL_HIGHLIGHT, not DEBUGGING)
 
-        self.ast_tree.setHeaderLabels(["Node", "Field", "Class", "Value",
-                                       "Line : Col", "Highlight"])
-        self.ast_tree.header().resizeSection(COL_NODE, 250)
-        self.ast_tree.header().resizeSection(COL_FIELD, 80)
-        self.ast_tree.header().resizeSection(COL_CLASS, 80)
-        self.ast_tree.header().resizeSection(COL_VALUE, 80)
-        self.ast_tree.header().resizeSection(COL_POS, 80)
-        self.ast_tree.header().resizeSection(COL_HIGHLIGHT, 100)
-        self.ast_tree.setColumnHidden(COL_HIGHLIGHT, not DEBUGGING)
+        self.ast_tree = AstTreeWidget()
 
         # Don't stretch last column, it doesn't play nice when columns are
         # hidden and then shown again. 
-        self.ast_tree.header().setStretchLastSection(True)
         central_layout.addWidget(self.ast_tree)
 
         # Editor widget
