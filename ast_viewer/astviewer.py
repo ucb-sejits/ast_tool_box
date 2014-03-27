@@ -11,6 +11,8 @@ import traceback
 
 from PySide import QtCore, QtGui
 
+from ast_viewer.search_widget import SearchLineEdit
+
 logger = logging.getLogger(__name__)
 
 DEBUGGING = False
@@ -136,6 +138,13 @@ class AstViewer(QtGui.QMainWindow):
         if width and height:
             self.resize(width, height)
 
+        self.tool_bar = self.addToolBar('Exit')
+        self.search_box = SearchLineEdit(
+            QtGui.QPixmap(r"images/search_icon.png"),
+            QtGui.QPixmap(r"images/search_icon.png"),
+            on_changed=self.search_box_changed
+        )
+        self.tool_bar.addWidget(self.search_box)
 
     def _setup_actions(self):
         """ Creates the MainWindow actions.
@@ -164,6 +173,8 @@ class AstViewer(QtGui.QMainWindow):
         self.col_pos_action.setShortcut("Ctrl+4")
         assert self.col_pos_action.toggled.connect(self.show_pos_column)
 
+        self.search_box = SearchLineEdit(QtGui.QPixmap(r"images/search_icon.png"), QtGui.QPixmap(r"images/search_icon.png"))
+
     def _setup_menu(self):
         """ Sets up the main menu.
         """
@@ -187,7 +198,6 @@ class AstViewer(QtGui.QMainWindow):
         help_menu = self.menuBar().addMenu("&Help")
         help_menu.addAction('&About', self.about)
 
-
     def _setup_views(self):
         """ Creates the UI widgets. 
         """
@@ -210,7 +220,7 @@ class AstViewer(QtGui.QMainWindow):
         self.ast_tree.header().resizeSection(COL_HIGHLIGHT, 100)
         self.ast_tree.setColumnHidden(COL_HIGHLIGHT, not DEBUGGING)
 
-        # Don't stretch last column, it doesn't play nice when columns are 
+        # Don't stretch last column, it doesn't play nice when columns are
         # hidden and then shown again. 
         self.ast_tree.header().setStretchLastSection(True)
         central_layout.addWidget(self.ast_tree)
@@ -285,7 +295,6 @@ class AstViewer(QtGui.QMainWindow):
                 logger.exception(ex)
                 QtGui.QMessageBox.warning(self, 'error', msg)
 
-
     def _load_file(self, file_name):
         """ Opens a file and sets self._file_name and self._source code if succesful
         """
@@ -306,7 +315,6 @@ class AstViewer(QtGui.QMainWindow):
             msg = "Unable to open file: {}".format(file_name)
             logger.warn(msg)
             QtGui.QMessageBox.warning(self, 'error', msg)
-
 
     def _fill_ast_tree_widget(self):
         """ Populates the tree widget.
@@ -397,7 +405,6 @@ class AstViewer(QtGui.QMainWindow):
         logger.debug("Highlighting ({!r}) : ({!r})".format(from_line_col, to_line_col))
         self.select_text(from_line_col, to_line_col)
 
-
     def select_text(self, from_line_col, to_line_col):
         """ Selects a text in the range from_line:col ... to_line:col
             
@@ -425,6 +432,21 @@ class AstViewer(QtGui.QMainWindow):
             text_cursor.setPosition(to_pos, QtGui.QTextCursor.KeepAnchor)
 
         self.editor.setTextCursor(text_cursor)
+
+    def search_box_changed(self):
+        print("search_box is now '%s'" % self.search_box.text())
+
+        items = self.ast_tree.findItems(
+            self.search_box.text(),
+            QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive,
+            column=COL_NODE
+        )
+        print( "Found %d items" % len(items))
+        if len(items) > 0:
+            print(items[0])
+            self.ast_tree.setCurrentItem(items[0])
+            self.ast_tree.expandItem(items[0])
+
 
 
     @QtCore.Slot(int)

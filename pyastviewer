@@ -1,12 +1,17 @@
-#!/opt/local/bin/python
+#!python
 """ 
    Program that shows the program on the right and its abstract syntax tree (ast) on the left.
 """
 from __future__ import print_function
 
-import sys, argparse, logging
-import astviewer
+import sys
+import argparse
+import logging
+
 from PySide import QtGui
+
+from ast_viewer import astviewer
+
 
 logger = logging.getLogger(__name__)
 
