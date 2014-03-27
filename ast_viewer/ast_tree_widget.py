@@ -14,7 +14,9 @@ class AstTreeItem(QtGui.QTreeWidgetItem):
 
 
 class AstTreeWidget(QtGui.QTreeWidget):
-    # Tree column indices
+    """
+    displays an ast as a tree widget
+    """
     COL_NODE = 0
     COL_FIELD = 1
     COL_CLASS = 2
@@ -58,9 +60,11 @@ class AstTreeWidget(QtGui.QTreeWidget):
         menu.exec_(event.globalPos())
 
     def make_root(self):
+        """make the current item the displayed root of the tree"""
         self.make_tree_from(self.currentItem().ast_node)
 
     def expand_descendants(self, item=None):
+        """Expand all descendants of the current item"""
         if item is None:
             item = self.currentItem()
         item.setExpanded(True)
@@ -112,7 +116,6 @@ class AstTreeWidget(QtGui.QTreeWidget):
                 node_str = "{} = {}".format(field_label, class_name(ast_node))
                 for key, val in ast.iter_fields(ast_node):
                     add_node(val, node_item, key)
-            # elif type(ast_node) == types.ListType or type(ast_node) == types.TupleType:
             elif isinstance(ast_node, types.ListType) or isinstance(ast_node, types.TupleType):
                 value_str = ''
                 node_str = "{} = {}".format(field_label, class_name(ast_node))

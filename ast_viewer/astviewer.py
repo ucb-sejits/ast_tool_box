@@ -7,6 +7,7 @@ import sys
 import logging
 import ast
 import traceback
+import ast_viewer
 
 from PySide import QtCore, QtGui
 
@@ -17,10 +18,9 @@ logger = logging.getLogger(__name__)
 
 DEBUGGING = False
 
-PROGRAM_NAME = 'astview'
-PROGRAM_VERSION = '1.0.0'
+PROGRAM_NAME = 'ast_viewer'
 ABOUT_MESSAGE = u"""%(prog)s version %(version)s
-""" % {"prog": PROGRAM_NAME, "version": PROGRAM_VERSION}
+""" % {"program": PROGRAM_NAME, "version": ast_viewer.__version__}
 
 
 def logging_basic_config(level):
@@ -40,7 +40,8 @@ def check_class(obj, target_class, allow_none=False):
 
 
 def get_qapplication_instance():
-    """ Returns the QApplication instance. Creates one if it doesn't exist.
+    """
+    Returns the QApplication instance. Creates one if it doesn't exist.
     """
     app = QtGui.QApplication.instance()
     if app is None:
