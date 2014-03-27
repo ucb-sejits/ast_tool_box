@@ -24,9 +24,11 @@ class AstTreeWidget(QtGui.QTreeWidget):
     COL_POS = 4
     COL_HIGHLIGHT = 5
 
-    def __init__(self):
-        super(AstTreeWidget, self).__init__()
+    def __init__(self, parent=None):
+        super(AstTreeWidget, self).__init__(parent)
 
+        self.parent_viewer = parent
+        self.ast_root = None
         self.setColumnCount(2)
         self.setHeaderLabels(
             ["Node", "Field", "Class", "Value", "Line : Col", "Highlight"]
@@ -40,6 +42,12 @@ class AstTreeWidget(QtGui.QTreeWidget):
         self.setColumnHidden(AstTreeWidget.COL_HIGHLIGHT, not DEBUGGING)
         self.header().setStretchLastSection(True)
 
+        self.make_new_tab_action = QtGui.QAction(
+            "&Duplicate this tree",
+            self,
+            statusTip="Duplicate this tree in new tab",
+            triggered=self.make_new_tab
+        )
         self.make_root_action = QtGui.QAction(
             "&Make this node be root",
             self,
@@ -55,9 +63,14 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
-        menu.addAction(self.make_root_action)
+        menu.addAction(self.make_new_tab_action)
         menu.addAction(self.expand_descendants_action)
+        menu.addAction(self.make_root_action)
         menu.exec_(event.globalPos())
+
+    def make_new_tab(self):
+        import copy
+        self.parent_viewer.add_tree_tab(copy.deepcopy(self.ast_root))
 
     def make_root(self):
         """make the current item the displayed root of the tree"""
@@ -141,7 +154,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
         # Fill highlight column for remainder of nodes
         for elem in to_be_updated:
             elem.setText(AstTreeWidget.COL_HIGHLIGHT, "{} : {}".format(state['to'], "... : ..."))
-
+        self.ast_root = syntax_tree
 
 def class_name(obj):
     """ Returns the class name of an object"""

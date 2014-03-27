@@ -13,6 +13,7 @@ from PySide import QtCore, QtGui
 
 from ast_viewer.search_widget import SearchLineEdit
 from ast_viewer.ast_tree_widget import AstTreeWidget
+from ast_viewer.ast_tree_tabs import AstTreeTabs
 
 logger = logging.getLogger(__name__)
 
@@ -209,8 +210,10 @@ class AstViewer(QtGui.QMainWindow):
         central_splitter.setLayout(central_layout)
 
         # Create base tree widget
-        self.ast_tree = AstTreeWidget()
-        central_layout.addWidget(self.ast_tree)
+        self.ast_tree_tabs = AstTreeTabs(self)
+        self.ast_tree = AstTreeWidget(self)
+        self.ast_tree_tabs.addTab(self.ast_tree, "Base Tree")
+        central_layout.addWidget(self.ast_tree_tabs)
 
         # Editor widget
         font = QtGui.QFont()
@@ -311,6 +314,12 @@ class AstViewer(QtGui.QMainWindow):
         syntax_tree = ast.parse(self._source_code, filename=self._file_name, mode=self._mode)
         self.ast_tree.make_tree_from(syntax_tree)
 
+    def add_tree_tab(self, ast_tree, name=None):
+        self.new_tree_tab = AstTreeWidget(self)
+        self.new_tree_tab.make_tree_from(ast_tree)
+        if not name:
+            name = "Tree %d" % (self.ast_tree_tabs.count() + 1)
+        self.ast_tree_tabs.addTab(self.new_tree_tab, name)
 
     @QtCore.Slot(QtGui.QTreeWidgetItem, QtGui.QTreeWidgetItem)
     def highlight_node(self, current_item, _previous_item):
