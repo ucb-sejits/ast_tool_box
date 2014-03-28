@@ -1,8 +1,11 @@
 __author__ = 'Chick Markley'
 
-from PySide import QtGui
+from PySide import QtGui, QtCore
 import types
 import ast
+import copy
+
+from ast_viewer.transformers import NodeTransformerManager
 
 DEBUGGING = False
 
@@ -12,6 +15,16 @@ class AstTreeItem(QtGui.QTreeWidgetItem):
         super(AstTreeItem, self).__init__(parent)
         self.ast_node = source_node
 
+
+class TransformerAction(QtGui.QAction):
+    def __init__(self, text, tree_widget, **kwargs):
+        super(TransformerAction, self).__init__(text, tree_widget, **kwargs)
+        self.tree_widget = tree_widget
+        self.text = text
+
+    def triggered(self, *args, **kwargs):
+        print("Triggered with string %s" % self.text)
+        self.tree_widget.transform_current_ast(self.text)
 
 class AstTreeWidget(QtGui.QTreeWidget):
     """
@@ -42,6 +55,11 @@ class AstTreeWidget(QtGui.QTreeWidget):
         self.setColumnHidden(AstTreeWidget.COL_HIGHLIGHT, not DEBUGGING)
         self.header().setStretchLastSection(True)
 
+        self.node_transformers = NodeTransformerManager()
+        self.node_transformers.get_node_transformers('ctree.transformations')
+
+        self.transform_signal = QtCore.Signal(int)
+
         self.make_new_tab_action = QtGui.QAction(
             "&Duplicate this tree",
             self,
@@ -65,11 +83,23 @@ class AstTreeWidget(QtGui.QTreeWidget):
         menu = QtGui.QMenu(self)
         menu.addAction(self.make_new_tab_action)
         menu.addAction(self.expand_descendants_action)
+
+        sub_menu = QtGui.QMenu(self)
+        sub_menu.setTitle("Available transformers")
+        for transformer_name in self.node_transformers.all_transformers_by_name:
+            sub_menu_action = TransformerAction(transformer_name, self)
+            sub_menu.addAction(sub_menu_action)
+        menu.addMenu(sub_menu)
         menu.addAction(self.make_root_action)
         menu.exec_(event.globalPos())
 
+    def transform_current_ast(self, name):
+        transformer = self.node_transformers.get_instance(name)
+        new_ast = copy.deepcopy(self.ast_root)
+        transformer.visit(new_ast)
+        self.parent_viewer.add_tree_tab(new_ast)
+
     def make_new_tab(self):
-        import copy
         self.parent_viewer.add_tree_tab(copy.deepcopy(self.ast_root))
 
     def make_root(self):
