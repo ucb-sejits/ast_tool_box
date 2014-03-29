@@ -8,7 +8,7 @@ class SearchLineEdit(QtGui.QLineEdit):
 
         self.clearButton = QtGui.QToolButton(self)
         # self.clearButton.setIcon(QtGui.QIcon(clear_pixmap))
-        self.clearButton.setIcon(QtGui.QIcon.fromTheme("system-close"))
+        self.clearButton.setIcon(QtGui.QIcon.fromTheme("system-close", fallback=QtGui.QIcon(clear_pixmap)))
         #self.clearButton.setIconSize(clear_pixmap.size())
         self.clearButton.setCursor(QtCore.Qt.ArrowCursor)
         self.clearButton.setStyleSheet("QToolButton { border: none; padding: 0px;}")
@@ -19,7 +19,7 @@ class SearchLineEdit(QtGui.QLineEdit):
             self.textChanged.connect(on_changed)
 
         self.searchButton = QtGui.QToolButton(self)
-        self.searchButton.setIcon(QtGui.QIcon.fromTheme("system-search"))
+        self.searchButton.setIcon(QtGui.QIcon.fromTheme("system-search", fallback=QtGui.QIcon(search_pixmap)))
 #        self.searchButton.setIcon(QtGui.QIcon(search_pixmap))
         #self.searchButton.setIconSize(search_pixmap.size())
         self.searchButton.setStyleSheet("QToolButton { border: none; padding: 0px;}")

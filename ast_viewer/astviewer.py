@@ -343,7 +343,6 @@ class AstViewer(QtGui.QMainWindow):
 
     def select_text(self, from_line_col, to_line_col):
         """ Selects a text in the range from_line:col ... to_line:col
-
             from_line_col and to_line_col should be a (line, column) tuple
             If from_line_col is None, the selection starts at the beginning of the document
             If to_line_col is None, the selection goes to the end of the document
