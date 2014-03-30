@@ -32,6 +32,9 @@ class NodeTransformerManager(object):
         clazz = self.all_transformers_by_name[transformer_name]
         return clazz()
 
+    def __iter__(self):
+        return iter(self.all_transformers_by_name)
+
 if __name__ == '__main__':
     ntm = NodeTransformerManager()
 

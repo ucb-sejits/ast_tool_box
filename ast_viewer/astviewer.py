@@ -8,12 +8,14 @@ import logging
 import ast
 import traceback
 import ast_viewer
+import copy
 
 from PySide import QtCore, QtGui
 
 from ast_viewer.search_widget import SearchLineEdit
 from ast_viewer.ast_tree_widget import AstTreeWidget
 from ast_viewer.ast_tree_tabs import AstTreeTabs
+from ast_viewer.ast_transform_viewer import AstTransformViewer
 
 logger = logging.getLogger(__name__)
 
@@ -226,7 +228,10 @@ class AstViewer(QtGui.QMainWindow):
         self.editor.setFont(font)
         self.editor.setWordWrapMode(QtGui.QTextOption.NoWrap)
         self.editor.setStyleSheet("selection-color: black; selection-background-color: yellow;")
-        central_layout.addWidget(self.editor)
+        # central_layout.addWidget(self.editor)
+
+        self.transform_list = AstTransformViewer(self)
+        central_layout.addWidget(self.transform_list)
 
         # Splitter parameters
         central_splitter.setCollapsible(0, False)
@@ -314,12 +319,22 @@ class AstViewer(QtGui.QMainWindow):
         syntax_tree = ast.parse(self._source_code, filename=self._file_name, mode=self._mode)
         self.ast_tree.make_tree_from(syntax_tree)
 
-    def add_tree_tab(self, ast_tree, name=None):
+    def add_tree_tab(self, ast_tree=None, transformer=None, name=None):
+        if not ast_tree:
+            current_tree_tab = self.ast_tree_tabs.currentWidget()
+            ast = current_tree_tab.ast_root
+
+        if transformer:
+            new_ast = copy.deepcopy(ast)
+            transformer.visit(new_ast)
+
         self.new_tree_tab = AstTreeWidget(self)
-        self.new_tree_tab.make_tree_from(ast_tree)
+        self.new_tree_tab.make_tree_from(new_ast)
+
         if not name:
             name = "Tree %d" % (self.ast_tree_tabs.count() + 1)
         self.ast_tree_tabs.addTab(self.new_tree_tab, name)
+        self.ast_tree_tabs.setCurrentWidget(self.new_tree_tab)
 
     @QtCore.Slot(QtGui.QTreeWidgetItem, QtGui.QTreeWidgetItem)
     def highlight_node(self, current_item, _previous_item):
