@@ -321,8 +321,7 @@ class AstViewer(QtGui.QMainWindow):
 
     def add_tree_tab(self, ast_tree=None, transformer=None, name=None):
         if not ast_tree:
-            current_tree_tab = self.ast_tree_tabs.currentWidget()
-            ast = current_tree_tab.ast_root
+            ast = self.ast_tree_tabs.current_ast()
 
         if transformer:
             new_ast = copy.deepcopy(ast)
@@ -333,6 +332,7 @@ class AstViewer(QtGui.QMainWindow):
 
         if not name:
             name = "Tree %d" % (self.ast_tree_tabs.count() + 1)
+
         self.ast_tree_tabs.addTab(self.new_tree_tab, name)
         self.ast_tree_tabs.setCurrentWidget(self.new_tree_tab)
 
