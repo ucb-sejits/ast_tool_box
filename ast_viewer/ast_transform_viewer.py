@@ -39,3 +39,16 @@ class AstTransformViewer(QtGui.QGroupBox):
 
         self.parent_viewer.add_tree_tab(name=current_item.text(), transformer=transformer)
 
+    def contextMenuEvent(self, event):
+        menu = QtGui.QMenu(self)
+        menu.addAction(
+            QtGui.QAction("Show source", self)
+        )
+        menu.addAction(
+            QtGui.QAction("Apply to current tree", self)
+        )
+        menu.addAction(
+            QtGui.QAction("Apply to current node of current tree", self)
+        )
+        menu.exec_(event.globalPos())
+

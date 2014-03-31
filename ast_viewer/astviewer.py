@@ -320,13 +320,20 @@ class AstViewer(QtGui.QMainWindow):
         self.ast_tree.make_tree_from(syntax_tree)
 
     def add_tree_tab(self, ast_tree=None, transformer=None, name=None):
+        """
+        Adds a new ast tab after running the specified transformer
+        on the current tab's ast
+        """
         if not ast_tree:
             ast_tree = self.ast_tree_tabs.current_ast()
 
         if transformer:
             new_ast_tree = copy.deepcopy(ast_tree)
-            print("got transformer %s" % transformer)
-            transformer.visit(new_ast_tree)
+            # print("got transformer %s" % transformer)
+            try:
+                transformer.visit(new_ast_tree)
+            except Exception as e:
+                print("Exception calling transformer %s" % e.message)
 
         new_tree_tab = AstTreeWidget(self)
         new_tree_tab.make_tree_from(new_ast_tree)
@@ -385,30 +392,28 @@ class AstViewer(QtGui.QMainWindow):
         self.editor.setTextCursor(text_cursor)
 
     def search_box_changed(self):
-        print("search_box is now '%s'" % self.search_box.text())
+        # print("search_box is now '%s'" % self.search_box.text())
 
         if not self.search_box.text():
             return
 
         current_tree = self.ast_tree_tabs.currentWidget()
-        print("current tree %s" % current_tree)
-
-        for widget_index in range(self.ast_tree_tabs.count()):
-            widget = self.ast_tree_tabs.widget(widget_index)
-            print( "widget %s ast_tree %s" % (widget, widget.ast_root))
+        # print("current tree %s" % current_tree)
+        #
+        # for widget_index in range(self.ast_tree_tabs.count()):
+        #     widget = self.ast_tree_tabs.widget(widget_index)
+        #     print("widget %s ast_tree %s" % (widget, widget.ast_root))
 
         items = current_tree.findItems(
             self.search_box.text(),
             QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive,
             column=AstTreeWidget.COL_NODE
         )
-        print( "Found %d items" % len(items))
+        # print("Found %d items" % len(items))
         if len(items) > 0:
             print(items[0])
             current_tree.setCurrentItem(items[0])
             current_tree.expandItem(items[0])
-
-
 
     @QtCore.Slot(int)
     def show_field_column(self, checked):
