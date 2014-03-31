@@ -44,15 +44,9 @@ class AstTreeWidget(QtGui.QTreeWidget):
         self.ast_root = None
         self.setColumnCount(2)
         self.setHeaderLabels(
-            ["Node", "Field", "Class", "Value", "Line : Col", "Highlight"]
+            ["Node"]
         )
-        self.header().resizeSection(AstTreeWidget.COL_NODE, 250)
-        self.header().resizeSection(AstTreeWidget.COL_FIELD, 80)
-        self.header().resizeSection(AstTreeWidget.COL_CLASS, 80)
-        self.header().resizeSection(AstTreeWidget.COL_VALUE, 80)
-        self.header().resizeSection(AstTreeWidget.COL_POS, 80)
-        self.header().resizeSection(AstTreeWidget.COL_HIGHLIGHT, 100)
-        self.setColumnHidden(AstTreeWidget.COL_HIGHLIGHT, not DEBUGGING)
+        self.header().resizeSection(AstTreeWidget.COL_NODE, 800)
         self.header().setStretchLastSection(True)
 
         self.node_transformers = NodeTransformerManager()
@@ -136,7 +130,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
             node_item.ast_node = ast_node
 
             if hasattr(ast_node, 'lineno'):
-                position_str = "{:d} : {:d}".format(ast_node.lineno, ast_node.col_offset)
+                position_str = "({:d}:{:d})".format(ast_node.lineno, ast_node.col_offset)
 
                 # If we find a new position string we set the items found since the last time
                 # to 'old_line : old_col : new_line : new_col' and reset the list
@@ -158,7 +152,8 @@ class AstTreeWidget(QtGui.QTreeWidget):
                 value_str = ''
                 node_str = "{} = {}".format(field_label, class_name(ast_node))
                 for key, val in ast.iter_fields(ast_node):
-                    add_node(val, node_item, key)
+                    if val:
+                        add_node(val, node_item, key)
             elif isinstance(ast_node, types.ListType) or isinstance(ast_node, types.TupleType):
                 value_str = ''
                 node_str = "{} = {}".format(field_label, class_name(ast_node))
@@ -166,13 +161,12 @@ class AstTreeWidget(QtGui.QTreeWidget):
                     add_node(node, node_item, "{}[{:d}]".format(field_label, idx))
             else:
                 value_str = repr(ast_node)
-                node_str = "{} = {}".format(field_label, value_str)
+                node_str = "{}: {}".format(field_label, value_str)
+
+            if position_str:
+                node_str += position_str
 
             node_item.setText(AstTreeWidget.COL_NODE, node_str)
-            node_item.setText(AstTreeWidget.COL_FIELD, field_label)
-            node_item.setText(AstTreeWidget.COL_CLASS, class_name(ast_node))
-            node_item.setText(AstTreeWidget.COL_VALUE, value_str)
-            node_item.setText(AstTreeWidget.COL_POS, position_str)
 
         # End of helper function
 
@@ -181,9 +175,6 @@ class AstTreeWidget(QtGui.QTreeWidget):
         add_node(syntax_tree, self, '"{}"'.format(file_name))
         self.expandToDepth(display_depth)
 
-        # Fill highlight column for remainder of nodes
-        for elem in to_be_updated:
-            elem.setText(AstTreeWidget.COL_HIGHLIGHT, "{} : {}".format(state['to'], "... : ..."))
         self.ast_root = syntax_tree
 
 def class_name(obj):

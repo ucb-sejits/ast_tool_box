@@ -292,7 +292,7 @@ class AstViewer(QtGui.QMainWindow):
                 QtGui.QMessageBox.warning(self, 'error', msg)
 
     def _load_file(self, file_name):
-        """ Opens a file and sets self._file_name and self._source code if succesful
+        """ Opens a file and sets self._file_name and self._source code if successful
         """
         logger.debug("Opening {!r}".format(file_name))
 
@@ -321,20 +321,21 @@ class AstViewer(QtGui.QMainWindow):
 
     def add_tree_tab(self, ast_tree=None, transformer=None, name=None):
         if not ast_tree:
-            ast = self.ast_tree_tabs.current_ast()
+            ast_tree = self.ast_tree_tabs.current_ast()
 
         if transformer:
-            new_ast = copy.deepcopy(ast)
-            transformer.visit(new_ast)
+            new_ast_tree = copy.deepcopy(ast_tree)
+            print("got transformer %s" % transformer)
+            transformer.visit(new_ast_tree)
 
-        self.new_tree_tab = AstTreeWidget(self)
-        self.new_tree_tab.make_tree_from(new_ast)
+        new_tree_tab = AstTreeWidget(self)
+        new_tree_tab.make_tree_from(new_ast_tree)
 
         if not name:
             name = "Tree %d" % (self.ast_tree_tabs.count() + 1)
 
-        self.ast_tree_tabs.addTab(self.new_tree_tab, name)
-        self.ast_tree_tabs.setCurrentWidget(self.new_tree_tab)
+        self.ast_tree_tabs.addTab(new_tree_tab, name)
+        self.ast_tree_tabs.setCurrentWidget(new_tree_tab)
 
     @QtCore.Slot(QtGui.QTreeWidgetItem, QtGui.QTreeWidgetItem)
     def highlight_node(self, current_item, _previous_item):
