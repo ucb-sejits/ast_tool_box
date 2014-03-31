@@ -51,7 +51,7 @@ def get_qapplication_instance():
     if app is None:
         app = QtGui.QApplication(sys.argv)
         app.setStyle(QtGui.QMacStyle)
-        QtGui.QApplication.setStyle(QtGui.QMacStyle)
+        QtGui.QApplication.setStyle(QtGui.QMacStyle())
     check_class(app, QtGui.QApplication)
     return app
 
@@ -187,7 +187,7 @@ class AstViewer(QtGui.QMainWindow):
         file_menu.addAction("&New", self.new_file, "Ctrl+N")
         file_menu.addAction("&Open...", self.open_file, "Ctrl+O")
         #file_menu.addAction("C&lose", self.close_window, "Ctrl+W")
-        file_menu.addAction("E&xit", self.quit_application, "Ctrl+Q")
+        file_menu.addAction("E&xit", AstViewer.quit_application, "Ctrl+Q")
 
         if DEBUGGING is True:
             file_menu.addSeparator()
@@ -442,7 +442,8 @@ class AstViewer(QtGui.QMainWindow):
         """ Closes the window """
         self.close()
 
-    def quit_application(self):
+    @staticmethod
+    def quit_application():
         """ Closes all windows """
         app = QtGui.QApplication.instance()
         app.closeAllWindows()
