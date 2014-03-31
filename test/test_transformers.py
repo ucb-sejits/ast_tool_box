@@ -9,10 +9,6 @@ from ast_viewer.models.transformers import NodeTransformerItem
 from ast_viewer.transformers.identity_transform import NoisyIdentityTransform, IdentityTransform
 
 
-class NodeTransformerSubclass(ast.NodeTransformer):
-    pass
-
-
 class TestTransformers(unittest.TestCase):
     def test_basic_load(self):
         ntm = NodeTransformerManager()
