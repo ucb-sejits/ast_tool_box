@@ -7,7 +7,6 @@ class SearchLineEdit(QtGui.QLineEdit):
         QtGui.QLineEdit.__init__(self, parent)
 
         self.clearButton = QtGui.QToolButton(self)
-        # self.clearButton.setIcon(QtGui.QIcon(clear_pixmap))
         self.clearButton.setIcon(QtGui.QIcon.fromTheme("system-close", fallback=QtGui.QIcon(clear_pixmap)))
         #self.clearButton.setIconSize(clear_pixmap.size())
         self.clearButton.setCursor(QtCore.Qt.ArrowCursor)

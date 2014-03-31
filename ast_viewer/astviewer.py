@@ -387,7 +387,17 @@ class AstViewer(QtGui.QMainWindow):
     def search_box_changed(self):
         print("search_box is now '%s'" % self.search_box.text())
 
-        items = self.ast_tree.findItems(
+        if not self.search_box.text():
+            return
+
+        current_tree = self.ast_tree_tabs.currentWidget()
+        print("current tree %s" % current_tree)
+
+        for widget_index in range(self.ast_tree_tabs.count()):
+            widget = self.ast_tree_tabs.widget(widget_index)
+            print( "widget %s ast_tree %s" % (widget, widget.ast_root))
+
+        items = current_tree.findItems(
             self.search_box.text(),
             QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive,
             column=AstTreeWidget.COL_NODE
@@ -395,8 +405,8 @@ class AstViewer(QtGui.QMainWindow):
         print( "Found %d items" % len(items))
         if len(items) > 0:
             print(items[0])
-            self.ast_tree.setCurrentItem(items[0])
-            self.ast_tree.expandItem(items[0])
+            current_tree.setCurrentItem(items[0])
+            current_tree.expandItem(items[0])
 
 
 
