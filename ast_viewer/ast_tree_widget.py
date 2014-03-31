@@ -1,11 +1,13 @@
 __author__ = 'Chick Markley'
 
-from PySide import QtGui, QtCore
 import types
 import ast
 import copy
 
-from ast_viewer.transformers import NodeTransformerManager
+from PySide import QtGui, QtCore
+
+from ast_viewer.models.transformers import NodeTransformerManager
+
 
 DEBUGGING = False
 

@@ -1,8 +1,9 @@
 import unittest
-
 import ast
+
 from nose.tools import assert_greater, assert_is_instance
-from ast_viewer.transformers import NodeTransformerManager
+
+from ast_viewer.models.transformers import NodeTransformerManager
 
 
 class NodeTransformerSubclass(ast.NodeTransformer):

@@ -1,5 +1,8 @@
 .pydevproject
 .project
 .idea
+
+*pyc
+
 build
 test_progs
