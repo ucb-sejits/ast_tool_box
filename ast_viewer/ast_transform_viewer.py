@@ -2,20 +2,39 @@ from __future__ import print_function
 
 __author__ = 'Chick Markley'
 
-from PySide import QtCore, QtGui
+from PySide import QtGui
 from ast_viewer.transformers import NodeTransformerManager
-import copy
+
 
 class AstTransformViewer(QtGui.QGroupBox):
     def __init__(self, parent):
         super(AstTransformViewer, self).__init__("Available Transforms")
 
         self.parent_viewer = parent
+
+        self.last_used_directory = "."
+
         layout = QtGui.QVBoxLayout()
+
+        button_box = QtGui.QGroupBox()
+        button_layout = QtGui.QHBoxLayout()
+        go_button = QtGui.QPushButton("Apply")
+        go_button.clicked.connect(self.go)
+
+        open_button = QtGui.QPushButton("Load More")
+        open_button.clicked.connect(self.load)
+
+        button_layout.addWidget(open_button)
+        button_layout.addWidget(go_button)
+
+        button_box.setLayout(button_layout)
+
+        layout.addWidget(button_box)
 
         self.transform_list = QtGui.QListWidget()
         self.transformers = NodeTransformerManager()
-        self.transformers.get_node_transformers('ctree.transformations')
+        self.transformers.get_node_transformers(''
+                                                'ctree.transformations')
 
         for transform_name in self.transformers:
             self.transform_list.addItem(
@@ -24,10 +43,6 @@ class AstTransformViewer(QtGui.QGroupBox):
         self.transform_list.doubleClicked.connect(self.go)
 
         layout.addWidget(self.transform_list)
-
-        go_button = QtGui.QPushButton("Go")
-        go_button.clicked.connect(self.go)
-        layout.addWidget(go_button)
 
         self.setLayout(layout)
 
@@ -38,6 +53,15 @@ class AstTransformViewer(QtGui.QGroupBox):
         transformer = self.transformers.get_instance(current_item.text())
 
         self.parent_viewer.add_tree_tab(name=current_item.text(), transformer=transformer)
+
+    def load(self):
+        file_name, _ = QtGui.QFileDialog.getOpenFileName(
+            self,
+            "Open File",
+            '',
+            "Python Files (*.py);;All Files (*)"
+        )
+        # self.transformers.get_node_transformers()
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
