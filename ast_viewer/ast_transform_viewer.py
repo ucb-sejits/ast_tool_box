@@ -36,9 +36,9 @@ class AstTransformViewer(QtGui.QGroupBox):
         self.transformers.get_node_transformers(''
                                                 'ctree.transformations')
 
-        for transform_name in self.transformers:
+        for transformer in self.transformers:
             self.transform_list.addItem(
-                QtGui.QListWidgetItem(transform_name)
+                QtGui.QListWidgetItem(transformer.name())
             )
         self.transform_list.doubleClicked.connect(self.go)
 
@@ -50,7 +50,7 @@ class AstTransformViewer(QtGui.QGroupBox):
         current_item = self.transform_list.currentItem()
         print(current_item.text())
 
-        transformer = self.transformers.get_instance(current_item.text())
+        transformer = self.transformers.get_instance_by_name(current_item.text())
 
         self.parent_viewer.add_tree_tab(name=current_item.text(), transformer=transformer)
 
