@@ -6,7 +6,7 @@ import copy
 
 from PySide import QtGui, QtCore
 
-from ast_viewer.models.transformers import NodeTransformerManager
+from ast_viewer.models.node_transformers import NodeTransformerManager
 
 
 DEBUGGING = False

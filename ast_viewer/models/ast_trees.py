@@ -6,7 +6,7 @@ import ast
 import inspect
 import copy
 
-class AstTrees(object):
+class AstTreeManager(object):
     def __init__(self):
         self.ast_trees = []
 

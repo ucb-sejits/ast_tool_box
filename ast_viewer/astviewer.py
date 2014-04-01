@@ -17,11 +17,14 @@ from ast_viewer.ast_tree_widget import AstTreeWidget
 from ast_viewer.ast_tree_tabs import AstTreeTabs
 from ast_viewer.ast_transform_viewer import AstTransformViewer
 
+from ast_viewer.models.ast_trees import AstTreeManager
+from ast_viewer.models.node_transformers import NodeTransformerManager
+
 logger = logging.getLogger(__name__)
 
 DEBUGGING = False
 
-PROGRAM_NAME = 'astview'
+PROGRAM_NAME = 'AST Toolkit'
 PROGRAM_VERSION = '1.0.0'
 ABOUT_MESSAGE = u"""
 %(prog)s version %(version)s
@@ -112,24 +115,15 @@ class AstViewer(QtGui.QMainWindow):
         if mode not in valid_modes:
             raise ValueError("Mode must be one of: {}".format(valid_modes))
 
-        # default references to later instantiated stuff
-        self.ast_tree = None
-
         # Models
-        self._file_name = '<source>'
-        self._source_code = source_code
-        self._mode = mode
+        self.ast_trees = AstTreeManager()
+        self.transformers = NodeTransformerManager()
 
         # Views
         self._setup_actions()
         self._setup_menu()
         self._setup_views()
         self.setWindowTitle('{}'.format(PROGRAM_NAME))
-
-        # Update views
-        self.col_field_action.setChecked(False)
-        self.col_class_action.setChecked(False)
-        self.col_value_action.setChecked(False)
 
         if file_name and source_code:
             logger.warn("Both the file_name and source_code are defined: source_code ignored.")
