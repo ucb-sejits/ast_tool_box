@@ -9,11 +9,20 @@ class IdentityTransform(ast.NodeTransformer):
 
 
 class NoisyIdentityTransform(ast.NodeTransformer):
-    def __init__(self, func):
+    def __init__(self):
         super(NoisyIdentityTransform, self).__init__()
+
+    def visit(self, node):
+        print("node %s" % node)
+        return super(NoisyIdentityTransform, self).visit(node)
+
+
+class LambdaIdentityTransform(ast.NodeTransformer):
+    def __init__(self, func):
+        super(LambdaIdentityTransform, self).__init__()
         self.lambda_func = func
 
     def visit(self, node):
-        self.func(node)
-        super(NoisyIdentityTransform, self).visit(node)
+        self.lambda_func(node)
+        return super(LambdaIdentityTransform, self).visit(node)
 
