@@ -6,7 +6,7 @@ import ast
 import copy
 
 
-class NodeTransformerManager(object):
+class AstTransformerManager(object):
     """
     manage the list of all transformer items that have been discovered.  items
     are all subclasses of ast.NodeTransformer
@@ -20,7 +20,7 @@ class NodeTransformerManager(object):
         """return current transformers"""
         return len(self.transformer_items)
 
-    def get_node_transformers(self, module_name):
+    def get_ast_transformers(self, module_name):
         """Use module_name to discover some transformers"""
 
         try:
@@ -33,7 +33,7 @@ class NodeTransformerManager(object):
         """rebuild list of all in memory subclasses of ast.NodeTransformer"""
 
         self.transformer_items = map(
-            lambda transformer: NodeTransformerItem(transformer),
+            lambda transformer: AstTransformerItem(transformer),
             ast.NodeTransformer.__subclasses__()
         )
 
@@ -49,12 +49,12 @@ class NodeTransformerManager(object):
         return iter(self.transformer_items)
 
 if __name__ == '__main__':
-    ntm = NodeTransformerManager()
+    ntm = AstTransformerManager()
 
-    ntm.get_node_transformers('ctree.transformations')
+    ntm.get_ast_transformers('ctree.transformations')
 
 
-class NodeTransformerItem(object):
+class AstTransformerItem(object):
     """
     Basic wrapper of an ast.NodeTransformer with convenience methods
     for creating, getting names etc

@@ -3,11 +3,11 @@ from __future__ import print_function
 __author__ = 'Chick Markley'
 
 from PySide import QtGui
-from ast_viewer.models.node_transformers import NodeTransformerManager
+from ast_viewer.models.node_transformer_manager import AstTransformerManager
 
 
 class AstTransformViewer(QtGui.QGroupBox):
-    def __init__(self, parent):
+    def __init__(self, parent, tree_transform_controller):
         super(AstTransformViewer, self).__init__("Available Transforms")
 
         self.parent_viewer = parent
@@ -32,8 +32,8 @@ class AstTransformViewer(QtGui.QGroupBox):
         layout.addWidget(button_box)
 
         self.transform_list = QtGui.QListWidget()
-        self.transformers = NodeTransformerManager()
-        self.transformers.get_node_transformers(''
+        self.transformers = AstTransformerManager()
+        self.transformers.get_ast_transformers(''
                                                 'ctree.transformations')
 
         for transformer in self.transformers:
@@ -61,7 +61,7 @@ class AstTransformViewer(QtGui.QGroupBox):
             '',
             "Python Files (*.py);;All Files (*)"
         )
-        # self.transformers.get_node_transformers()
+        # self.transformers.get_ast_transformers()
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)

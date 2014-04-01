@@ -6,7 +6,7 @@ import copy
 
 from PySide import QtGui, QtCore
 
-from ast_viewer.models.node_transformers import NodeTransformerManager
+from ast_viewer.models.node_transformer_manager import AstTransformerManager
 
 
 DEBUGGING = False
@@ -51,8 +51,8 @@ class AstTreeWidget(QtGui.QTreeWidget):
         self.header().resizeSection(AstTreeWidget.COL_NODE, 800)
         self.header().setStretchLastSection(True)
 
-        self.node_transformers = NodeTransformerManager()
-        self.node_transformers.get_node_transformers('ctree.transformations')
+        self.ast_transformers = AstTransformerManager()
+        self.ast_transformers.get_ast_transformers('ctree.transformations')
 
         self.transform_signal = QtCore.Signal(int)
 
@@ -82,7 +82,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
         sub_menu = QtGui.QMenu(self)
         sub_menu.setTitle("Available transformers")
-        for transformer_name in self.node_transformers.all_transformers_by_name:
+        for transformer_name in self.ast_transformers.all_transformers_by_name:
             sub_menu_action = TransformerAction(transformer_name, self)
             sub_menu.addAction(sub_menu_action)
         menu.addMenu(sub_menu)
@@ -90,7 +90,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
         menu.exec_(event.globalPos())
 
     def transform_current_ast(self, name):
-        transformer = self.node_transformers.get_instance(name)
+        transformer = self.ast_transformers.get_instance(name)
         new_ast = copy.deepcopy(self.ast_root)
         transformer.visit(new_ast)
         self.parent_viewer.add_tree_tab(new_ast)

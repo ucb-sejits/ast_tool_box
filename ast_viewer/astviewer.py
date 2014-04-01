@@ -7,18 +7,21 @@ import sys
 import logging
 import ast
 import traceback
-import ast_viewer
 import copy
 
 from PySide import QtCore, QtGui
 
-from ast_viewer.search_widget import SearchLineEdit
-from ast_viewer.ast_tree_widget import AstTreeWidget
-from ast_viewer.ast_tree_tabs import AstTreeTabs
-from ast_viewer.ast_transform_viewer import AstTransformViewer
+import ast_viewer
+from ast_viewer.views.search_widget import SearchLineEdit
+from ast_viewer.views.ast_tree_widget import AstTreeWidget
+from ast_viewer.views.ast_tree_tabs import AstTreeTabs
+from ast_viewer.views.ast_transform_viewer import AstTransformViewer
 
-from ast_viewer.models.ast_trees import AstTreeManager
-from ast_viewer.models.node_transformers import NodeTransformerManager
+from ast_viewer.models.ast_tree_manager import AstTreeManager
+from ast_viewer.models.node_transformer_manager import AstTransformerManager
+
+from ast_viewer.controllers.tree_transform_controller import TreeTransformController
+
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +91,7 @@ class AstViewer(QtGui.QMainWindow):
     """ The main application.
     """
 
-    def __init__(self, file_name='', source_code='', mode='exec',
+    def __init__(self, file_names=[], mode='exec',
                  width=None, height=None):
         """ Constructor
             
@@ -114,24 +117,21 @@ class AstViewer(QtGui.QMainWindow):
         valid_modes = ['exec', 'eval', 'single']
         if mode not in valid_modes:
             raise ValueError("Mode must be one of: {}".format(valid_modes))
+        self._mode = mode
 
-        # Models
-        self.ast_trees = AstTreeManager()
-        self.transformers = NodeTransformerManager()
+        # Controllers
+        self.tree_transform_controller = TreeTransformController()
 
         # Views
+        self.ast_tree_tabs = AstTreeTabs(self, self.tree_transform_controller)
+        self.ast_transform_viewer = AstTransformViewer(self, self.tree_transform_controller)
+
         self._setup_actions()
         self._setup_menu()
         self._setup_views()
         self.setWindowTitle('{}'.format(PROGRAM_NAME))
 
-        if file_name and source_code:
-            logger.warn("Both the file_name and source_code are defined: source_code ignored.")
-
-        if not file_name and not source_code:
-            file_name = self._get_file_name_from_dialog()
-
-        self._update_widgets(file_name)
+        self._update_widgets(file_names[0])
 
         if width and height:
             self.resize(width, height)
@@ -305,13 +305,6 @@ class AstViewer(QtGui.QMainWindow):
             msg = "Unable to open file: {}".format(file_name)
             logger.warn(msg)
             QtGui.QMessageBox.warning(self, 'error', msg)
-
-    def _fill_ast_tree_widget(self):
-        """
-        Populates the tree widget.
-        """
-        syntax_tree = ast.parse(self._source_code, filename=self._file_name, mode=self._mode)
-        self.ast_tree.make_tree_from(syntax_tree)
 
     def add_tree_tab(self, ast_tree=None, transformer=None, name=None):
         """

@@ -5,8 +5,8 @@ import inspect
 from nose.tools import assert_greater, assert_is_instance, assert_equal, assert_not_equal
 from nose.tools import assert_is_none, assert_is_not_none
 
-from ast_viewer.models.ast_trees import AstTreeItem, AstLink, AstTreeManager
-from ast_viewer.models.node_transformers import NodeTransformerItem
+from ast_viewer.models.ast_tree_manager import AstTreeItem, AstLink, AstTreeManager
+from ast_viewer.models.node_transformer_manager import AstTransformerItem
 from ast_viewer.transformers.identity_transform import NoisyIdentityTransform, IdentityTransform
 
 
@@ -21,7 +21,7 @@ class TestAstTrees(unittest.TestCase):
         assert_equal(trees.count(), 1)
         assert_is_not_none(test_ast)
 
-        ti = NodeTransformerItem(NoisyIdentityTransform)
+        ti = AstTransformerItem(NoisyIdentityTransform)
         trees.create_transformed_child(test_ast, ast_transform_item=ti)
 
         assert_equal(trees.count(), 2)

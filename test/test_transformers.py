@@ -4,21 +4,21 @@ import inspect
 
 from nose.tools import assert_greater, assert_is_instance, assert_equal, assert_not_equal
 
-from ast_viewer.models.node_transformers import NodeTransformerManager
-from ast_viewer.models.node_transformers import NodeTransformerItem
+from ast_viewer.models.node_transformer_manager import AstTransformerManager
+from ast_viewer.models.node_transformer_manager import AstTransformerItem
 from ast_viewer.transformers.identity_transform import NoisyIdentityTransform, IdentityTransform
 
 
 class TestTransformers(unittest.TestCase):
     def test_basic_load(self):
-        ntm = NodeTransformerManager()
-        ntm.get_node_transformers("ast_viewer.transformers.identity_transform")
+        ntm = AstTransformerManager()
+        ntm.get_ast_transformers("ast_viewer.transformers.identity_transform")
         ntm.reload()
 
         assert_greater(ntm.count(), 0)
 
     def test_get_transformer(self):
-        ntm = NodeTransformerManager()
+        ntm = AstTransformerManager()
         ntm.reload()
 
         ntsc = ntm.get_instance_by_name('IdentityTransform')
@@ -28,13 +28,13 @@ class TestTransformers(unittest.TestCase):
 
 class TestTransformerItems(unittest.TestCase):
     def test_basics(self):
-        nti = NodeTransformerItem(IdentityTransform)
+        nti = AstTransformerItem(IdentityTransform)
 
         assert_equal(nti.name(), "IdentityTransform")
         assert_equal(nti.package(), "ast_viewer.transformers.identity_transform")
 
     def test_no_arg_transformer(self):
-        nti = NodeTransformerItem(IdentityTransform)
+        nti = AstTransformerItem(IdentityTransform)
 
         nodes_visited = []
         tree = ast.parse(inspect.getsource(sample_code))
@@ -49,7 +49,7 @@ class TestTransformerItems(unittest.TestCase):
         transformers that require them
         """
         pass
-        # nti = NodeTransformerItem(IdentityTransform)
+        # nti = AstTransformerItem(IdentityTransform)
         #
         # nodes_visited = []
         # tree = ast.parse(inspect.getsource(sample_code))
