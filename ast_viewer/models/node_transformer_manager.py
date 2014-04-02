@@ -16,9 +16,16 @@ class AstTransformerManager(object):
         self.transformer_items = []
         self.transformers_by_name = {}
 
+    def clear(self):
+        self.transformer_items = []
+        self.transformers_by_name = {}
+
     def count(self):
         """return current transformers"""
         return len(self.transformer_items)
+
+    def __getitem__(self, item):
+        return self.transformer_items[item]
 
     def get_ast_transformers(self, module_name):
         """Use module_name to discover some transformers"""

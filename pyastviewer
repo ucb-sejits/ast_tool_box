@@ -43,7 +43,7 @@ def main():
     astviewer.logging_basic_config(args.log_level.upper())
 
     logger.info('Started {}'.format(astviewer.PROGRAM_NAME))
-    exit_code = astviewer.view(file_names = [args.file_name], mode = args.mode,
+    exit_code = astviewer.view(file_name=args.file_name, mode = args.mode,
                                width=1100, height=800)
     logging.info('Done {}'.format(astviewer.PROGRAM_NAME))
     sys.exit(exit_code)

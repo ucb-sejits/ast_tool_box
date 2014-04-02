@@ -10,8 +10,14 @@ class AstTreeManager(object):
     def __init__(self):
         self.ast_trees = []
 
+    def clear(self):
+        self.ast_trees = []
+
     def count(self):
         return len(self.ast_trees)
+
+    def __getitem__(self, item):
+        return self.ast_trees[item]
 
     def __iter__(self):
         return iter(self.ast_trees)
@@ -19,6 +25,7 @@ class AstTreeManager(object):
     def create_transformed_child(self, ast_tree_item, ast_transform_item=None):
         child_ast_tree = copy.deepcopy(ast_tree_item.ast_tree)
         if ast_transform_item:
+            print("child ast tree %s" % child_ast_tree)
             ast_transform_item.transform_in_place(child_ast_tree)
         new_ast_tree_item = AstTreeItem(child_ast_tree, parent_link=ast_tree_item)
 
@@ -56,8 +63,8 @@ class AstTreeItem(object):
     @staticmethod
     def from_file(file_name):
         with open(file_name, "r") as file_handle:
-            source = file_handle.read()
-            return AstTreeItem(source, file_name=file_name)
+            source_text = file_handle.read()
+            return AstTreeItem(ast.parse(source_text), source_text, file_name=file_name)
         return None
 
 

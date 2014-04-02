@@ -17,9 +17,6 @@ from ast_viewer.views.ast_tree_widget import AstTreeWidget
 from ast_viewer.views.ast_tree_tabs import AstTreeTabs
 from ast_viewer.views.ast_transform_viewer import AstTransformViewer
 
-from ast_viewer.models.ast_tree_manager import AstTreeManager
-from ast_viewer.models.node_transformer_manager import AstTransformerManager
-
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
 
 
@@ -91,7 +88,7 @@ class AstViewer(QtGui.QMainWindow):
     """ The main application.
     """
 
-    def __init__(self, file_names=[], mode='exec',
+    def __init__(self, file_name=None, mode='exec',
                  width=None, height=None):
         """ Constructor
             
@@ -121,6 +118,7 @@ class AstViewer(QtGui.QMainWindow):
 
         # Controllers
         self.tree_transform_controller = TreeTransformController()
+        self.tree_transform_controller.ast_tree_manager.new_item_from_file(file_name)
 
         # Views
         self.ast_tree_tabs = AstTreeTabs(self, self.tree_transform_controller)
@@ -130,8 +128,6 @@ class AstViewer(QtGui.QMainWindow):
         self._setup_menu()
         self._setup_views()
         self.setWindowTitle('{}'.format(PROGRAM_NAME))
-
-        self._update_widgets(file_names[0])
 
         if width and height:
             self.resize(width, height)
@@ -206,26 +202,11 @@ class AstViewer(QtGui.QMainWindow):
         central_splitter.setLayout(central_layout)
 
         # Create base tree widget
-        self.ast_tree_tabs = AstTreeTabs(self)
-        self.ast_tree = AstTreeWidget(self)
-        self.ast_tree_tabs.addTab(self.ast_tree, "Base Tree")
         central_layout.addWidget(self.ast_tree_tabs)
 
-        # Editor widget
-        font = QtGui.QFont()
-        font.setFamily('Courier')
-        font.setFixedPitch(True)
-        font.setPointSize(13)
-
-        self.editor = QtGui.QPlainTextEdit()
-        self.editor.setReadOnly(True)
-        self.editor.setFont(font)
-        self.editor.setWordWrapMode(QtGui.QTextOption.NoWrap)
-        self.editor.setStyleSheet("selection-color: black; selection-background-color: yellow;")
         # central_layout.addWidget(self.editor)
 
-        self.transform_list = AstTransformViewer(self)
-        central_layout.addWidget(self.transform_list)
+        central_layout.addWidget(self.ast_transform_viewer)
 
         # Splitter parameters
         central_splitter.setCollapsible(0, False)
@@ -235,15 +216,11 @@ class AstViewer(QtGui.QMainWindow):
         central_splitter.setStretchFactor(1, 0.5)
 
         # Connect signals
-        assert self.ast_tree.currentItemChanged.connect(self.highlight_node)
+        # assert self.ast_tree.currentItemChanged.connect(self.highlight_node)
 
 
     def new_file(self):
         """ Clears the widgets """
-        self._file_name = ""
-        self._source_code = ""
-        self.editor.clear()
-        # self._fill_ast_tree_widget()
         self.ast_tree.make_tree_from()
 
 
@@ -271,7 +248,7 @@ class AstViewer(QtGui.QMainWindow):
             self._load_file(file_name)
 
         self.setWindowTitle('{} - {}'.format(PROGRAM_NAME, self._file_name))
-        self.editor.setPlainText(self._source_code)
+        # self.editor.setPlainText(self._source_code)
 
         try:
             self._fill_ast_tree_widget()
@@ -286,7 +263,8 @@ class AstViewer(QtGui.QMainWindow):
                 QtGui.QMessageBox.warning(self, 'error', msg)
 
     def _load_file(self, file_name):
-        """ Opens a file and sets self._file_name and self._source code if successful
+        """
+        Opens a file and sets self._file_name and self._source code if successful
         """
         logger.debug("Opening {!r}".format(file_name))
 
