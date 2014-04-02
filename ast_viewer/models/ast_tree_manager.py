@@ -47,11 +47,12 @@ class AstTreeItem(object):
     """
     represent an ast and where it came from
     """
-    def __init__(self, ast_tree, parent_link=None, source=None, file_name=None):
+    def __init__(self, ast_tree, parent_link=None, source=None, file_name=None, name=None):
         self.ast_tree = ast_tree
         self.parent_link = parent_link
         self.source = source
         self.file_name = file_name
+        self.name = name if name else "Derived"
 
     def get_parent_link(self):
         return self.parent_link

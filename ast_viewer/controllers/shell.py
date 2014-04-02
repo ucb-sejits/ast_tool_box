@@ -5,8 +5,6 @@ an AST
 from __future__ import print_function
 
 import readline
-import time
-import argparse
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
 
 
@@ -21,9 +19,24 @@ class AstTransformInterpreter(object):
         self.controller.clear()
         pass
 
+    def show_ast(self, index):
+        def show_parents_links(current_ast_item):
+            link = current_ast_item.parent_link
+            print("link %s" % link)
+            if link:
+                show_parents_links(link.parent_ast_tree)
+                print(
+                    "derived from item %s transform %s" %
+                    (link.parent_ast_tree.name, link.tranform_item.name)
+                )
+        ast_item = self.controller.ast_tree_manager[index]
+        print("ast[%d]: %s %s" % (index, ast_item.name, ast_item.ast_tree))
+        show_parents_links(ast_item)
+
     def show_asts(self):
         for index, ast_tree_item in enumerate(self.controller.ast_tree_manager):
-            print("Ast[%d]: %s" % (index, ast_tree_item))
+            #print("Ast[%d]: %s" % (index, ast_tree_item))
+            self.show_ast(index)
 
     def ast_command(self, command):
         fields = command.split()
@@ -31,6 +44,14 @@ class AstTransformInterpreter(object):
             self.show_asts()
         elif fields[1].startswith("cle"):
             self.controller.ast_tree_manager.clear()
+        elif fields[1].startswith("sho"):
+            try:
+                index = int(fields[2])
+                from ctree.visual.dot_manager import DotManager
+                print("calling open")
+                DotManager.dot_ast_to_browser(self.controller.ast_tree_manager[index].ast_tree, "tree.png")
+            except IOError as e:
+                print("ast show requires numeric index of ast")
         else:
             print("unknown ast command")
 
@@ -108,31 +129,3 @@ class AstTransformInterpreter(object):
             else:
                 print("unknown command: %s" % user_input)
             last_input = user_input
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="AST Transform interpreter")
-    parser.add_argument(
-        '-i', '--interactive', help='interactive mode, allows direct communication with device', action="store_true"
-    )
-    parser.add_argument('-f', '--file', help='path to python source file')
-    parser.add_argument('-v', '--verbose', help='show more debug than you like', action="store_true")
-
-    args = parser.parse_args()
-
-    if not args.port:
-        usb_port_name = AstTransformInterpreter.guess_port()
-        print("Using port %s" % usb_port_name)
-    else:
-        usb_port_name = args.port
-
-    watt_reader = AstTransformInterpreter(args.file, verbose=False)
-
-    if args.verbose:
-        watt_reader.set_verbose(True)
-    if args.clear:
-        watt_reader.drain()
-
-    if args.interactive:
-        watt_reader.interactive_mode()
-    else:
-        parser.print_usage()
