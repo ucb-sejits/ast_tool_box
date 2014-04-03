@@ -22,12 +22,29 @@ class AstTreeManager(object):
     def __iter__(self):
         return iter(self.ast_trees)
 
+    def get_valid_index(self, index):
+        """
+        convenience method for checking index,
+        if index is a string it will be converted to int
+        None returned if failed to convert or index out of range
+        """
+        if not isinstance(index, int):
+            try:
+                index = int(index)
+            except:
+                return None
+
+        if index >= 0:
+            if index < len(self.ast_trees):
+                return index
+        return None
+
     def create_transformed_child(self, ast_tree_item, ast_transform_item=None):
         child_ast_tree = copy.deepcopy(ast_tree_item.ast_tree)
         if ast_transform_item:
-            print("child ast tree %s" % child_ast_tree)
             ast_transform_item.transform_in_place(child_ast_tree)
-        new_ast_tree_item = AstTreeItem(child_ast_tree, parent_link=ast_tree_item)
+        link = AstLink(parent_ast_tree=ast_tree_item, transform_item=ast_transform_item)
+        new_ast_tree_item = AstTreeItem(child_ast_tree, parent_link=link)
 
         self.ast_trees.append(new_ast_tree_item)
         return new_ast_tree_item
@@ -42,6 +59,22 @@ class AstTreeManager(object):
         self.ast_trees.append(new_ast_item)
         return new_ast_item
 
+    def delete(self, ast_tree_item):
+        """
+        delete an ast tree from manager
+        ast_tree_item can be AstTreeItem or index or string
+        representing index
+        """
+        if isinstance(ast_tree_item, AstTreeItem):
+            self.ast_trees.remove(ast_tree_item)
+            return True
+        else:
+            index = self.get_valid_index(ast_tree_item)
+            if index:
+                self.ast_trees.remove(self.ast_trees[index])
+                return True
+        return False
+
 
 class AstTreeItem(object):
     """
@@ -52,10 +85,7 @@ class AstTreeItem(object):
         self.parent_link = parent_link
         self.source = source
         self.file_name = file_name
-        self.name = name if name else "Derived"
-
-    def get_parent_link(self):
-        return self.parent_link
+        self.name = name if name else file_name if file_name else "Derived"
 
     @staticmethod
     def from_source(source_text):
@@ -65,7 +95,7 @@ class AstTreeItem(object):
     def from_file(file_name):
         with open(file_name, "r") as file_handle:
             source_text = file_handle.read()
-            return AstTreeItem(ast.parse(source_text), source_text, file_name=file_name)
+            return AstTreeItem(ast.parse(source_text), source=source_text, file_name=file_name)
         return None
 
 

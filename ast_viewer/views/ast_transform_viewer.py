@@ -3,7 +3,7 @@ from __future__ import print_function
 __author__ = 'Chick Markley'
 
 from PySide import QtGui
-from ast_viewer.models.node_transformer_manager import AstTransformerManager
+from ast_viewer.models.ast_transformer_manager import AstTransformerManager
 
 
 class AstTransformViewer(QtGui.QGroupBox):

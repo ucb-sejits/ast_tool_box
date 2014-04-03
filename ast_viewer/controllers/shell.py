@@ -1,10 +1,20 @@
 """
-basic shell that allows for application of node_transformer and code serializers to be applied to
+basic shell that allows for application of ast_transformer and code serializers to be applied to
 an AST
 """
 from __future__ import print_function
 
+import os
 import readline
+import atexit
+history_file = os.path.join(os.path.expanduser("~"), ".ast_viewer_hist")
+try:
+    readline.read_history_file(history_file)
+except IOError:
+    pass
+atexit.register(readline.write_history_file, history_file)
+del os, history_file
+
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
 
 
@@ -13,22 +23,23 @@ class AstTransformInterpreter(object):
         self.verbose = verbose
         self.controller = TreeTransformController()
         self.controller.ast_tree_manager.new_item_from_file(file_name)
-        self.controller.node_transformer_manager.get_ast_transformers("ctree.transformations")
+        self.controller.ast_transformer_manager.get_ast_transformers("ctree.transformations")
 
     def clear(self):
+        """delete all trees and transforms"""
         self.controller.clear()
         pass
 
     def show_ast(self, index):
         def show_parents_links(current_ast_item):
             link = current_ast_item.parent_link
-            print("link %s" % link)
             if link:
                 show_parents_links(link.parent_ast_tree)
                 print(
                     "derived from item %s transform %s" %
-                    (link.parent_ast_tree.name, link.tranform_item.name)
+                    (link.parent_ast_tree.name, link.transform_item.name)
                 )
+
         ast_item = self.controller.ast_tree_manager[index]
         print("ast[%d]: %s %s" % (index, ast_item.name, ast_item.ast_tree))
         show_parents_links(ast_item)
@@ -38,10 +49,18 @@ class AstTransformInterpreter(object):
             #print("Ast[%d]: %s" % (index, ast_tree_item))
             self.show_ast(index)
 
+    def delete_ast(self, tree_item):
+        return self.controller.ast_tree_manager.delete(tree_item)
+
     def ast_command(self, command):
         fields = command.split()
         if len(fields) < 2 or fields[1].startswith("list"):
             self.show_asts()
+        elif fields[1].startswith("del"):
+            if len(fields) > 2 and self.delete_ast(fields[2]):
+                pass
+            else:
+                print("error: delete command must specify index of tree to delete")
         elif fields[1].startswith("cle"):
             self.controller.ast_tree_manager.clear()
         elif fields[1].startswith("sho"):
@@ -56,7 +75,7 @@ class AstTransformInterpreter(object):
             print("unknown ast command")
 
     def show_transforms(self):
-        for index, transformer_item in enumerate(self.controller.node_transformer_manager):
+        for index, transformer_item in enumerate(self.controller.ast_transformer_manager):
             print("transform[%d]: %s" % (index, transformer_item))
 
     def transform_command(self, command):
@@ -64,7 +83,7 @@ class AstTransformInterpreter(object):
         if len(fields) < 2 or fields[1].startswith("list"):
             self.show_transforms()
         elif fields[1].startswith("cle"):
-            self.controller.node_transformer_manager.clear()
+            self.controller.ast_transformer_manager.clear()
         else:
             print("unknown ast command")
 
@@ -74,10 +93,7 @@ class AstTransformInterpreter(object):
         ast_index = int(fields[1])
         transform_index = int(fields[2])
 
-        self.controller.ast_tree_manager.create_transformed_child(
-            self.controller.ast_tree_manager[ast_index],
-            self.controller.node_transformer_manager[transform_index]
-        )
+        self.controller.apply_transform(ast_index, transform_index)
         self.show_asts()
         # except Exception as e:
         #     print("command must have ast_index then transform_index %s" % e.message)

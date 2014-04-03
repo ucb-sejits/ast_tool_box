@@ -4,8 +4,8 @@ import inspect
 
 from nose.tools import assert_greater, assert_is_instance, assert_equal, assert_not_equal
 
-from ast_viewer.models.node_transformer_manager import AstTransformerManager
-from ast_viewer.models.node_transformer_manager import AstTransformerItem
+from ast_viewer.models.ast_transformer_manager import AstTransformerManager
+from ast_viewer.models.ast_transformer_manager import AstTransformerItem
 from ast_viewer.transformers.identity_transform import NoisyIdentityTransform, IdentityTransform
 
 

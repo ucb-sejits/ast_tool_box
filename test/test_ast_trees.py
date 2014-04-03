@@ -6,7 +6,7 @@ from nose.tools import assert_greater, assert_is_instance, assert_equal, assert_
 from nose.tools import assert_is_none, assert_is_not_none
 
 from ast_viewer.models.ast_tree_manager import AstTreeItem, AstLink, AstTreeManager
-from ast_viewer.models.node_transformer_manager import AstTransformerItem
+from ast_viewer.models.ast_transformer_manager import AstTransformerItem
 from ast_viewer.transformers.identity_transform import NoisyIdentityTransform, IdentityTransform
 
 
