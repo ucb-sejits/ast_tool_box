@@ -28,3 +28,6 @@ class TreeTransformController(object):
             tree, transform, name=name
         )
         return new_ast_tree
+
+    def load_transformers(self, key):
+        self.ast_transformer_manager.load_transformers(key)

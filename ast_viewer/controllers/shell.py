@@ -84,6 +84,12 @@ class AstTransformInterpreter(object):
             self.show_transforms()
         elif fields[1].startswith("cle"):
             self.controller.ast_transformer_manager.clear()
+        elif fields[1].startswith("load"):
+            if len(fields) > 2:
+                key = fields[2]
+                self.controller.load_transformers(key)
+            else:
+                print("transform load must specify filename")
         else:
             print("unknown transform command")
 

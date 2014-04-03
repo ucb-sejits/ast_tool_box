@@ -72,6 +72,17 @@ class AstTransformerManager(object):
     def __iter__(self):
         return iter(self.transformer_items)
 
+    def load_transformers_by_file_name(self, file_name):
+        pass
+
+    def load_transformers(self, key):
+        if key.endswith(".py"):
+
+            package_fields = key.split(".")
+            if len(package_fields) > 0:
+                self.get_ast_transformers(key)
+
+
 if __name__ == '__main__':
     ntm = AstTransformerManager()
 
