@@ -70,7 +70,7 @@ class AstTransformInterpreter(object):
                 print("calling open")
                 DotManager.dot_ast_to_browser(self.controller.ast_tree_manager[index].ast_tree, "tree%d.png" % index)
             except IOError as e:
-                print("ast show requires numeric index of ast")
+                print("ast show requires numeric index of ast, msg %s" % e.message)
         else:
             print("unknown ast command")
 
@@ -123,7 +123,6 @@ class AstTransformInterpreter(object):
         readline.parse_and_bind('tab: complete')
         readline.parse_and_bind('set editing-mode vi')
 
-        last_input = None
         while True:
             # print("Command: ", end="")
             # user_input = sys.stdin.readline()
@@ -147,4 +146,3 @@ class AstTransformInterpreter(object):
                 self.verbose = not self.verbose
             else:
                 print("unknown command: %s" % user_input)
-            last_input = user_input
