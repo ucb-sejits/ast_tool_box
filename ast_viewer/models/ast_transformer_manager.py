@@ -2,8 +2,10 @@ from __future__ import print_function
 
 __author__ = 'Chick Markley'
 
+import sys
 import ast
 import copy
+from ast_viewer.util import Util
 
 
 class AstTransformerManager(object):
@@ -76,11 +78,13 @@ class AstTransformerManager(object):
         pass
 
     def load_transformers(self, key):
-        if key.endswith(".py"):
+        path, package_name = Util.path_to_path_and_package(key)
 
-            package_fields = key.split(".")
-            if len(package_fields) > 0:
-                self.get_ast_transformers(key)
+        if not path in sys.path:
+            sys.path.append(path)
+
+        self.get_ast_transformers(package_name)
+        self.reload()
 
 
 if __name__ == '__main__':
