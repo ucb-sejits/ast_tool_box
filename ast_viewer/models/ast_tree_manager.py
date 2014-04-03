@@ -40,9 +40,10 @@ class AstTreeManager(object):
         return None
 
     def create_transformed_child(self, ast_tree_item, ast_transform_item=None, name=None):
-        child_ast_tree = copy.deepcopy(ast_tree_item.ast_tree)
-        if ast_transform_item:
-            ast_transform_item.transform_in_place(child_ast_tree)
+        # child_ast_tree = copy.deepcopy(ast_tree_item.ast_tree)
+        # if ast_transform_item:
+        #     child_ast_tree = ast_transform_item.transform(child_ast_tree)
+        child_ast_tree = ast_transform_item.copy_and_transform(ast_tree_item.ast_tree)
         link = AstLink(parent_ast_tree=ast_tree_item, transform_item=ast_transform_item)
         new_ast_tree_item = AstTreeItem(child_ast_tree, parent_link=link, name=name)
 

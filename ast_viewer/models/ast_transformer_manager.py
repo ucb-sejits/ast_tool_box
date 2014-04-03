@@ -110,11 +110,12 @@ class AstTransformerItem(object):
     def get_instance(self):
         return self.node_transformer()
 
-    def transform_in_place(self, *args, **kwargs):
+    def transform(self, *args, **kwargs):
         """Transform a tree in place"""
         if args:
             transformer = self.node_transformer(*args[1:], **kwargs)
-            transformer.visit(args[0])
+            return transformer.visit(args[0])
+        return None
 
     def copy_and_transform(self, *args, **kwargs):
         if args:
@@ -122,7 +123,7 @@ class AstTransformerItem(object):
             new_args = [new_ast]
             new_args += args[1:]
 
-            self.transform_in_place(*new_args, **kwargs)
+            new_ast = self.transform(*new_args, **kwargs)
             return new_ast
         return None
 
