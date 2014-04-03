@@ -37,7 +37,7 @@ class AstTransformInterpreter(object):
                 show_parents_links(link.parent_ast_tree)
                 print(
                     "derived from item %s transform %s" %
-                    (link.parent_ast_tree.name, link.transform_item.name)
+                    (link.parent_ast_tree.name, link.transform_item.name())
                 )
 
         ast_item = self.controller.ast_tree_manager[index]
@@ -68,7 +68,7 @@ class AstTransformInterpreter(object):
                 index = int(fields[2])
                 from ctree.visual.dot_manager import DotManager
                 print("calling open")
-                DotManager.dot_ast_to_browser(self.controller.ast_tree_manager[index].ast_tree, "tree.png")
+                DotManager.dot_ast_to_browser(self.controller.ast_tree_manager[index].ast_tree, "tree%d.png" % index)
             except IOError as e:
                 print("ast show requires numeric index of ast")
         else:
@@ -76,7 +76,7 @@ class AstTransformInterpreter(object):
 
     def show_transforms(self):
         for index, transformer_item in enumerate(self.controller.ast_transformer_manager):
-            print("transform[%d]: %s" % (index, transformer_item))
+            print("transform[%d]: %s" % (index, transformer_item.name()))
 
     def transform_command(self, command):
         fields = command.split()
@@ -85,20 +85,23 @@ class AstTransformInterpreter(object):
         elif fields[1].startswith("cle"):
             self.controller.ast_transformer_manager.clear()
         else:
-            print("unknown ast command")
+            print("unknown transform command")
 
     def apply_transform(self, command):
         fields = command.split()
-        # try:
-        ast_index = int(fields[1])
-        transform_index = int(fields[2])
 
-        self.controller.apply_transform(ast_index, transform_index)
-        self.show_asts()
-        # except Exception as e:
-        #     print("command must have ast_index then transform_index %s" % e.message)
-        #     raise e
-        #     return
+        if len(fields) > 2:
+            ast_index = self.controller.ast_tree_manager.get_valid_index(fields[1])
+            transform_index = self.controller.ast_transformer_manager.get_valid_index(fields[2])
+            name = fields[3] if len(fields) > 3 else "Tree %d" % self.controller.ast_tree_manager.count()
+
+            if ast_index is not None and transform_index is not None:
+                self.controller.apply_transform(ast_index, transform_index, name=name)
+                self.show_asts()
+            else:
+                print("apply missing index or index out of range")
+        else:
+            print("apply requires two numeric indices, tree index and transform index")
 
     def set_verbose(self, new_value=None):
         if new_value is None:

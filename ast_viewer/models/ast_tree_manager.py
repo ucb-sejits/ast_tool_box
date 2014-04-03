@@ -3,8 +3,8 @@ from __future__ import print_function
 __author__ = 'Chick Markley'
 
 import ast
-import inspect
 import copy
+
 
 class AstTreeManager(object):
     def __init__(self):
@@ -31,7 +31,7 @@ class AstTreeManager(object):
         if not isinstance(index, int):
             try:
                 index = int(index)
-            except:
+            except ValueError:
                 return None
 
         if index >= 0:
@@ -39,12 +39,12 @@ class AstTreeManager(object):
                 return index
         return None
 
-    def create_transformed_child(self, ast_tree_item, ast_transform_item=None):
+    def create_transformed_child(self, ast_tree_item, ast_transform_item=None, name=None):
         child_ast_tree = copy.deepcopy(ast_tree_item.ast_tree)
         if ast_transform_item:
             ast_transform_item.transform_in_place(child_ast_tree)
         link = AstLink(parent_ast_tree=ast_tree_item, transform_item=ast_transform_item)
-        new_ast_tree_item = AstTreeItem(child_ast_tree, parent_link=link)
+        new_ast_tree_item = AstTreeItem(child_ast_tree, parent_link=link, name=name)
 
         self.ast_trees.append(new_ast_tree_item)
         return new_ast_tree_item

@@ -27,6 +27,23 @@ class AstTransformerManager(object):
     def __getitem__(self, item):
         return self.transformer_items[item]
 
+    def get_valid_index(self, index):
+        """
+        convenience method for checking index
+        if index is a string make it an int
+        None returned if failed to convert or index out of range
+        """
+        if not isinstance(index, int):
+            try:
+                index = int(index)
+            except ValueError:
+                return None
+
+        if index > 0:
+            if index < len(self.transformer_items):
+                return index
+        return None
+
     def get_ast_transformers(self, module_name):
         """Use module_name to discover some transformers"""
 
