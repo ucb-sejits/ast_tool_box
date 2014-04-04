@@ -82,7 +82,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
         sub_menu = QtGui.QMenu(self)
         sub_menu.setTitle("Available transformers")
-        for transformer_name in self.ast_transformers.all_transformers_by_name:
+        for transformer_name in self.ast_transformers.transformers_by_name:
             sub_menu_action = TransformerAction(transformer_name, self)
             sub_menu.addAction(sub_menu_action)
         menu.addMenu(sub_menu)
@@ -132,7 +132,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
             node_item.ast_node = ast_node
 
             if hasattr(ast_node, 'lineno'):
-                position_str = "({:d}:{:d})".format(ast_node.lineno, ast_node.col_offset)
+                position_str = " ({:d}:{:d})".format(ast_node.lineno, ast_node.col_offset)
 
                 # If we find a new position string we set the items found since the last time
                 # to 'old_line : old_col : new_line : new_col' and reset the list
