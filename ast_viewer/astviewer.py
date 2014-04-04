@@ -15,6 +15,7 @@ import ast_viewer
 from ast_viewer.views.search_widget import SearchLineEdit
 from ast_viewer.views.ast_tree_widget import AstTreeWidget
 from ast_viewer.views.ast_tree_tabs import AstTreeTabs
+from ast_viewer.views.ast_tree_tabs import AstTreePane
 from ast_viewer.views.ast_transform_viewer import AstTransformViewer
 
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
@@ -121,7 +122,9 @@ class AstViewer(QtGui.QMainWindow):
         self.tree_transform_controller.ast_tree_manager.new_item_from_file(file_name)
 
         # Views
-        self.ast_tree_tabs = AstTreeTabs(self, self.tree_transform_controller)
+        # self.ast_tree_tabs = AstTreeTabs(self, self.tree_transform_controller)
+        self.ast_tree_pane = AstTreePane(self.tree_transform_controller)
+        self.ast_tree_tabs = self.ast_tree_pane.ast_tree_tabs
         self.ast_transform_viewer = AstTransformViewer(self, self.tree_transform_controller)
 
         self._setup_actions()
@@ -132,13 +135,13 @@ class AstViewer(QtGui.QMainWindow):
         if width and height:
             self.resize(width, height)
 
-        self.tool_bar = self.addToolBar('Exit')
-        self.search_box = SearchLineEdit(
-            QtGui.QPixmap(r"images/search_icon.png"),
-            QtGui.QPixmap(r"images/search_icon.png"),
-            on_changed=self.search_box_changed
-        )
-        self.tool_bar.addWidget(self.search_box)
+        # self.tool_bar = self.addToolBar('Exit')
+        # self.search_box = SearchLineEdit(
+        #     QtGui.QPixmap(r"images/search_icon.png"),
+        #     QtGui.QPixmap(r"images/search_icon.png"),
+        #     on_changed=self.search_box_changed
+        # )
+        # self.tool_bar.addWidget(self.search_box)
         self.search_box.setFocus()
 
     def _setup_actions(self):
@@ -202,7 +205,7 @@ class AstViewer(QtGui.QMainWindow):
         central_splitter.setLayout(central_layout)
 
         # Create base tree widget
-        central_layout.addWidget(self.ast_tree_tabs)
+        central_layout.addWidget(self.ast_tree_pane)
 
         # central_layout.addWidget(self.editor)
 

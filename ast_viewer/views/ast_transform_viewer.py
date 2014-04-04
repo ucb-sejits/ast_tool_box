@@ -4,12 +4,13 @@ __author__ = 'Chick Markley'
 
 from PySide import QtGui
 from ast_viewer.models.ast_transformer_manager import AstTransformerManager
-
+import os
 
 class AstTransformViewer(QtGui.QGroupBox):
     def __init__(self, parent, tree_transform_controller):
         super(AstTransformViewer, self).__init__("Available Transforms")
 
+        self.controller = tree_transform_controller
         self.parent_viewer = parent
 
         self.last_used_directory = "."
@@ -57,11 +58,12 @@ class AstTransformViewer(QtGui.QGroupBox):
     def load(self):
         file_name, _ = QtGui.QFileDialog.getOpenFileName(
             self,
-            "Open File",
-            '',
-            "Python Files (*.py);;All Files (*)"
+            caption="Select a file containing Node Transformers",
+            dir=os.getcwd(),
+            filter="Python Files (*.py);;All Files (*);;"
         )
-        # self.transformers.get_ast_transformers()
+        print("got file_name %s" % file_name)
+        self.controller.load_transformers(file_name)
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
