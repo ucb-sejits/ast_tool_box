@@ -3,11 +3,16 @@ __author__ = 'Chick Markley'
 from PySide import QtGui, QtCore
 
 class SearchLineEdit(QtGui.QLineEdit):
-    def __init__(self, search_pixmap, clear_pixmap, parent=None, on_changed=None):
+    def __init__(self, parent=None, on_changed=None):
         QtGui.QLineEdit.__init__(self, parent)
 
         self.clearButton = QtGui.QToolButton(self)
-        self.clearButton.setIcon(QtGui.QIcon.fromTheme("system-close", fallback=QtGui.QIcon(clear_pixmap)))
+        self.clearButton.setIcon(
+            QtGui.QIcon.fromTheme(
+                "system-close",
+                fallback=QtGui.QIcon(QtGui.QPixmap(r"images/close_icon.png"))
+            )
+        )
         #self.clearButton.setIconSize(clear_pixmap.size())
         self.clearButton.setCursor(QtCore.Qt.ArrowCursor)
         self.clearButton.setStyleSheet("QToolButton { border: none; padding: 0px;}")
@@ -18,7 +23,12 @@ class SearchLineEdit(QtGui.QLineEdit):
             self.textChanged.connect(on_changed)
 
         self.searchButton = QtGui.QToolButton(self)
-        self.searchButton.setIcon(QtGui.QIcon.fromTheme("system-search", fallback=QtGui.QIcon(search_pixmap)))
+        self.searchButton.setIcon(
+            QtGui.QIcon.fromTheme(
+                "system-search",
+                fallback=QtGui.QIcon(QtGui.QPixmap(r"images/search_icon.png"))
+            )
+        )
 #        self.searchButton.setIcon(QtGui.QIcon(search_pixmap))
         #self.searchButton.setIconSize(search_pixmap.size())
         self.searchButton.setStyleSheet("QToolButton { border: none; padding: 0px;}")

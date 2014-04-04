@@ -142,7 +142,6 @@ class AstViewer(QtGui.QMainWindow):
         #     on_changed=self.search_box_changed
         # )
         # self.tool_bar.addWidget(self.search_box)
-        self.search_box.setFocus()
 
     def _setup_actions(self):
         """ Creates the MainWindow actions.
@@ -170,8 +169,6 @@ class AstViewer(QtGui.QMainWindow):
             statusTip="Shows or hides the 'Line : Col' column")
         self.col_pos_action.setShortcut("Ctrl+4")
         assert self.col_pos_action.toggled.connect(self.show_pos_column)
-
-        self.search_box = SearchLineEdit(QtGui.QPixmap(r"images/search_icon.png"), QtGui.QPixmap(r"images/search_icon.png"))
 
     def _setup_menu(self):
         """ Sets up the main menu.

@@ -11,11 +11,7 @@ class AstTreePane(QtGui.QGroupBox):
 
         layout = QtGui.QVBoxLayout()
 
-        self.search_box = SearchLineEdit(
-            QtGui.QPixmap(r"images/search_icon.png"),
-            QtGui.QPixmap(r"images/search_icon.png"),
-            on_changed=self.search_box_changed
-        )
+        self.search_box = SearchLineEdit(self, on_changed=self.search_box_changed)
         layout.addWidget(self.search_box)
 
         self.ast_tree_tabs = AstTreeTabs(self, self.controller)
