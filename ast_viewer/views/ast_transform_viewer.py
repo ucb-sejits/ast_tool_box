@@ -22,9 +22,13 @@ class AstTransformViewer(QtGui.QGroupBox):
         go_button = QtGui.QPushButton("Apply")
         go_button.clicked.connect(self.go)
 
-        open_button = QtGui.QPushButton("Load More")
+        open_button = QtGui.QPushButton("Load File")
         open_button.clicked.connect(self.load)
 
+        package_button = QtGui.QPushButton("Load Package")
+        package_button.clicked.connect(self.load_package)
+
+        button_layout.addWidget(package_button)
         button_layout.addWidget(open_button)
         button_layout.addWidget(go_button)
 
@@ -37,10 +41,7 @@ class AstTransformViewer(QtGui.QGroupBox):
         self.transformers.get_ast_transformers(''
                                                 'ctree.transformations')
 
-        for transformer in self.transformers:
-            self.transform_list.addItem(
-                QtGui.QListWidgetItem(transformer.name())
-            )
+        self.reload_list()
         self.transform_list.doubleClicked.connect(self.go)
 
         layout.addWidget(self.transform_list)
@@ -55,15 +56,27 @@ class AstTransformViewer(QtGui.QGroupBox):
 
         self.parent_viewer.add_tree_tab(name=current_item.text(), transformer=transformer)
 
+    def reload_list(self):
+        self.transform_list.clear()
+        for transformer in self.transformers:
+            self.transform_list.addItem(
+                QtGui.QListWidgetItem(transformer.name())
+            )
+
     def load(self):
         file_name, _ = QtGui.QFileDialog.getOpenFileName(
-            self,
+            self.parent_viewer,
             caption="Select a file containing Node Transformers",
-            dir=os.getcwd(),
-            filter="Python Files (*.py);;All Files (*);;"
+            # dir=os.getcwd(),
+            # filter="Python Files (*.py);;All Files (*);;"
         )
         print("got file_name %s" % file_name)
         self.controller.load_transformers(file_name)
+        self.reload_list()
+
+    def load_package(self):
+
+        pass
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
