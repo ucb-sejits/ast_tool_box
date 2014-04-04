@@ -37,9 +37,8 @@ class AstTransformViewer(QtGui.QGroupBox):
         layout.addWidget(button_box)
 
         self.transform_list = QtGui.QListWidget()
-        self.transformers = AstTransformerManager()
-        self.transformers.get_ast_transformers(''
-                                                'ctree.transformations')
+        self.transformers = self.controller.ast_transformer_manager
+        self.transformers.get_ast_transformers('ctree.transformations')
 
         self.reload_list()
         self.transform_list.doubleClicked.connect(self.go)
@@ -57,8 +56,10 @@ class AstTransformViewer(QtGui.QGroupBox):
         self.parent_viewer.add_tree_tab(name=current_item.text(), transformer=transformer)
 
     def reload_list(self):
+        print("self.transformers %s" % self.transformers)
         self.transform_list.clear()
-        for transformer in self.transformers:
+        for transformer in self.transformers.transformer_items:
+            print("adding transformer %s" % transformer.name)
             self.transform_list.addItem(
                 QtGui.QListWidgetItem(transformer.name())
             )
@@ -75,8 +76,17 @@ class AstTransformViewer(QtGui.QGroupBox):
         self.reload_list()
 
     def load_package(self):
-
-        pass
+        package_name, ok = QtGui.QInputDialog.getText(
+            self,
+            "Load additional tranformers",
+            "package name or path to file",
+            QtGui.QLineEdit.Normal,
+            "ast_viewer.transformers.identity_transform"
+        )
+        if ok and package_name != '':
+            print("Got package name %s" % package_name)
+            self.controller.load_transformers(package_name)
+            self.reload_list()
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)

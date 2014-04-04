@@ -6,7 +6,7 @@ import os
 class Util(object):
     @staticmethod
     def is_package(directory):
-        print "is_package testing %s" % os.path.join(directory, "__init__.py")
+        # print "is_package testing %s" % os.path.join(directory, "__init__.py")
         return os.path.isfile(os.path.join(directory, "__init__.py"))
 
     @staticmethod

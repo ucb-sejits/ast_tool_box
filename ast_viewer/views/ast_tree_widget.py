@@ -51,7 +51,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
         self.header().resizeSection(AstTreeWidget.COL_NODE, 800)
         self.header().setStretchLastSection(True)
 
-        self.ast_transformers = AstTransformerManager()
+        self.ast_transformers = self.parent_viewer.tree_transform_controller.ast_transformer_manager
         self.ast_transformers.get_ast_transformers('ctree.transformations')
 
         self.transform_signal = QtCore.Signal(int)

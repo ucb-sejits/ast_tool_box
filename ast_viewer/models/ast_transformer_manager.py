@@ -64,7 +64,7 @@ class AstTransformerManager(object):
         )
 
         for transformer_item in self.transformer_items:
-            # print("loaded %s" % transformer_item.name())
+            print("loaded %s" % transformer_item.name())
             self.transformers_by_name[transformer_item.name()] = transformer_item
 
     def get_instance_by_name(self, transformer_name):
@@ -80,11 +80,15 @@ class AstTransformerManager(object):
     def load_transformers(self, key):
         path, package_name = Util.path_to_path_and_package(key)
 
+        print("path %s package %s" % (path, package_name))
+
         if not path in sys.path:
             sys.path.append(path)
 
         self.get_ast_transformers(package_name)
         self.reload()
+
+        print("AstTransformerManager %s" % self)
 
 
 if __name__ == '__main__':
