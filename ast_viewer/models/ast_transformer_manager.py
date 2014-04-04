@@ -41,7 +41,7 @@ class AstTransformerManager(object):
             except ValueError:
                 return None
 
-        if index > 0:
+        if index >= 0:
             if index < len(self.transformer_items):
                 return index
         return None

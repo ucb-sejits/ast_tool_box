@@ -101,6 +101,7 @@ class AstTransformInterpreter(object):
             transform_index = self.controller.ast_transformer_manager.get_valid_index(fields[2])
             name = fields[3] if len(fields) > 3 else "Tree %d" % self.controller.ast_tree_manager.count()
 
+            print( "ast %s transform %s" % (ast_index, transform_index))
             if ast_index is not None and transform_index is not None:
                 self.controller.apply_transform(ast_index, transform_index, name=name)
                 self.show_asts()
