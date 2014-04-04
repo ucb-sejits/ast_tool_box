@@ -60,6 +60,13 @@ class AstTreeManager(object):
         self.ast_trees.append(new_ast_item)
         return new_ast_item
 
+    def fix_derived_items_before_delete(self, item_to_delete):
+        for other_item in self.ast_trees:
+            if other_item != item_to_delete:
+                if other_item.parent_link:
+                    if other_item.parent_link.parent_ast_tree == item_to_delete:
+                        other_item.parent_link = None
+
     def delete(self, ast_tree_item):
         """
         delete an ast tree from manager
@@ -67,11 +74,13 @@ class AstTreeManager(object):
         representing index
         """
         if isinstance(ast_tree_item, AstTreeItem):
+            self.fix_derived_items_before_delete(ast_tree_item)
             self.ast_trees.remove(ast_tree_item)
             return True
         else:
             index = self.get_valid_index(ast_tree_item)
             if index:
+                self.fix_derived_items_before_delete(self.ast_trees[index])
                 self.ast_trees.remove(self.ast_trees[index])
                 return True
         return False

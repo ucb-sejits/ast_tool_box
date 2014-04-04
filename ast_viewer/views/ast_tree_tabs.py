@@ -47,6 +47,11 @@ class AstTreeTabs(QtGui.QTabWidget):
         super(AstTreeTabs, self).__init__(parent)
         self.tree_transform_controller = tree_transform_controller
 
+        self.setTabsClosable(True)
+        self.setUsesScrollButtons(True)
+        self.setStyle(QtGui.QStyleFactory.create("Plastique"))
+        self.tabCloseRequested.connect(self.close_tab)
+
         for tree_item in self.tree_transform_controller.ast_tree_manager:
             ast_tree_widget = AstTreeWidget(self)
             ast_tree_widget.make_tree_from(tree_item.ast_tree)
@@ -54,6 +59,12 @@ class AstTreeTabs(QtGui.QTabWidget):
                 ast_tree_widget,
                 tree_item.name
             )
+
+    @QtCore.Slot(int)
+    def close_tab(self, index):
+        print("Tab close requested index %s" % index)
+        self.tree_transform_controller.ast_tree_manager.delete(index)
+        self.removeTab(index)
 
     def current_ast(self):
         if self.currentWidget():
