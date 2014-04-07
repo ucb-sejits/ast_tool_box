@@ -12,9 +12,7 @@ import copy
 from PySide import QtCore, QtGui
 
 import ast_viewer
-from ast_viewer.views.search_widget import SearchLineEdit
 from ast_viewer.views.ast_tree_widget import AstTreeWidget
-from ast_viewer.views.ast_tree_tabs import AstTreeTabs
 from ast_viewer.views.ast_tree_tabs import AstTreePane
 from ast_viewer.views.ast_transform_viewer import AstTransformViewer
 
@@ -123,7 +121,7 @@ class AstViewer(QtGui.QMainWindow):
 
         # Views
         # self.ast_tree_tabs = AstTreeTabs(self, self.tree_transform_controller)
-        self.ast_tree_pane = AstTreePane(self.tree_transform_controller)
+        self.ast_tree_pane = AstTreePane(self, self.tree_transform_controller)
         self.ast_tree_tabs = self.ast_tree_pane.ast_tree_tabs
         self.ast_transform_viewer = AstTransformViewer(self, self.tree_transform_controller)
 
@@ -300,7 +298,7 @@ class AstViewer(QtGui.QMainWindow):
             except Exception as e:
                 print("Exception calling transformer %s" % e.message)
 
-        new_tree_tab = AstTreeWidget(self)
+        new_tree_tab = AstTreeWidget(self, main_window=self)
         new_tree_tab.make_tree_from(new_ast_tree)
 
         if not name:

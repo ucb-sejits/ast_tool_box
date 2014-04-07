@@ -6,9 +6,6 @@ import copy
 
 from PySide import QtGui, QtCore
 
-from ast_viewer.models.ast_transformer_manager import AstTransformerManager
-
-
 DEBUGGING = False
 
 
@@ -23,8 +20,13 @@ class TransformerAction(QtGui.QAction):
         super(TransformerAction, self).__init__(text, tree_widget, **kwargs)
         self.tree_widget = tree_widget
         self.text = text
+        self.triggered.connect(self.do_transform)
 
-    def triggered(self, *args, **kwargs):
+    def do_transform(self):
+        print("Triggered with string %s" % self.text)
+        self.tree_widget.transform_current_ast(self.text)
+
+    def xtriggered(self, *args, **kwargs):
         print("Triggered with string %s" % self.text)
         self.tree_widget.transform_current_ast(self.text)
 
@@ -39,10 +41,12 @@ class AstTreeWidget(QtGui.QTreeWidget):
     COL_POS = 4
     COL_HIGHLIGHT = 5
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, main_window=None):
         super(AstTreeWidget, self).__init__(parent)
 
         self.parent_viewer = parent
+        self.main_window = main_window
+
         self.ast_root = None
         self.setColumnCount(2)
         self.setHeaderLabels(
@@ -90,13 +94,11 @@ class AstTreeWidget(QtGui.QTreeWidget):
         menu.exec_(event.globalPos())
 
     def transform_current_ast(self, name):
-        transformer = self.ast_transformers.get_instance(name)
-        new_ast = copy.deepcopy(self.ast_root)
-        transformer.visit(new_ast)
-        self.parent_viewer.add_tree_tab(new_ast)
+        transformer = self.ast_transformers.get_instance_by_name(name)
+        self.main_window.add_tree_tab(transformer=transformer)
 
     def make_new_tab(self):
-        self.parent_viewer.add_tree_tab(copy.deepcopy(self.ast_root))
+        self.main_window.add_tree_tab(copy.deepcopy(self.ast_root))
 
     def make_root(self):
         """make the current item the displayed root of the tree"""

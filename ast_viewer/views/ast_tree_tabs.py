@@ -5,8 +5,9 @@ from ast_viewer.views.ast_tree_widget import AstTreeWidget
 from ast_viewer.views.search_widget import SearchLineEdit
 
 class AstTreePane(QtGui.QGroupBox):
-    def __init__(self, controller):
+    def __init__(self, main_window, controller):
         super(AstTreePane, self).__init__("AST Trees")
+        self.main_window = main_window
         self.controller = controller
 
         layout = QtGui.QVBoxLayout()
@@ -14,7 +15,7 @@ class AstTreePane(QtGui.QGroupBox):
         self.search_box = SearchLineEdit(self, on_changed=self.search_box_changed)
         layout.addWidget(self.search_box)
 
-        self.ast_tree_tabs = AstTreeTabs(self, self.controller)
+        self.ast_tree_tabs = AstTreeTabs(self, self.main_window, self.controller)
         layout.addWidget(self.ast_tree_tabs)
 
         self.setLayout(layout)
@@ -43,8 +44,10 @@ class AstTreePane(QtGui.QGroupBox):
 
 
 class AstTreeTabs(QtGui.QTabWidget):
-    def __init__(self, parent, tree_transform_controller):
+    def __init__(self, parent, main_window, tree_transform_controller):
         super(AstTreeTabs, self).__init__(parent)
+        self.parent = parent
+        self.main_window = main_window
         self.tree_transform_controller = tree_transform_controller
 
         self.setTabsClosable(True)
@@ -53,7 +56,7 @@ class AstTreeTabs(QtGui.QTabWidget):
         self.tabCloseRequested.connect(self.close_tab)
 
         for tree_item in self.tree_transform_controller.ast_tree_manager:
-            ast_tree_widget = AstTreeWidget(self)
+            ast_tree_widget = AstTreeWidget(self, self.main_window)
             ast_tree_widget.make_tree_from(tree_item.ast_tree)
             self.addTab(
                 ast_tree_widget,
