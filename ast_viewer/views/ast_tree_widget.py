@@ -26,10 +26,6 @@ class TransformerAction(QtGui.QAction):
         print("Triggered with string %s" % self.text)
         self.tree_widget.transform_current_ast(self.text)
 
-    def xtriggered(self, *args, **kwargs):
-        print("Triggered with string %s" % self.text)
-        self.tree_widget.transform_current_ast(self.text)
-
 class AstTreeWidget(QtGui.QTreeWidget):
     """
     displays an ast as a tree widget
@@ -60,11 +56,11 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
         self.transform_signal = QtCore.Signal(int)
 
-        self.make_new_tab_action = QtGui.QAction(
-            "&Duplicate this tree",
+        self.show_with_dot_action = QtGui.QAction(
+            "&show tree using dot",
             self,
-            statusTip="Duplicate this tree in new tab",
-            triggered=self.make_new_tab
+            statusTip="Create a *.png file using dot",
+            triggered=self.show_with_dot
         )
         self.make_root_action = QtGui.QAction(
             "&Make this node be root",
@@ -81,7 +77,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
-        menu.addAction(self.make_new_tab_action)
+        menu.addAction(self.show_with_dot_action)
         menu.addAction(self.expand_descendants_action)
 
         sub_menu = QtGui.QMenu(self)
@@ -97,8 +93,10 @@ class AstTreeWidget(QtGui.QTreeWidget):
         transformer = self.ast_transformers.get_instance_by_name(name)
         self.main_window.add_tree_tab(transformer=transformer)
 
-    def make_new_tab(self):
-        self.main_window.add_tree_tab(copy.deepcopy(self.ast_root))
+    def show_with_dot(self):
+        from ctree.visual.dot_manager import DotManager
+        print("calling open")
+        DotManager.dot_ast_to_browser(self.ast_root, "ast_%s.png" % "tree")
 
     def make_root(self):
         """make the current item the displayed root of the tree"""
