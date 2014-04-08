@@ -2,7 +2,6 @@ __author__ = 'Chick Markley'
 
 import types
 import ast
-import copy
 
 from PySide import QtGui, QtCore
 
@@ -10,6 +9,9 @@ DEBUGGING = False
 
 
 class AstTreeItem(QtGui.QTreeWidgetItem):
+    """
+    connects a gui tree item with the corresponding node in the actual ast tree
+    """
     def __init__(self, parent, source_node=None):
         super(AstTreeItem, self).__init__(parent)
         self.ast_node = source_node
@@ -25,6 +27,7 @@ class TransformerAction(QtGui.QAction):
     def do_transform(self):
         print("Triggered with string %s" % self.text)
         self.tree_widget.transform_current_ast(self.text)
+
 
 class AstTreeWidget(QtGui.QTreeWidget):
     """

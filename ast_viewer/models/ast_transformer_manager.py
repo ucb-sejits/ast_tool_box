@@ -6,6 +6,7 @@ import sys
 import ast
 import copy
 from ast_viewer.util import Util
+from ctree.codegen import CodeGenVisitor
 
 
 class AstTransformerManager(object):
@@ -61,6 +62,11 @@ class AstTransformerManager(object):
         self.transformer_items = map(
             lambda transformer: AstTransformerItem(transformer),
             ast.NodeTransformer.__subclasses__()
+        )
+
+        self.transformer_items += map(
+            lambda transformer: AstTransformerItem(transformer),
+            CodeGenVisitor.__subclasses__()
         )
 
         for transformer_item in self.transformer_items:

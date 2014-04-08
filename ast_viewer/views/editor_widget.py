@@ -2,16 +2,16 @@ __author__ = 'Chick Markley'
 
 from PySide import QtGui
 
-class EditorPane(object):
+class EditorPane(QtGui.QPlainTextEdit):
     def __init__(self):
         # Editor widget
+        super(EditorPane, self).__init__()
         font = QtGui.QFont()
         font.setFamily('Courier')
         font.setFixedPitch(True)
         font.setPointSize(13)
 
-        self.editor = QtGui.QPlainTextEdit()
-        self.editor.setReadOnly(True)
-        self.editor.setFont(font)
-        self.editor.setWordWrapMode(QtGui.QTextOption.NoWrap)
-        self.editor.setStyleSheet("selection-color: black; selection-background-color: yellow;")
+        self.setReadOnly(True)
+        self.setFont(font)
+        self.setWordWrapMode(QtGui.QTextOption.NoWrap)
+        self.setStyleSheet("selection-color: black; selection-background-color: yellow;")

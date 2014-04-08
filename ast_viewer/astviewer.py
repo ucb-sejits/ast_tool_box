@@ -207,8 +207,8 @@ class AstViewer(QtGui.QMainWindow):
         central_layout.addWidget(self.ast_transform_viewer)
 
         # Splitter parameters
-        central_splitter.setCollapsible(0, False)
-        central_splitter.setCollapsible(1, False)
+        central_splitter.setCollapsible(0, True)
+        central_splitter.setCollapsible(1, True)
         central_splitter.setSizes([500, 500])
         central_splitter.setStretchFactor(0, 0.5)
         central_splitter.setStretchFactor(1, 0.5)

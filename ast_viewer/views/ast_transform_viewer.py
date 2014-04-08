@@ -2,9 +2,12 @@ from __future__ import print_function
 
 __author__ = 'Chick Markley'
 
-from PySide import QtGui
-from ast_viewer.models.ast_transformer_manager import AstTransformerManager
-import os
+from PySide import QtGui, QtCore
+import ast
+import inspect
+from ctree.codegen import CodeGenVisitor
+from ast_viewer.views.editor_widget import EditorPane
+
 
 class AstTransformViewer(QtGui.QGroupBox):
     def __init__(self, parent, tree_transform_controller):
@@ -41,19 +44,33 @@ class AstTransformViewer(QtGui.QGroupBox):
         self.transformers.get_ast_transformers('ctree.transformations')
 
         self.reload_list()
+        self.transform_list.itemClicked.connect(self.show)
         self.transform_list.doubleClicked.connect(self.go)
 
         layout.addWidget(self.transform_list)
+
+        self.editor = EditorPane()
+        layout.addWidget(self.editor)
 
         self.setLayout(layout)
 
     def go(self):
         current_item = self.transform_list.currentItem()
-        print(current_item.text())
+        print("apply invoked with %s" % current_item.text())
 
-        transformer = self.transformers.get_instance_by_name(current_item.text())
+        transformer = current_item.ast_transformer_item.node_transformer()
+        print("go got transformer %s" % transformer)
+        if isinstance(transformer, ast.NodeTransformer):
+            print("let's add a tree")
+            self.parent_viewer.add_tree_tab(name=current_item.text(), transformer=transformer)
+        elif isinstance(transformer, CodeGenVisitor):
+            print(transformer.visit(self))
 
-        self.parent_viewer.add_tree_tab(name=current_item.text(), transformer=transformer)
+    @QtCore.Slot(QtGui.QListWidgetItem)
+    def show(self, item):
+        print("show item %s" % item)
+        transformer = item.ast_transformer_item.node_transformer
+        self.editor.setPlainText(inspect.getsource(transformer))
 
     def reload_list(self):
         print("self.transformers %s" % self.transformers)
@@ -61,7 +78,7 @@ class AstTransformViewer(QtGui.QGroupBox):
         for transformer in self.transformers.transformer_items:
             print("adding transformer %s" % transformer.name)
             self.transform_list.addItem(
-                QtGui.QListWidgetItem(transformer.name())
+                AstTransformWidgetItem(transformer)
             )
 
     def load(self):
@@ -101,3 +118,8 @@ class AstTransformViewer(QtGui.QGroupBox):
         )
         menu.exec_(event.globalPos())
 
+
+class AstTransformWidgetItem(QtGui.QListWidgetItem):
+    def __init__(self, ast_transformer_item):
+        super(AstTransformWidgetItem, self).__init__(ast_transformer_item.name())
+        self.ast_transformer_item = ast_transformer_item

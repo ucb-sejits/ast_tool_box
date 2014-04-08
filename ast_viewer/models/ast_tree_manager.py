@@ -3,6 +3,7 @@ from __future__ import print_function
 __author__ = 'Chick Markley'
 
 import ast
+import os
 import copy
 
 
@@ -95,7 +96,8 @@ class AstTreeItem(object):
         self.parent_link = parent_link
         self.source = source
         self.file_name = file_name
-        self.name = name if name else file_name if file_name else "Derived"
+        self.base_name = None if not file_name else os.path.basename(file_name)
+        self.name = name if name else self.base_name if self.base_name else "Derived"
 
     @staticmethod
     def from_source(source_text):
