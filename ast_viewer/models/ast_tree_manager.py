@@ -10,6 +10,7 @@ import copy
 class AstTreeManager(object):
     def __init__(self):
         self.ast_trees = []
+        self.default_tree_depth = 1
 
     def clear(self):
         self.ast_trees = []

@@ -84,7 +84,8 @@ def class_name(obj):
 # pylint: disable=R0901, R0902, R0904, W0201, R0913 
 
 class AstViewer(QtGui.QMainWindow):
-    """ The main application.
+    """
+    The main application.
     """
 
     def __init__(self, file_name=None, mode='exec',
@@ -133,14 +134,6 @@ class AstViewer(QtGui.QMainWindow):
         if width and height:
             self.resize(width, height)
 
-        # self.tool_bar = self.addToolBar('Exit')
-        # self.search_box = SearchLineEdit(
-        #     QtGui.QPixmap(r"images/search_icon.png"),
-        #     QtGui.QPixmap(r"images/search_icon.png"),
-        #     on_changed=self.search_box_changed
-        # )
-        # self.tool_bar.addWidget(self.search_box)
-
     def _setup_actions(self):
         """ Creates the MainWindow actions.
         """
@@ -172,7 +165,6 @@ class AstViewer(QtGui.QMainWindow):
         """ Sets up the main menu.
         """
         file_menu = self.menuBar().addMenu("&File")
-        file_menu.addAction("&New", self.new_file, "Ctrl+N")
         file_menu.addAction("&Open...", self.open_file, "Ctrl+O")
         #file_menu.addAction("C&lose", self.close_window, "Ctrl+W")
         file_menu.addAction("E&xit", AstViewer.quit_application, "Ctrl+Q")
@@ -182,6 +174,10 @@ class AstViewer(QtGui.QMainWindow):
             file_menu.addAction("&Test", self.my_test, "Ctrl+T")
 
         view_menu = self.menuBar().addMenu("&View")
+
+        self.auto_expand_ast = QtGui.QAction("Expand AST trees on create", self, checkable=True, checked=True)
+        assert self.auto_expand_ast.toggled.connect(self.set_auto_expand)
+
         view_menu.addAction(self.col_field_action)
         view_menu.addAction(self.col_class_action)
         view_menu.addAction(self.col_value_action)
@@ -209,13 +205,15 @@ class AstViewer(QtGui.QMainWindow):
         # Splitter parameters
         central_splitter.setCollapsible(0, True)
         central_splitter.setCollapsible(1, True)
-        central_splitter.setSizes([500, 500])
+        central_splitter.setSizes([700, 300])
         central_splitter.setStretchFactor(0, 0.5)
         central_splitter.setStretchFactor(1, 0.5)
 
         # Connect signals
         # assert self.ast_tree.currentItemChanged.connect(self.highlight_node)
 
+    def set_auto_expand(self):
+        self.tree_transform_controller.ast_tree_manager.set_auto_expand(self.auto_expand_ast.isChecked())
 
     def new_file(self):
         """ Clears the widgets """

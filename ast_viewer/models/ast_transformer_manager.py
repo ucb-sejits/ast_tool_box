@@ -81,6 +81,7 @@ class AstTransformerManager(object):
         return iter(self.transformer_items)
 
     def load_transformers_by_file_name(self, file_name):
+        """Todo"""
         pass
 
     def load_transformers(self, key):
