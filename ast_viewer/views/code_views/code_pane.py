@@ -1,8 +1,10 @@
 __author__ = 'Chick Markley'
 
 from PySide import QtGui, QtCore
-from ast_viewer.views.ast_tree_widget import AstTreeWidget
+from ast_viewer.models.code_models.code_model import AstTreeItem, CodeItem, FileItem, GeneratedCodeItem, CodeTransformLink
 from ast_viewer.views.search_widget import SearchLineEdit
+from ast_viewer.views.code_views.ast_tree_widget import AstTreeWidget, AstTreeWidgetItem
+from ast_viewer.views.editor_widget import EditorPane
 
 
 class CodePane(QtGui.QGroupBox):
@@ -28,14 +30,15 @@ class CodePane(QtGui.QGroupBox):
 
         layout.addWidget(toolbar)
 
-        code_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Horizontal)
-        code_splitter.setCollapsible(0, True)
-        code_splitter.setCollapsible(1, True)
-        code_splitter.setSizes([700, 300])
-        code_splitter.setStretchFactor(0, 0.5)
-        code_splitter.setStretchFactor(1, 0.5)
+        self.code_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Horizontal)
 
-        layout.addWidget(code_splitter)
+        self.code_splitter.setCollapsible(0, True)
+        # code_splitter.setCollapsible(1, True)
+        # code_splitter.setSizes([700, 300])
+        # code_splitter.setStretchFactor(0, 0.5)
+        # code_splitter.setStretchFactor(1, 0.5)
+
+        layout.addWidget(self.code_splitter)
 
 
         self.search_box = SearchLineEdit(self, on_changed=self.search_box_changed)
@@ -54,6 +57,30 @@ class CodePane(QtGui.QGroupBox):
     def set_to_two_panel(self):
         pass
 
+    def add_code_item(self, code_item):
+        """
+        add a new code item widget to the right hand side of the
+        splitter, reduce size of left hand members
+        """
+        assert isinstance(code_item, CodeItem)
+
+        if isinstance(code_item, FileItem):
+            widget = EditorPane()
+            widget.setPlainText(code_item.code)
+        elif isinstance(code_item, AstTreeItem):
+            widget = AstTreeWidget()
+
+            pass
+        elif isinstance(code_item, GeneratedCodeItem):
+            pass
+        else:
+            print("add_code_item got %s %s" % (type(code_item), code_item))
+
+        self.code_splitter.addWidget(
+            widget
+        )
+
+
     def search_box_changed(self):
         if not self.search_box.text():
             return
@@ -68,7 +95,7 @@ class CodePane(QtGui.QGroupBox):
         items = current_tree.findItems(
             self.search_box.text(),
             QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive,
-            column=AstTreeWidget.COL_NODE
+            column=0
         )
         # print("Found %d items" % len(items))
         if len(items) > 0:

@@ -176,11 +176,6 @@ class AstToolBox(QtGui.QMainWindow):
         self.auto_expand_ast = QtGui.QAction("Expand AST trees on create", self, checkable=True, checked=True)
         assert self.auto_expand_ast.toggled.connect(self.set_auto_expand)
 
-        view_menu.addAction(self.col_field_action)
-        view_menu.addAction(self.col_class_action)
-        view_menu.addAction(self.col_value_action)
-        view_menu.addAction(self.col_pos_action)
-
         self.menuBar().addSeparator()
         help_menu = self.menuBar().addMenu("&Help")
         help_menu.addAction('&About', self.about)

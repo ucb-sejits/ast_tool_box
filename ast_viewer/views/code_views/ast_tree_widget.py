@@ -8,12 +8,12 @@ from PySide import QtGui, QtCore
 DEBUGGING = False
 
 
-class AstTreeItem(QtGui.QTreeWidgetItem):
+class AstTreeWidgetItem(QtGui.QTreeWidgetItem):
     """
     connects a gui tree item with the corresponding node in the actual ast tree
     """
     def __init__(self, parent, source_node=None):
-        super(AstTreeItem, self).__init__(parent)
+        super(AstTreeWidgetItem, self).__init__(parent)
         self.ast_node = source_node
 
 
@@ -40,22 +40,18 @@ class AstTreeWidget(QtGui.QTreeWidget):
     COL_POS = 4
     COL_HIGHLIGHT = 5
 
-    def __init__(self, parent=None, main_window=None):
-        super(AstTreeWidget, self).__init__(parent)
+    def __init__(self, code_presenter=None, ast_root=None):
+        super(AstTreeWidget, self).__init__()
 
-        self.parent_viewer = parent
-        self.main_window = main_window
+        self.code_presenter = code_presenter
 
-        self.ast_root = None
+        self.ast_root = ast
         self.setColumnCount(2)
         self.setHeaderLabels(
             ["Node"]
         )
         self.header().resizeSection(AstTreeWidget.COL_NODE, 800)
         self.header().setStretchLastSection(True)
-
-        self.ast_transformers = self.parent_viewer.tree_transform_controller.ast_transformer_manager
-        self.ast_transformers.get_ast_transformers('ctree.transformations')
 
         self.transform_signal = QtCore.Signal(int)
 
@@ -77,6 +73,9 @@ class AstTreeWidget(QtGui.QTreeWidget):
             statusTip="Expand all descendant nodes",
             triggered=self.expand_descendants
         )
+
+        if ast_root:
+            self.make_tree_from(self.ast_root)
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
@@ -131,7 +130,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
                 :param parent_item: The parent QTreeWidgetItem to which this node will be added
                 :param field_label: Labels how this node is known to the parent
             """
-            node_item = AstTreeItem(parent_item)
+            node_item = AstTreeWidgetItem(parent_item)
             node_item.ast_node = ast_node
 
             if hasattr(ast_node, 'lineno'):

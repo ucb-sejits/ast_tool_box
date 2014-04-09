@@ -122,7 +122,7 @@ class CodePresenter(object):
     def delete(self, ast_tree_item):
         """
         delete an ast tree from manager
-        ast_tree_item can be AstTreeItem or index or string
+        ast_tree_item can be AstTreeWidgetItem or index or string
         representing index
         """
         if isinstance(ast_tree_item, code_model.CodeItem):
