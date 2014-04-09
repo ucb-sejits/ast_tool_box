@@ -10,7 +10,7 @@ import logging
 
 from PySide import QtGui
 
-from ast_viewer.ast_tool_box import AstToolBox
+import ast_viewer.ast_tool_box as ast_tool_box
 
 
 logger = logging.getLogger(__name__)
@@ -39,8 +39,6 @@ def main():
 
     
     args = parser.parse_args(args = remaining_argv[1:])
-
-    ast_tool_box = AstToolBox()
 
     ast_tool_box.logging_basic_config(args.log_level.upper())
 

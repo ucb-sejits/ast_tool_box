@@ -57,7 +57,7 @@ class CodePresenter(object):
 
     def add_code_item(self, code_item):
         self.code_items.append(code_item)
-        self.view.add_code_item(code_item)
+        self.code_pane.add_code_item(code_item)
 
     def apply_transform(self, code_item, transform_item):
         """

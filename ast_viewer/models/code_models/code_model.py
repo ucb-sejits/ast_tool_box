@@ -12,12 +12,11 @@ class CodeItem(object):
     Base class for python source, ast trees and generated c code
     """
     def __init__(self, code=None, code_name=None, path_name=None, parent_link=None):
-        assert isinstance(parent_link, CodeTransformLink)
+        assert parent_link is None or isinstance(parent_link, CodeTransformLink)
         self.code = code
         self.code_name = code_name
         self.path_name = path_name
         self.parent_code_item = parent_link
-        self.children
 
     def name(self):
         self.code_name

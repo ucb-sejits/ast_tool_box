@@ -16,6 +16,7 @@ class TransformItem(object):
         return self.transform.__module__
 
     def name(self):
+        print("self.transform %s" % self.transform)
         return self.transform.__name__
 
     def get_instance(self):
@@ -28,8 +29,8 @@ class AstTransformItem(TransformItem):
     for creating, getting names etc
     """
     def __init__(self, node_transform):
-        assert isinstance(node_transform, ast.NodeTransformer)
-        super(AstTransformItem, self).__init__(node_transform.__name__)
+        assert issubclass(node_transform, ast.NodeTransformer), "bad node_transform %s" % node_transform
+        super(AstTransformItem, self).__init__(node_transform)
         self.node_transform = node_transform
 
 
@@ -39,14 +40,15 @@ class CodeGeneratorItem(TransformItem):
     for creating, getting names etc
     """
     def __init__(self, code_generator):
-        assert isinstance(code_generator, CodeGenVisitor)
+        assert issubclass(code_generator, CodeGenVisitor)
         super(CodeGeneratorItem, self).__init__(code_generator)
         self.code_generator = self.transform
 
 
 class AstParseItem(TransformItem):
     def __init__(self):
-        super(AstParseItem, self).__init__(self)
+        # super(AstParseItem, self).__init__(self)
+        pass
 
     def package(self):
         """override base class method"""

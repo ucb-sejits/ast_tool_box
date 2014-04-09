@@ -5,7 +5,7 @@ import sys
 from PySide import QtCore, QtGui
 
 import ast_viewer.controllers as controllers
-import ast_viewer.models.transform_models as transform_model
+import ast_viewer.models.transform_models.transform_model as transform_model
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
 from ast_viewer.views.transform_views.transform_pane import TransformPane
 from ctree.codegen import CodeGenVisitor
@@ -30,11 +30,11 @@ class TransformPresenter(object):
         self.transform_items = []
         self.transforms_by_name = {}
 
-        self.get_ast_transformers('ctree.transformations')
+        self.load_transforms('ctree.transformations')
 
 
     def set_code_presenter(self, code_presenter):
-        assert isinstance(code_presenter, controllers.TransformPresenter)
+        # assert isinstance(code_presenter, controllers.TransformPresenter)
         self.code_presenter = code_presenter
 
     def apply_transform(self, code_item, transform_item):

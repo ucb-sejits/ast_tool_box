@@ -81,8 +81,6 @@ def class_name(obj):
 
 from ast_viewer.controllers.code_presenter import CodePresenter
 from ast_viewer.controllers.transform_presenter import TransformPresenter
-from ast_viewer.views.code_views.code_pane import CodePane
-from ast_viewer.views.transform_views import transform_pane
 
 # The main window inherits from a Qt class, therefore it has many 
 # ancestors public methods and attributes.
@@ -134,7 +132,7 @@ class AstToolBox(QtGui.QMainWindow):
         self.code_presenter.set_transform_presenter(self.transform_presenter)
         self.transform_presenter.set_code_presenter(self.code_presenter)
 
-        self.tree_transform_controller.ast_tree_manager.new_item_from_file(file_name)
+        self.code_presenter.new_item_from_file(file_name)
 
         central_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Horizontal)
         self.setCentralWidget(central_splitter)
@@ -142,11 +140,11 @@ class AstToolBox(QtGui.QMainWindow):
         central_splitter.setLayout(central_layout)
 
         # Create base tree widget
-        central_layout.addWidget(self.ast_tree_pane)
+        central_layout.addWidget(self.code_presenter.code_pane)
 
         # central_layout.addWidget(self.editor)
 
-        central_layout.addWidget(self.ast_transform_viewer)
+        central_layout.addWidget(self.transform_presenter.transform_pane)
 
         # Splitter parameters
         central_splitter.setCollapsible(0, True)
