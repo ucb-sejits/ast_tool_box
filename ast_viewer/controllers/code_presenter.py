@@ -1,25 +1,26 @@
 from __future__ import print_function
 
-from ast_viewer.controllers.transformer_presenter import TransformPresenter
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
 import ast_viewer.models.code_models.code_model as code_model
 import ast_viewer.models.transform_models.transform_model as transform_model
+import ast_viewer.controllers.transform_presenter as transform_controllers
+
 from ast_viewer.views.code_views.code_pane import CodePane
 import ast
 
 
 class CodePresenter(object):
-    def __init__(self, transform_presenter=None, tree_transform_controller=None, code_pane=None):
-        assert isinstance(transform_presenter, TransformPresenter)
+    def __init__(self, tree_transform_controller=None):
         assert isinstance(tree_transform_controller, TreeTransformController)
 
         self.code_items = []
-        self.transform_presenter = transform_presenter
+        self.transform_presenter = None
         self.tree_transform_controller = tree_transform_controller
 
-        self.code_pane = code_pane
+        self.code_pane = CodePane(code_presenter=self)
 
     def set_transform_presenter(self, transform_presenter):
+        assert isinstance(transform_presenter, transform_controllers.TransformPresenter)
         self.transform_presenter = transform_presenter
 
     def clear(self):

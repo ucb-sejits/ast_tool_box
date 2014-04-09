@@ -5,16 +5,16 @@ import inspect
 from ast_viewer.views.editor_widget import EditorPane
 
 
-class TransformerPane(QtGui.QGroupBox):
+class TransformPane(QtGui.QGroupBox):
     """
     Show a list of transformers
     ast_transformers create a new tree from an existing tree
     code generators generate some language text from a tree
     transformers can be applied to nodes other than the root
     """
-    def __init__(self, transformer_controller=None):
-        super(TransformerPane, self).__init__("Transformers & CodeGenerators")
-        self.transformer_controller = transformer_controller
+    def __init__(self, transform_presenter=None):
+        super(TransformPane, self).__init__("Transformers & CodeGenerators")
+        self.transform_presenter = transform_presenter
 
         self.last_used_directory = "."
 
@@ -23,7 +23,7 @@ class TransformerPane(QtGui.QGroupBox):
         button_box = QtGui.QGroupBox()
         button_layout = QtGui.QHBoxLayout()
         go_button = QtGui.QPushButton("Apply")
-        go_button.clicked.connect(self.transformer_controller.apply_current_transform)
+        go_button.clicked.connect(self.transform_presenter.apply_current_transform)
 
         open_button = QtGui.QPushButton("Load File")
         open_button.clicked.connect(self.load)
@@ -40,12 +40,9 @@ class TransformerPane(QtGui.QGroupBox):
         layout.addWidget(button_box)
 
         self.transform_list = QtGui.QListWidget()
-        self.transformers = self.controller.ast_transformer_manager
-        self.transformers.get_ast_transformers('ctree.transformations')
 
-        self.reload_list()
         self.transform_list.itemClicked.connect(self.load_editor_from)
-        self.transform_list.doubleClicked.connect(self.transformer_controller.apply_current_transform)
+        self.transform_list.doubleClicked.connect(self.transform_presenter.apply_current_transform)
 
         layout.addWidget(self.transform_list)
 
@@ -61,9 +58,8 @@ class TransformerPane(QtGui.QGroupBox):
         self.editor.setPlainText(inspect.getsource(transformer))
 
     def reload_list(self):
-        print("self.transformers %s" % self.transformers)
         self.transform_list.clear()
-        for transformer in self.transformers.transformer_items:
+        for transformer in self.transform_presenter.transform_items:
             print("adding transformer %s" % transformer.name)
             self.transform_list.addItem(
                 TransformWidgetItem(transformer)
@@ -77,7 +73,7 @@ class TransformerPane(QtGui.QGroupBox):
             # filter="Python Files (*.py);;All Files (*);;"
         )
         print("got file_name %s" % file_name)
-        self.transformer_controller.load_transformers(file_name)
+        self.transform_presenter.load_transformers(file_name)
         self.reload_list()
 
     def load_package(self):

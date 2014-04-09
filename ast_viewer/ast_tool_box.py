@@ -80,9 +80,9 @@ def class_name(obj):
 
 
 from ast_viewer.controllers.code_presenter import CodePresenter
-from ast_viewer.controllers.transformer_presenter import TransformPresenter
+from ast_viewer.controllers.transform_presenter import TransformPresenter
 from ast_viewer.views.code_views.code_pane import CodePane
-from ast_viewer.views.transform_views import TransformPane
+from ast_viewer.views.transform_views import transform_pane
 
 # The main window inherits from a Qt class, therefore it has many 
 # ancestors public methods and attributes.
@@ -125,16 +125,14 @@ class AstToolBox(QtGui.QMainWindow):
         self.tree_transform_controller = TreeTransformController()
 
         # there is a little trick here so both presenters know about their partner
-        self.code_pane = CodePane()
         self.code_presenter = CodePresenter(
             tree_transform_controller=self.tree_transform_controller
         )
-        self.transform_pane = TransformPane()
         self.transform_presenter = TransformPresenter(
-            code_presenter=self.code_presenter,
             tree_transform_controller=self.tree_transform_controller
         )
-        self.code_presenter.transform_presenter = self.transform_presenter
+        self.code_presenter.set_transform_presenter(self.transform_presenter)
+        self.transform_presenter.set_code_presenter(self.code_presenter)
 
         self.tree_transform_controller.ast_tree_manager.new_item_from_file(file_name)
 

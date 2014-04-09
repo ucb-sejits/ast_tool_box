@@ -2,12 +2,12 @@ from __future__ import print_function
 
 import ast
 import sys
-from Pyside import QtCore, QtGui
-from ast_viewer.views.transform_views import TransformPane
-import ast_viewer.models.code_models.code_model as code_model
-import ast_viewer.models.transform_models.transform_model as transform_model
-from ast_viewer.controllers.code_presenter import CodePresenter
+from PySide import QtCore, QtGui
+
+import ast_viewer.controllers as controllers
+import ast_viewer.models.transform_models as transform_model
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
+from ast_viewer.views.transform_views.transform_pane import TransformPane
 from ctree.codegen import CodeGenVisitor
 from ast_viewer.util import Util
 
@@ -16,22 +16,25 @@ class TransformPresenter(object):
     """
     coordinate between various transformer, either
     ast transformers or code generators
-    have direct connection to a code controller
+    have direct connection to a code code_presenter
     TODO: Do more investigation of managing transforms in separate namespace
     """
-    def __init__(self, code_presenter=None, tree_transform_controller=None, transform_pane=None):
-        assert isinstance(code_presenter, CodePresenter)
+    def __init__(self, tree_transform_controller=None):
         assert isinstance(tree_transform_controller, TreeTransformController)
 
-        self.code_presenter = code_presenter
+        self.code_presenter = None
         self.tree_transform_controller = tree_transform_controller
-        self.transform_pane = transform_pane
+        self.transform_pane = TransformPane(transform_presenter=self)
 
         self.files_loaded = []
         self.transform_items = []
         self.transforms_by_name = {}
 
+        self.get_ast_transformers('ctree.transformations')
+
+
     def set_code_presenter(self, code_presenter):
+        assert isinstance(code_presenter, controllers.TransformPresenter)
         self.code_presenter = code_presenter
 
     def apply_transform(self, code_item, transform_item):

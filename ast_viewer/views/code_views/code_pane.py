@@ -10,9 +10,9 @@ class CodePane(QtGui.QGroupBox):
     A pane that can show one or more code_items
     A code item can be source ast
     """
-    def __init__(self, code_controller, panel_count=2):
+    def __init__(self, code_presenter=None, panel_count=2):
         super(CodePane, self).__init__("Code & Trees")
-        self.controller = code_controller
+        self.code_presenter = code_presenter
 
         layout = QtGui.QVBoxLayout()
 
@@ -41,8 +41,8 @@ class CodePane(QtGui.QGroupBox):
         self.search_box = SearchLineEdit(self, on_changed=self.search_box_changed)
         layout.addWidget(self.search_box)
 
-        self.ast_tree_tabs = AstTreeTabs(self, self.controller)
-        layout.addWidget(self.ast_tree_tabs)
+        # self.ast_tree_tabs = AstTreeTabs(self, self.code_presenter)
+        # layout.addWidget(self.ast_tree_tabs)
 
         self.setLayout(layout)
 
