@@ -1,11 +1,16 @@
 from __future__ import print_function
 
+import ast
+import sys
 from Pyside import QtCore, QtGui
 from ast_viewer.views.transform_views import TransformPane
 import ast_viewer.models.code_models.code_model as code_model
 import ast_viewer.models.transform_models.transform_model as transform_model
 from ast_viewer.controllers.code_presenter import CodePresenter
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
+from ctree.codegen import CodeGenVisitor
+from ast_viewer.util import Util
+
 
 class TransformPresenter(object):
     """
@@ -38,9 +43,7 @@ class TransformPresenter(object):
     def apply_current_transform(self):
         transform_item = self.current_item()
         code_item = self.code_presenter.current_item()
-        print("apply invoked with %s" % current_item.name())
-
-        self.apply_transform(code_item, transform_item)\
+        self.apply_transform(code_item, transform_item)
 
     def clear(self):
         self.transform_items = []
@@ -86,12 +89,12 @@ class TransformPresenter(object):
         """rebuild list of all in memory subclasses of ast.Nodetransform"""
 
         self.transform_items = map(
-            lambda transform: AstTransformItem(transform),
+            lambda transform: transform_model.AstTransformItem(transform),
             ast.NodeTransformer.__subclasses__()
         )
 
         self.transform_items += map(
-            lambda transform: CodeGeneratorItem(transform),
+            lambda transform: transform_model.CodeGeneratorItem(transform),
             CodeGenVisitor.__subclasses__()
         )
 
@@ -121,4 +124,4 @@ class TransformPresenter(object):
         self.get_ast_transforms(package_name)
         self.reload()
 
-        print("AsttransformManager %s" % self)
+        print("AstTransformManager %s" % self)
