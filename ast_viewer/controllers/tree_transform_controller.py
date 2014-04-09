@@ -13,7 +13,7 @@ class TreeTransformController(object):
         self.ast_tree_manager.clear()
         self.ast_transformer_manager.clear()
 
-    def apply_transform(self, tree, transform, name=None):
+    def apply_transform(self, tree=None, transform=None, name=None):
         """
         creates a new ast_tree item by applying
         transform to tree, updates the controllers

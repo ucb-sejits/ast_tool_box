@@ -1,22 +1,46 @@
 from __future__ import print_function
 
-__author__ = 'Chick Markley'
+from Pyside import QtCore, QtGui
+from ast_viewer.views.transform_views import TransformPane
+import ast_viewer.models.code_models.code_model as code_model
+import ast_viewer.models.transform_models.transform_model as transform_model
+from ast_viewer.controllers.code_presenter import CodePresenter
+from ast_viewer.controllers.tree_transform_controller import TreeTransformController
 
-import sys
-import ast
-from ast_viewer.util import Util
-from ctree.codegen import CodeGenVisitor
-
-
-class TransformManager(object):
+class TransformPresenter(object):
     """
-    manage the list of all transforms items that have been discovered.  items
-    will all subclasses of ast.NodeTransformer, and ctree CodeGenerator
-    TODO: Figure out how to use transformers whose constructors require parameters
+    coordinate between various transformer, either
+    ast transformers or code generators
+    have direct connection to a code controller
+    TODO: Do more investigation of managing transforms in separate namespace
     """
-    def __init__(self):
+    def __init__(self, code_presenter=None, tree_transform_controller=None, transform_pane=None):
+        assert isinstance(code_presenter, CodePresenter)
+        assert isinstance(tree_transform_controller, TreeTransformController)
+
+        self.code_presenter = code_presenter
+        self.tree_transform_controller = tree_transform_controller
+        self.transform_pane = transform_pane
+
+        self.files_loaded = []
         self.transform_items = []
         self.transforms_by_name = {}
+
+    def set_code_presenter(self, code_presenter):
+        self.code_presenter = code_presenter
+
+    def apply_transform(self, code_item, transform_item):
+        self.code_presenter.apply_transform(code_item=code_item, transform_item=transform_item)
+
+    def current_item(self):
+        return self.transform_pane.current_item()
+
+    def apply_current_transform(self):
+        transform_item = self.current_item()
+        code_item = self.code_presenter.current_item()
+        print("apply invoked with %s" % current_item.name())
+
+        self.apply_transform(code_item, transform_item)\
 
     def clear(self):
         self.transform_items = []
@@ -98,45 +122,3 @@ class TransformManager(object):
         self.reload()
 
         print("AsttransformManager %s" % self)
-
-
-if __name__ == '__main__':
-    ntm = TransformManager()
-
-    ntm.get_ast_transforms('ctree.transformations')
-
-
-class TransformItem(object):
-    def __init__(self, transform):
-        self.transform = transform
-
-    def package(self):
-        return self.transform.__module__
-
-    def name(self):
-        return self.transform.__name__
-
-    def get_instance(self):
-        return self.transform()
-
-
-class AstTransformItem(TransformItem):
-    """
-    Basic wrapper of an ast.NodeTransform with convenience methods
-    for creating, getting names etc
-    """
-    def __init__(self, node_transform):
-        assert isinstance(node_transform, ast.NodeTransformer)
-        super(AstTransformItem, self).__init__(node_transform.__name__)
-        self.node_transform = node_transform
-
-
-class CodeGeneratorItem(TransformItem):
-    """
-    Basic wrapper of an CodeGenVisitor with convenience methods
-    for creating, getting names etc
-    """
-    def __init__(self, code_generator):
-        assert isinstance(code_generator, CodeGenVisitor)
-        super(CodeGeneratorItem, self).__init__(code_generator)
-        self.code_generator = self.transform
