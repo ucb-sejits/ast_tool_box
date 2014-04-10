@@ -38,7 +38,7 @@ class CodePane(QtGui.QGroupBox):
         toolbar_layout.addSpacing(10)
 
         del_button = QtGui.QPushButton("Del")
-        del_button.clicked.connect(self.delete_last)
+        del_button.clicked.connect(self.code_presenter.delete_last)
         toolbar_layout.addWidget(del_button)
         toolbar_layout.addStretch(1)
 
@@ -61,11 +61,15 @@ class CodePane(QtGui.QGroupBox):
 
         self.setLayout(layout)
 
-    def delete_last(self):
-        last_item = self.code_splitter.widget(self.code_splitter.count()-1)
-        self.code_presenter.delete_last_item()
-        last_item.deleteLater()
-        self.tab_bar.removeTab(self.tab_bar.count()-1)
+    def clear(self):
+        for index in range(self.code_splitter.count()-1, 0, -1):
+            self.tab_bar.removeTab(index)
+            self.code_splitter.widget(index).deleteLater()
+
+    def delete_at(self, index):
+        item = self.code_splitter.widget(index)
+        item.deleteLater()
+        self.tab_bar.removeTab(index)
         self.set_panel_sizes()
 
     def set_to_one_panel(self):

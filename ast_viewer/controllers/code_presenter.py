@@ -25,6 +25,10 @@ class CodePresenter(object):
 
     def clear(self):
         self.code_items = []
+        self.code_pane.clear()
+
+    def delete_last(self):
+        self.delete(len(self.code_items)-1)
 
     def count(self):
         return len(self.code_items)
@@ -145,20 +149,17 @@ class CodePresenter(object):
                     if other_item.parent_link.parent_ast_tree == item_to_delete:
                         other_item.parent_link = None
 
-    def delete(self, ast_tree_item):
+    def delete(self, index):
         """
         delete an ast tree from manager
         ast_tree_item can be AstTreeWidgetItem or index or string
         representing index
         """
-        if isinstance(ast_tree_item, code_model.CodeItem):
-            self.fix_derived_items_before_delete(ast_tree_item)
-            self.code_items.remove(ast_tree_item)
+        if index < len(self.code_items):
+            # self.fix_derived_items_before_delete(self.code_items[index])
+            self.code_items.remove(self.code_items[index])
+            self.code_pane.delete_at(index)
             return True
         else:
-            index = self.get_valid_index(ast_tree_item)
-            if index:
-                self.fix_derived_items_before_delete(self.code_items[index])
-                self.code_items.remove(self.code_items[index])
-                return True
-        return False
+            self.show_error("Tried to delete non-existing code panel %s" % index)
+            return False
