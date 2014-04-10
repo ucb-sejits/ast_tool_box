@@ -26,23 +26,25 @@ class CodePane(QtGui.QGroupBox):
         two_button = QtGui.QPushButton("2")
         two_button.clicked.connect(self.set_to_two_panel)
         toolbar_layout.addWidget(two_button)
-        toolbar.setLayout(toolbar_layout)
+        toolbar_layout.addStretch(1)
+        layout.addLayout(toolbar_layout)
+        # toolbar.setLayout(toolbar_layout)
 
-        layout.addWidget(toolbar)
+        # layout.addWidget(toolbar)
 
         self.code_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Horizontal)
 
-        self.code_splitter.setCollapsible(0, True)
+        # self.code_splitter.setCollapsible(0, True)
         # code_splitter.setCollapsible(1, True)
         # code_splitter.setSizes([700, 300])
         # code_splitter.setStretchFactor(0, 0.5)
         # code_splitter.setStretchFactor(1, 0.5)
 
         layout.addWidget(self.code_splitter)
-
-
-        self.search_box = SearchLineEdit(self, on_changed=self.search_box_changed)
-        layout.addWidget(self.search_box)
+        #
+        #
+        # self.search_box = SearchLineEdit(self, on_changed=self.search_box_changed)
+        # layout.addWidget(self.search_box)
 
         # self.ast_tree_tabs = AstTreeTabs(self, self.code_presenter)
         # layout.addWidget(self.ast_tree_tabs)
@@ -68,9 +70,7 @@ class CodePane(QtGui.QGroupBox):
             widget = EditorPane()
             widget.setPlainText(code_item.code)
         elif isinstance(code_item, AstTreeItem):
-            widget = AstTreeWidget()
-
-            pass
+            widget = AstTreeWidget(self.code_presenter, code_item)
         elif isinstance(code_item, GeneratedCodeItem):
             pass
         else:
