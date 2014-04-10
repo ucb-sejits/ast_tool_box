@@ -8,27 +8,6 @@ from PySide import QtGui, QtCore
 DEBUGGING = False
 
 
-class AstTreeWidgetItem(QtGui.QTreeWidgetItem):
-    """
-    connects a gui tree item with the corresponding node in the actual ast tree
-    """
-    def __init__(self, parent, source_node=None):
-        super(AstTreeWidgetItem, self).__init__(parent)
-        self.ast_node = source_node
-
-
-class TransformerAction(QtGui.QAction):
-    def __init__(self, text, tree_widget, **kwargs):
-        super(TransformerAction, self).__init__(text, tree_widget, **kwargs)
-        self.tree_widget = tree_widget
-        self.text = text
-        self.triggered.connect(self.do_transform)
-
-    def do_transform(self):
-        print("Triggered with string %s" % self.text)
-        self.tree_widget.transform_current_ast(self.text)
-
-
 class AstTreeWidget(QtGui.QTreeWidget):
     """
     displays an ast as a tree widget
@@ -178,6 +157,29 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
         self.ast_root = syntax_tree
 
+
 def class_name(obj):
     """ Returns the class name of an object"""
     return obj.__class__.__name__
+
+
+class AstTreeWidgetItem(QtGui.QTreeWidgetItem):
+    """
+    connects a gui tree item with the corresponding node in the actual ast tree
+    """
+    def __init__(self, parent, source_node=None):
+        super(AstTreeWidgetItem, self).__init__(parent)
+        self.ast_node = source_node
+
+
+class TransformerAction(QtGui.QAction):
+    def __init__(self, text, tree_widget, **kwargs):
+        super(TransformerAction, self).__init__(text, tree_widget, **kwargs)
+        self.tree_widget = tree_widget
+        self.text = text
+        self.triggered.connect(self.do_transform)
+
+    def do_transform(self):
+        print("Triggered with string %s" % self.text)
+        self.tree_widget.transform_current_ast(self.text)
+

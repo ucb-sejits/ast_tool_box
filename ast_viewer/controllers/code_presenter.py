@@ -94,13 +94,13 @@ class CodePresenter(object):
                 new_tree = transform_item.get_instance().visit(code_item.ast_tree)
                 new_ast_tree_item = code_model.AstTreeItem(
                     new_tree,
+                    name=transform_item.name(),
                     parent_link=code_model.CodeTransformLink(code_item=code_item, transform_item=transform_item),
                 )
                 self.add_code_item(new_ast_tree_item)
             elif isinstance(transform_item, transform_model.CodeGeneratorItem):
                 # new_code = transform_item.get_instance().visit(code_item.ast_tree)
                 new_code = apply_codegen_transform(code_item.ast_tree)
-                print("Got new_code %s" % new_code)
                 new_code_item = code_model.GeneratedCodeItem(
                     new_code,
                     parent_link=code_model.CodeTransformLink(code_item=code_item, transform_item=transform_item),
@@ -116,9 +116,11 @@ class CodePresenter(object):
 
     def new_item_from_source(self, source_text):
         new_code_item = code_model.FileItem(code=source_text)
+        parser_item = transform_model.AstParseItem()
         new_tree_item = code_model.AstTreeItem(
             ast.parse(source_text),
-            parent_link=code_model.CodeTransformLink(new_code_item, transform_model.AstParseItem())
+            name=parser_item.name(),
+            parent_link=code_model.CodeTransformLink(new_code_item, parser_item)
         )
         self.add_code_item(new_code_item)
         self.add_code_item(new_tree_item)
@@ -127,9 +129,11 @@ class CodePresenter(object):
         with open(file_name, "r") as file_handle:
             source_text = file_handle.read()
             new_code_item = code_model.FileItem(code=source_text, file_name=file_name)
+            parser_item = transform_model.AstParseItem()
             new_tree_item = code_model.AstTreeItem(
                 ast.parse(source_text),
-                parent_link=code_model.CodeTransformLink(new_code_item, transform_model.AstParseItem())
+                name=parser_item.name(),
+                parent_link=code_model.CodeTransformLink(new_code_item, parser_item)
             )
             self.add_code_item(new_code_item)
             self.add_code_item(new_tree_item)

@@ -1,10 +1,10 @@
 __author__ = 'Chick Markley'
 
 from PySide import QtGui, QtCore
-from ast_viewer.models.code_models.code_model import AstTreeItem, CodeItem, FileItem, GeneratedCodeItem, CodeTransformLink
-from ast_viewer.views.search_widget import SearchLineEdit
-from ast_viewer.views.code_views.ast_tree_widget import AstTreeWidget, AstTreeWidgetItem
+from ast_viewer.models.code_models.code_model import AstTreeItem, CodeItem, FileItem, GeneratedCodeItem
+from ast_viewer.views.code_views.ast_tree_widget import AstTreeWidget
 from ast_viewer.views.editor_widget import EditorPane
+import ast_viewer.ast_tool_box
 
 
 class CodePane(QtGui.QGroupBox):
@@ -46,6 +46,10 @@ class CodePane(QtGui.QGroupBox):
 
         self.code_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Horizontal)
 
+        self.tab_bar = QtGui.QTabBar()
+        self.tab_bar.setStyle(QtGui.QStyleFactory.create("Plastique"))
+        layout.addWidget(self.tab_bar)
+
         layout.addWidget(self.code_splitter)
         #
         #
@@ -61,6 +65,7 @@ class CodePane(QtGui.QGroupBox):
         last_item = self.code_splitter.widget(self.code_splitter.count()-1)
         self.code_presenter.delete_last_item()
         last_item.deleteLater()
+        self.tab_bar.removeTab(self.tab_bar.count()-1)
         self.set_panel_sizes()
 
     def set_to_one_panel(self):
@@ -77,7 +82,16 @@ class CodePane(QtGui.QGroupBox):
 
     def set_panel_sizes(self):
         sizes = self.code_splitter.sizes()
+        print("In set panel sizes splitter %s self.panel_count %d sizes %s" %
+              (
+                  [self.code_splitter.size(),self.code_splitter.baseSize(), self.code_splitter.frameSize()],
+                   self.panel_count,
+                   sizes
+              )
+        )
         total = sum(sizes)
+        if total == 0:
+            total = ast_viewer.ast_tool_box.AstToolBox.default_left_frame_size
         new_sizes = map(lambda x: 0, sizes)
         panel_count = self.panel_count
         if panel_count > len(sizes):
@@ -114,7 +128,10 @@ class CodePane(QtGui.QGroupBox):
             widget = EditorPane()
             widget.setPlainText(code_item.code)
         else:
-            print("add_code_item got %s %s" % (type(code_item), code_item))
+            CodePane.show_error("add_code_item got %s %s" % (type(code_item), code_item))
+            return
+
+        self.tab_bar.addTab(code_item.code_name)
 
         self.code_splitter.addWidget(widget)
         if self.code_splitter.count() > 2:
@@ -122,7 +139,8 @@ class CodePane(QtGui.QGroupBox):
         self.code_splitter.setCollapsible(self.code_splitter.count()-1, True)
         self.set_panel_sizes()
 
-    def show_error(self, message):
+    @staticmethod
+    def show_error(message):
         QtGui.QErrorMessage.showMessage(message)
 
     def search_box_changed(self):
@@ -146,40 +164,3 @@ class CodePane(QtGui.QGroupBox):
             # print(items[0])
             current_tree.setCurrentItem(items[0])
             current_tree.expandItem(items[0])
-
-
-class CodeSplitterView(QtGui.QSplitter):
-    def __init__(self):
-        super(CodeSplitterView, self).__init__()
-
-
-class AstTreeTabs(QtGui.QTabWidget):
-    def __init__(self, parent, main_window, tree_transform_controller):
-        super(AstTreeTabs, self).__init__(parent)
-        self.parent = parent
-        self.main_window = main_window
-        self.tree_transform_controller = tree_transform_controller
-
-        self.setTabsClosable(True)
-        self.setUsesScrollButtons(True)
-        self.setStyle(QtGui.QStyleFactory.create("Plastique"))
-        self.tabCloseRequested.connect(self.close_tab)
-
-        for tree_item in self.tree_transform_controller.ast_tree_manager:
-            ast_tree_widget = AstTreeWidget(self, self.main_window)
-            ast_tree_widget.make_tree_from(tree_item.ast_tree)
-            self.addTab(
-                ast_tree_widget,
-                tree_item.name
-            )
-
-    @QtCore.Slot(int)
-    def close_tab(self, index):
-        print("Tab close requested index %s" % index)
-        self.tree_transform_controller.ast_tree_manager.delete(index)
-        self.removeTab(index)
-
-    def current_ast(self):
-        if self.currentWidget():
-            return self.currentWidget().ast_root
-        return None

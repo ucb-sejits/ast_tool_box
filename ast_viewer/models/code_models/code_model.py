@@ -13,16 +13,17 @@ class CodeItem(object):
     """
     def __init__(self, code=None, code_name=None, path_name=None, parent_link=None):
         assert parent_link is None or isinstance(parent_link, CodeTransformLink)
+        print("code_name %s" % code_name)
         self.code = code
         self.code_name = code_name
         self.path_name = path_name
         self.parent_code_item = parent_link
 
     def name(self):
-        self.code_name
+        return self.code_name
 
     def path(self):
-        self.path_name
+        return self.path_name
 
     def has_parent(self):
         return self.parent_code_item is not None and self.parent_code_item.code_item is not None
@@ -32,13 +33,11 @@ class AstTreeItem(CodeItem):
     """
     represent an ast and where it came from
     """
-    def __init__(self, ast_tree, parent_link=None, source=None, file_name=None, name=None):
-        base_name = None if file_name is None else os.path.basename(file_name)
-        name = name if name else base_name if base_name else "Derived"
+    def __init__(self, ast_tree, parent_link=None, name=None):
+        name = name if name else "Derived"
         super(AstTreeItem, self).__init__(
             ast_tree,
             code_name=name,
-            path_name=file_name,
             parent_link=parent_link
         )
         self.ast_tree = ast_tree

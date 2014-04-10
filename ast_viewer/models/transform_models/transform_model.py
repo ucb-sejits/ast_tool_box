@@ -16,7 +16,6 @@ class TransformItem(object):
         return self.transform.__module__
 
     def name(self):
-        print("self.transform %s" % self.transform)
         return self.transform.__name__
 
     def get_instance(self):

@@ -86,10 +86,13 @@ from ast_viewer.controllers.transform_presenter import TransformPresenter
 # ancestors public methods and attributes.
 # pylint: disable=R0901, R0902, R0904, W0201, R0913 
 
+
 class AstToolBox(QtGui.QMainWindow):
     """
     The main application.
     """
+
+    default_left_frame_size = 700
 
     def __init__(self, file_name=None, mode='exec',
                  width=None, height=None):
@@ -149,7 +152,7 @@ class AstToolBox(QtGui.QMainWindow):
         # Splitter parameters
         central_splitter.setCollapsible(0, True)
         central_splitter.setCollapsible(1, True)
-        central_splitter.setSizes([700, 300])
+        central_splitter.setSizes([AstToolBox.default_left_frame_size, 300])
         central_splitter.setStretchFactor(0, 0.5)
         central_splitter.setStretchFactor(1, 0.5)
 
