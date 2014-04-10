@@ -15,6 +15,7 @@ class CodePane(QtGui.QGroupBox):
     def __init__(self, code_presenter=None, panel_count=2):
         super(CodePane, self).__init__("Code & Trees")
         self.code_presenter = code_presenter
+        self.panel_count = panel_count
 
         layout = QtGui.QVBoxLayout()
 
@@ -33,7 +34,15 @@ class CodePane(QtGui.QGroupBox):
         self.three_button.clicked.connect(self.set_to_three_panel)
         toolbar_layout.addWidget(self.three_button)
         self.three_button.setEnabled(False)
+
+        toolbar_layout.addSpacing(10)
+
+        del_button = QtGui.QPushButton("Del")
+        del_button.clicked.connect(self.delete_last)
+        toolbar_layout.addWidget(del_button)
         toolbar_layout.addStretch(1)
+
+
 
         layout.addLayout(toolbar_layout)
 
@@ -52,7 +61,11 @@ class CodePane(QtGui.QGroupBox):
 
         self.setLayout(layout)
 
-        self.panel_count = panel_count
+    def delete_last(self):
+        last_item = self.code_splitter.widget(self.code_splitter.count()-1)
+        self.code_presenter.delete_last_item()
+        last_item.deleteLater()
+        self.set_panel_sizes()
 
     def set_to_one_panel(self):
         self.panel_count = 1
@@ -61,7 +74,6 @@ class CodePane(QtGui.QGroupBox):
     def set_to_two_panel(self):
         self.panel_count = 2
         self.set_panel_sizes()
-        self.code_splitter.setSizes(new_sizes)
 
     def set_to_three_panel(self):
         self.panel_count = 3
@@ -103,7 +115,8 @@ class CodePane(QtGui.QGroupBox):
         elif isinstance(code_item, AstTreeItem):
             widget = AstTreeWidget(self.code_presenter, code_item.code)
         elif isinstance(code_item, GeneratedCodeItem):
-            pass
+            widget = EditorPane()
+            widget.setPlainText(code_item.code)
         else:
             print("add_code_item got %s %s" % (type(code_item), code_item))
 
@@ -111,6 +124,7 @@ class CodePane(QtGui.QGroupBox):
         if self.code_splitter.count() > 2:
             self.three_button.setEnabled(True)
         self.code_splitter.setCollapsible(self.code_splitter.count()-1, True)
+        self.set_panel_sizes()
 
 
     def search_box_changed(self):

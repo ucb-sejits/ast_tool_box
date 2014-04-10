@@ -31,6 +31,10 @@ class TransformPresenter(object):
         self.transforms_by_name = {}
 
         self.load_transforms('ctree.transformations')
+        self.load_transforms('ctree.c.codegen')
+        self.load_transforms('ctree.ocl.codegen')
+        self.load_transforms('ctree.omp.codegen')
+
         self.transform_pane.reload_list()
 
     def set_code_presenter(self, code_presenter):

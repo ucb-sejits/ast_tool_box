@@ -64,9 +64,10 @@ class FileItem(CodeItem):
 
 class GeneratedCodeItem(CodeItem):
     def __init__(self, code=None, parent_link=None, parent_ast_node=None, transform_item=None):
-        self.parent_ast_tree = parent_link
-        self.parent_ast_node = parent_ast_node if parent_ast_node else parent_link
-        self.transform_item = transform_item
+        super(GeneratedCodeItem, self).__init__(
+            code,
+            parent_link=parent_link
+        )
 
 
 class CodeTransformLink(object):

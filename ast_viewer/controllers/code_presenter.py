@@ -29,6 +29,9 @@ class CodePresenter(object):
     def count(self):
         return len(self.code_items)
 
+    def delete_last_item(self):
+        self.code_items.remove(self.code_items[-1])
+
     def __getitem__(self, item):
         return self.code_items[item]
 
@@ -85,6 +88,7 @@ class CodePresenter(object):
                 self.add_code_item(new_ast_tree_item)
             elif isinstance(transform_item, transform_model.CodeGeneratorItem):
                 new_code = transform_item.get_instance().visit(code_item.ast_tree)
+                print("Got new_code %s" % new_code)
                 new_code_item = code_model.GeneratedCodeItem(
                     new_code,
                     parent_link=code_model.CodeTransformLink(code_item=code_item, transform_item=transform_item),
