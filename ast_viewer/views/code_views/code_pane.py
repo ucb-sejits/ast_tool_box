@@ -70,7 +70,7 @@ class CodePane(QtGui.QGroupBox):
             widget = EditorPane()
             widget.setPlainText(code_item.code)
         elif isinstance(code_item, AstTreeItem):
-            widget = AstTreeWidget(self.code_presenter, code_item)
+            widget = AstTreeWidget(self.code_presenter, code_item.code)
         elif isinstance(code_item, GeneratedCodeItem):
             pass
         else:
@@ -79,6 +79,7 @@ class CodePane(QtGui.QGroupBox):
         self.code_splitter.addWidget(
             widget
         )
+        self.code_splitter.setCollapsible(self.code_splitter.count()-1, True)
 
 
     def search_box_changed(self):

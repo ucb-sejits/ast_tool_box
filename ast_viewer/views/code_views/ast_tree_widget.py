@@ -45,11 +45,9 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
         self.code_presenter = code_presenter
 
-        self.ast_root = ast
+        self.ast_root = ast_root
         self.setColumnCount(2)
-        self.setHeaderLabels(
-            ["Node"]
-        )
+        self.setHeaderLabels(["Node"])
         self.header().resizeSection(AstTreeWidget.COL_NODE, 800)
         self.header().setStretchLastSection(True)
 
