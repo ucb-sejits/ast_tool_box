@@ -18,27 +18,28 @@ class CodePane(QtGui.QGroupBox):
 
         layout = QtGui.QVBoxLayout()
 
-        toolbar = QtGui.QGroupBox()
         toolbar_layout = QtGui.QHBoxLayout()
-        one_button = QtGui.QPushButton("1")
+        toolbar_layout.addSpacing(0)
+
+        one_button = QtGui.QPushButton("|1|")
         one_button.clicked.connect(self.set_to_one_panel)
         toolbar_layout.addWidget(one_button)
-        two_button = QtGui.QPushButton("2")
+
+        two_button = QtGui.QPushButton("|1|2|")
         two_button.clicked.connect(self.set_to_two_panel)
         toolbar_layout.addWidget(two_button)
+
+        self.three_button = QtGui.QPushButton("|1|2|3|")
+        self.three_button.clicked.connect(self.set_to_three_panel)
+        toolbar_layout.addWidget(self.three_button)
+        self.three_button.setEnabled(False)
         toolbar_layout.addStretch(1)
+
         layout.addLayout(toolbar_layout)
-        # toolbar.setLayout(toolbar_layout)
 
         # layout.addWidget(toolbar)
 
         self.code_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Horizontal)
-
-        # self.code_splitter.setCollapsible(0, True)
-        # code_splitter.setCollapsible(1, True)
-        # code_splitter.setSizes([700, 300])
-        # code_splitter.setStretchFactor(0, 0.5)
-        # code_splitter.setStretchFactor(1, 0.5)
 
         layout.addWidget(self.code_splitter)
         #
@@ -54,10 +55,37 @@ class CodePane(QtGui.QGroupBox):
         self.panel_count = panel_count
 
     def set_to_one_panel(self):
-        pass
+        self.panel_count = 1
+        self.set_panel_sizes()
 
     def set_to_two_panel(self):
-        pass
+        self.panel_count = 2
+        self.set_panel_sizes()
+        self.code_splitter.setSizes(new_sizes)
+
+    def set_to_three_panel(self):
+        self.panel_count = 3
+        self.set_panel_sizes()
+
+    def set_panel_sizes(self):
+        sizes = self.code_splitter.sizes()
+        total = sum(sizes)
+        new_sizes = map(lambda x: 0, sizes)
+        panel_count = self.panel_count
+        if panel_count > len(sizes):
+            panel_count = len(sizes)
+
+        if panel_count == 1:
+            new_sizes[-1] = total
+        elif panel_count == 2:
+            new_sizes[-2] = int(total * 0.4)
+            new_sizes[-1] = int(total * 0.6)
+        elif panel_count > 2:
+            new_sizes[-3] = int(total * 0.2)
+            new_sizes[-2] = int(total * 0.3)
+            new_sizes[-1] = int(total * 0.5)
+
+        self.code_splitter.setSizes(new_sizes)
 
     def current_item(self):
         return self.code_presenter.current_item()
@@ -79,9 +107,9 @@ class CodePane(QtGui.QGroupBox):
         else:
             print("add_code_item got %s %s" % (type(code_item), code_item))
 
-        self.code_splitter.addWidget(
-            widget
-        )
+        self.code_splitter.addWidget(widget)
+        if self.code_splitter.count() > 2:
+            self.three_button.setEnabled(True)
         self.code_splitter.setCollapsible(self.code_splitter.count()-1, True)
 
 

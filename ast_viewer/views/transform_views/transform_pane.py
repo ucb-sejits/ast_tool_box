@@ -54,7 +54,7 @@ class TransformPane(QtGui.QGroupBox):
     @QtCore.Slot(QtGui.QListWidgetItem)
     def load_editor_from(self, item):
         print("show item %s" % item)
-        transformer = item.ast_transformer_item.transform
+        transformer = item.transform_item.transform
         self.editor.setPlainText(inspect.getsource(transformer))
 
     def reload_list(self):
