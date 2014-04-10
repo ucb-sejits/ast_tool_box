@@ -82,7 +82,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
         sub_menu = QtGui.QMenu(self)
         sub_menu.setTitle("Available transformers")
-        for transformer_name in self.ast_transformers.transformers_by_name:
+        for transformer_name in self.code_presenter.transform_presenter.transforms_by_name:
             sub_menu_action = TransformerAction(transformer_name, self)
             sub_menu.addAction(sub_menu_action)
         menu.addMenu(sub_menu)
@@ -95,7 +95,6 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
     def show_with_dot(self):
         from ctree.visual.dot_manager import DotManager
-        print("calling open")
         DotManager.dot_ast_to_browser(self.ast_root, "ast_%s.png" % "tree")
 
     def make_root(self):

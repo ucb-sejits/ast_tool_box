@@ -31,7 +31,7 @@ class TransformPresenter(object):
         self.transforms_by_name = {}
 
         self.load_transforms('ctree.transformations')
-
+        self.transform_pane.reload_list()
 
     def set_code_presenter(self, code_presenter):
         # assert isinstance(code_presenter, controllers.TransformPresenter)
@@ -44,7 +44,7 @@ class TransformPresenter(object):
         return self.transform_pane.current_item()
 
     def apply_current_transform(self):
-        transform_item = self.current_item()
+        transform_item = self.current_item().transform_item
         code_item = self.code_presenter.current_item()
         self.apply_transform(code_item, transform_item)
 

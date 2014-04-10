@@ -54,7 +54,7 @@ class TransformPane(QtGui.QGroupBox):
     @QtCore.Slot(QtGui.QListWidgetItem)
     def load_editor_from(self, item):
         print("show item %s" % item)
-        transformer = item.ast_transformer_item.node_transformer
+        transformer = item.ast_transformer_item.transform
         self.editor.setPlainText(inspect.getsource(transformer))
 
     def reload_list(self):
@@ -64,6 +64,9 @@ class TransformPane(QtGui.QGroupBox):
             self.transform_list.addItem(
                 TransformWidgetItem(transformer)
             )
+
+    def current_item(self):
+        return self.transform_list.currentItem()
 
     def load(self):
         file_name, _ = QtGui.QFileDialog.getOpenFileName(
@@ -104,6 +107,6 @@ class TransformPane(QtGui.QGroupBox):
 
 
 class TransformWidgetItem(QtGui.QListWidgetItem):
-    def __init__(self, ast_transformer_item):
-        super(AstTransformWidgetItem, self).__init__(ast_transformer_item.name())
-        self.ast_transformer_item = ast_transformer_item
+    def __init__(self, transform_item):
+        super(TransformWidgetItem, self).__init__(transform_item.name())
+        self.transform_item = transform_item

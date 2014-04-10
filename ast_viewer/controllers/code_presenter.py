@@ -55,6 +55,9 @@ class CodePresenter(object):
                 return index
         return None
 
+    def current_item(self):
+        return self.code_items[-1]
+
     def add_code_item(self, code_item):
         self.code_items.append(code_item)
         self.code_pane.add_code_item(code_item)

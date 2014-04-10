@@ -59,6 +59,9 @@ class CodePane(QtGui.QGroupBox):
     def set_to_two_panel(self):
         pass
 
+    def current_item(self):
+        return self.code_presenter.current_item()
+
     def add_code_item(self, code_item):
         """
         add a new code item widget to the right hand side of the
