@@ -38,9 +38,6 @@ class CodePresenter(object):
     def __iter__(self):
         return iter(self.code_items)
 
-    def current_item(self):
-        return self.code_pane.current_item()
-
     def get_valid_index(self, index):
         """
         convenience method for checking index,
@@ -73,8 +70,22 @@ class CodePresenter(object):
         assert isinstance(code_item, code_model.CodeItem)
         assert isinstance(transform_item, transform_model.TransformItem)
 
-        def update_view():
-            self.code_pane.update
+        def apply_codegen_transform(ast_root):
+            """
+            Code generates each file in the project
+            """
+            import ctree.nodes
+            assert isinstance(ast_root, ctree.nodes.Project), \
+                "apply_code_gen root of tree not Project is a %s" % ast_root
+
+            # TODO: stay more in line with ctree and use ResolveGeneratedPathRefs
+
+            # transform all files a combined source string
+            combined_source = ""
+            for f in ast_root.files:
+                combined_source += "File %s\n" % f.name
+                combined_source += f.codegen()
+            return combined_source
 
         if isinstance(code_item, code_model.FileItem):
             self.show_error("Transformation cannot be applied to source code")
@@ -87,7 +98,8 @@ class CodePresenter(object):
                 )
                 self.add_code_item(new_ast_tree_item)
             elif isinstance(transform_item, transform_model.CodeGeneratorItem):
-                new_code = transform_item.get_instance().visit(code_item.ast_tree)
+                # new_code = transform_item.get_instance().visit(code_item.ast_tree)
+                new_code = apply_codegen_transform(code_item.ast_tree)
                 print("Got new_code %s" % new_code)
                 new_code_item = code_model.GeneratedCodeItem(
                     new_code,
@@ -97,7 +109,10 @@ class CodePresenter(object):
             else:
                 self.show_error("Cannot transform\n%s\n with\n%s" % (code_item, transform_item))
         else:
-            self.error("Unknown transform of\n%s\n with\n%s" % (code_item, transform_item))
+            self.show_error("Unknown transform of\n%s\n with\n%s" % (code_item, transform_item))
+
+    def show_error(self, message):
+        self.code_pane.show_error(message)
 
     def new_item_from_source(self, source_text):
         new_code_item = code_model.FileItem(code=source_text)

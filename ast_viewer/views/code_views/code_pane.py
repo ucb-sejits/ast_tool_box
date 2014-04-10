@@ -42,11 +42,7 @@ class CodePane(QtGui.QGroupBox):
         toolbar_layout.addWidget(del_button)
         toolbar_layout.addStretch(1)
 
-
-
         layout.addLayout(toolbar_layout)
-
-        # layout.addWidget(toolbar)
 
         self.code_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Horizontal)
 
@@ -126,6 +122,8 @@ class CodePane(QtGui.QGroupBox):
         self.code_splitter.setCollapsible(self.code_splitter.count()-1, True)
         self.set_panel_sizes()
 
+    def show_error(self, message):
+        QtGui.QErrorMessage.showMessage(message)
 
     def search_box_changed(self):
         if not self.search_box.text():

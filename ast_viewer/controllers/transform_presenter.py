@@ -26,7 +26,7 @@ class TransformPresenter(object):
         self.tree_transform_controller = tree_transform_controller
         self.transform_pane = TransformPane(transform_presenter=self)
 
-        self.files_loaded = []
+        self.transforms_loaded = []
         self.transform_items = []
         self.transforms_by_name = {}
 
@@ -93,7 +93,7 @@ class TransformPresenter(object):
             print("cannot load %s message %s" % (module_name, exception.message))
 
     def reload(self):
-        """rebuild list of all in memory subclasses of ast.Nodetransform"""
+        """rebuild list of all in memory subclasses of ast.NodeTransformer"""
 
         self.transform_items = map(
             lambda transform: transform_model.AstTransformItem(transform),
@@ -121,6 +121,8 @@ class TransformPresenter(object):
         pass
 
     def load_transforms(self, key):
+        self.transforms_loaded.append(key)
+
         path, package_name = Util.path_to_path_and_package(key)
 
         print("path %s package %s" % (path, package_name))
