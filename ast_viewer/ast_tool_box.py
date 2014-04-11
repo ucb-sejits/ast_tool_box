@@ -94,8 +94,7 @@ class AstToolBox(QtGui.QMainWindow):
 
     default_left_frame_size = 700
 
-    def __init__(self, file_name=None, mode='exec',
-                 width=None, height=None):
+    def __init__(self, file_name=None, mode='exec', packages=None, width=None, height=None):
         """ Constructor
             
             AST browser windows that displays the Abstract Syntax Tree
@@ -120,7 +119,9 @@ class AstToolBox(QtGui.QMainWindow):
         valid_modes = ['exec', 'eval', 'single']
         if mode not in valid_modes:
             raise ValueError("Mode must be one of: {}".format(valid_modes))
-        self._mode = mode
+        self._mode = 'exec'
+
+        self.start_packages = packages if packages else []
 
         # Set up the UI
         self.tree_transform_controller = TreeTransformController()
@@ -130,7 +131,8 @@ class AstToolBox(QtGui.QMainWindow):
             tree_transform_controller=self.tree_transform_controller
         )
         self.transform_presenter = TransformPresenter(
-            tree_transform_controller=self.tree_transform_controller
+            tree_transform_controller=self.tree_transform_controller,
+            start_packages=self.start_packages,
         )
         self.code_presenter.set_transform_presenter(self.transform_presenter)
         self.transform_presenter.set_code_presenter(self.code_presenter)

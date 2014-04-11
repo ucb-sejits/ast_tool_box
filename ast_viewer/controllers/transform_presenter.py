@@ -19,7 +19,7 @@ class TransformPresenter(object):
     have direct connection to a code code_presenter
     TODO: Do more investigation of managing transforms in separate namespace
     """
-    def __init__(self, tree_transform_controller=None):
+    def __init__(self, tree_transform_controller=None, start_packages=None):
         assert isinstance(tree_transform_controller, TreeTransformController)
 
         self.code_presenter = None
@@ -32,8 +32,11 @@ class TransformPresenter(object):
 
         self.load_transforms('ctree.transformations')
         self.load_transforms('ctree.c.codegen')
-        self.load_transforms('ctree.ocl.codegen')
-        self.load_transforms('ctree.omp.codegen')
+        # self.load_transforms('ctree.ocl.codegen')
+        # self.load_transforms('ctree.omp.codegen')
+
+        for package_name in start_packages:
+            self.load_transforms(package_name)
 
         self.transform_pane.reload_list()
 

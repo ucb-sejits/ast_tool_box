@@ -22,29 +22,29 @@ def main():
     app = QtGui.QApplication(sys.argv) # to allow for Qt command line arguments
     remaining_argv = app.arguments()
     
-    parser = argparse.ArgumentParser(description='Python abstract syntax tree viewer')
-    parser.add_argument(dest='file_name', help='Python input file', nargs='?')
-    parser.add_argument('-m', '--mode', dest='mode', default = 'exec',
-        choices=('exec', 'eval', 'single'),
-        help="""The mode argument specifies what kind of code must be compiled;
-            it can be 'exec' if source consists of a sequence of statements, 
-            'eval' if it consists of a single expression, or 'single' if it 
-            consists of a single interactive statement (in the latter case, 
-            expression statements that evaluate to something other than None 
-            will be printed). """)    
-    parser.add_argument('-l', '--log-level', dest='log_level', default = 'warn', 
+    parser = argparse.ArgumentParser(description='Python abstract syntax tree viewer and transformer')
+    parser.add_argument('file_name', help='Python input file')
+    parser.add_argument('packages', metavar='P', nargs='*')
+
+    parser.add_argument(
+        '-l', '--log-level', dest='log_level', default='warn',
         choices=('debug', 'info', 'warn', 'error', 'critical'),
         help="Log level. Only log messages with a level higher or equal than this "
-            "will be printed. Default: 'warn'")
+             "will be printed. Default: 'warn'"
+    )
 
-    
     args = parser.parse_args(args = remaining_argv[1:])
 
     ast_tool_box.logging_basic_config(args.log_level.upper())
 
     logger.info('Started {}'.format(ast_tool_box.PROGRAM_NAME))
-    exit_code = ast_tool_box.view(file_name=args.file_name, mode = args.mode,
-                               width=1100, height=800)
+
+    exit_code = ast_tool_box.view(
+        file_name=args.file_name,
+        packages=args.packages,
+        width=1100, height=800
+    )
+
     logging.info('Done {}'.format(ast_tool_box.PROGRAM_NAME))
     sys.exit(exit_code)
 
