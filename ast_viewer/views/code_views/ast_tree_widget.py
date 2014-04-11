@@ -87,6 +87,8 @@ class AstTreeWidget(QtGui.QTreeWidget):
     COL_POS = 4
     COL_HIGHLIGHT = 5
 
+    expand_all_at_create = True
+
     def __init__(self, code_presenter=None, ast_root=None):
         super(AstTreeWidget, self).__init__()
 
@@ -248,7 +250,10 @@ class AstTreeWidget(QtGui.QTreeWidget):
         #logger.debug(ast.dump(syntax_tree))
         add_node(syntax_tree, self, '"{}"'.format(file_name))
 
-        self.expandToDepth(display_depth)
+        if AstTreeWidget.expand_all_at_create:
+            self.expandToDepth(100)
+        else:
+            self.expandToDepth(display_depth)
 
         self.ast_root = syntax_tree
 

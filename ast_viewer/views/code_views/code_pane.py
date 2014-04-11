@@ -2,7 +2,7 @@ __author__ = 'Chick Markley'
 
 from PySide import QtGui, QtCore
 from ast_viewer.models.code_models.code_model import AstTreeItem, CodeItem, FileItem, GeneratedCodeItem
-from ast_viewer.views.code_views.ast_tree_widget import AstTreePane
+from ast_viewer.views.code_views.ast_tree_widget import AstTreePane, AstTreeWidget
 from ast_viewer.views.editor_widget import EditorPane
 import ast_viewer.ast_tool_box
 
@@ -39,13 +39,9 @@ class CodePane(QtGui.QGroupBox):
         toolbar_layout.addWidget(self.three_button)
         self.three_button.setEnabled(False)
 
-        expand_all_button = QtGui.QPushButton("<>")
-        expand_all_button.clicked.connect(self.expand_all_asts)
-        toolbar_layout.addWidget(expand_all_button)
-
-        collapse_all_button = QtGui.QPushButton("><")
-        collapse_all_button.clicked.connect(self.collapse_all_asts)
-        toolbar_layout.addWidget(collapse_all_button)
+        self.expand_all_button = QtGui.QPushButton("><")
+        self.expand_all_button.clicked.connect(self.expand_all_asts)
+        toolbar_layout.addWidget(self.expand_all_button)
 
         toolbar_layout.addSpacing(1)
 
@@ -67,21 +63,26 @@ class CodePane(QtGui.QGroupBox):
         self.setLayout(layout)
 
     def expand_all_asts(self):
-        self.all_expanded = True
-        for index in range(self.code_splitter.count()):
-            try:
-                self.code_splitter.widget(index).expand_all()
-            except AttributeError:
-                pass
-
-    def collapse_all_asts(self):
-        self.all_expanded = False
-        for index in range(self.code_splitter.count()):
-            try:
-                self.code_splitter.widget(index).collapse_all()
-            except AttributeError:
-                pass
-
+        if self.all_expanded:
+            self.all_expanded = False
+            AstTreeWidget.expand_all_at_create = False
+            self.expand_all_button.setText("<>")
+            self.expand_all_button.setToolTip("Expand all ast trees")
+            for index in range(self.code_splitter.count()):
+                try:
+                    self.code_splitter.widget(index).collapse_all()
+                except AttributeError:
+                    pass
+        else:
+            self.all_expanded = True
+            AstTreeWidget.expand_all_at_create = True
+            self.expand_all_button.setText("><")
+            self.expand_all_button.setToolTip("Collapse all ast trees")
+            for index in range(self.code_splitter.count()):
+                try:
+                    self.code_splitter.widget(index).expand_all()
+                except AttributeError:
+                    pass
 
     def clear(self):
         for index in range(self.code_splitter.count()-1, 0, -1):
