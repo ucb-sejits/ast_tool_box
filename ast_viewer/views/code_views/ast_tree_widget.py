@@ -2,11 +2,79 @@ __author__ = 'Chick Markley'
 
 import types
 import ast
+from ast_viewer.views.editor_widget import EditorPane
+from ast_viewer.views.search_widget import SearchLineEdit
 
 from PySide import QtGui, QtCore
 
 DEBUGGING = False
 
+class AstTreePane(QtGui.QGroupBox):
+    def __init__(self, code_presenter=None, ast_root=None):
+        super(AstTreePane, self).__init__()
+        self.code_presenter = code_presenter
+
+        layout = QtGui.QVBoxLayout()
+
+        # button_box = QtGui.QGroupBox()
+        # button_layout = QtGui.QHBoxLayout()
+        # go_button = QtGui.QPushButton("Apply")
+        # go_button.clicked.connect(self.transform_presenter.apply_current_transform)
+        #
+        # open_button = QtGui.QPushButton("Load File")
+        # open_button.clicked.connect(self.load)
+        #
+        # package_button = QtGui.QPushButton("Load Package")
+        # package_button.clicked.connect(self.load_package)
+        #
+        # button_layout.addWidget(package_button)
+        # button_layout.addWidget(open_button)
+        # button_layout.addWidget(go_button)
+        #
+        # button_box.setLayout(button_layout)
+        #
+        # layout.addWidget(button_box)
+
+        self.search_box = SearchLineEdit(on_changed=self.search_box_changed)
+        layout.addWidget(self.search_box)
+
+        self.ast_tree_widget = AstTreeWidget(code_presenter=self.code_presenter, ast_root=ast_root)
+        layout.addWidget(self.ast_tree_widget)
+
+        self.setLayout(layout)
+
+    def expand_all(self):
+        print("got to %s" % self)
+        self.ast_tree_widget.expand_descendants()
+
+    def collapse_all(self):
+        print("got to %s" % self)
+        self.ast_tree_widget.collapse_descendants()
+
+    def make_tree_from(self, syntax_tree, file_name="", display_depth=1):
+        self.ast_tree_widget.make_tree_from(syntax_tree, file_name=file_name, display_depth=display_depth)
+
+    def search_box_changed(self):
+        if not self.search_box.text():
+            return
+
+        current_tree = self.ast_tree_widget
+        # print("current tree %s" % current_tree)
+        #
+        # for widget_index in range(self.ast_tree_tabs.count()):
+        #     widget = self.ast_tree_tabs.widget(widget_index)
+        #     print("widget %s ast_tree %s" % (widget, widget.ast_root))
+
+        items = current_tree.findItems(
+            self.search_box.text(),
+            QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive,
+            column=AstTreeWidget.COL_NODE
+        )
+        # print("Found %d items" % len(items))
+        if len(items) > 0:
+            # print(items[0])
+            current_tree.setCurrentItem(items[0])
+            current_tree.expandItem(items[0])
 
 class AstTreeWidget(QtGui.QTreeWidget):
     """
@@ -82,12 +150,35 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
     def expand_descendants(self, item=None):
         """Expand all descendants of the current item"""
+        print("XXX got to expand descendants item %s" % item)
+
         if item is None:
+            print("item is none")
             item = self.currentItem()
+            print("item is %s" % item)
+
+        print("XXX got to expand descendants item %s %s" % (item, item.childCount()))
+
         item.setExpanded(True)
-        # print("at_node %s children count %d" % (item, item.childCount()))
+        print("at_node %s children count %d" % (item, item.childCount()))
         for child_index in range(item.childCount()):
             self.expand_descendants(item.child(child_index))
+
+    def collapse_descendants(self, item=None):
+        """Expand all descendants of the current item"""
+        print("XXX got to collapse descendants item %s" % item)
+
+        if item is None:
+            print("item is none")
+            item = self.currentItem()
+            print("item is %s" % item)
+
+        print("XXX got to collpase descendants item %s %s" % (item, item.childCount()))
+
+        item.setExpanded(False)
+        print("at_node %s children count %d" % (item, item.childCount()))
+        for child_index in range(item.childCount()):
+            self.collapse_descendants(item.child(child_index))
 
     def make_tree_from(self, syntax_tree, file_name="", display_depth=1):
         """
@@ -107,6 +198,9 @@ class AstTreeWidget(QtGui.QTreeWidget):
                 :param field_label: Labels how this node is known to the parent
             """
             node_item = AstTreeWidgetItem(parent_item)
+            if parent_item is self:
+               self.setCurrentItem(node_item)
+
             node_item.ast_node = ast_node
 
             if hasattr(ast_node, 'lineno'):
@@ -153,6 +247,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
         #syntax_tree = ast.parse(self._source_code, filename=self._file_name, mode=self._mode)
         #logger.debug(ast.dump(syntax_tree))
         add_node(syntax_tree, self, '"{}"'.format(file_name))
+
         self.expandToDepth(display_depth)
 
         self.ast_root = syntax_tree

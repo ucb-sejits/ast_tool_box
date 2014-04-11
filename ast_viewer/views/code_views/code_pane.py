@@ -2,7 +2,7 @@ __author__ = 'Chick Markley'
 
 from PySide import QtGui, QtCore
 from ast_viewer.models.code_models.code_model import AstTreeItem, CodeItem, FileItem, GeneratedCodeItem
-from ast_viewer.views.code_views.ast_tree_widget import AstTreeWidget
+from ast_viewer.views.code_views.ast_tree_widget import AstTreePane
 from ast_viewer.views.editor_widget import EditorPane
 import ast_viewer.ast_tool_box
 
@@ -13,20 +13,24 @@ class CodePane(QtGui.QGroupBox):
     A code item can be source ast
     """
     def __init__(self, code_presenter=None, panel_count=2):
-        super(CodePane, self).__init__("Code & Trees")
+        super(CodePane, self).__init__("Code && Trees")
         self.code_presenter = code_presenter
         self.panel_count = panel_count
+        self.all_expanded = True
 
         layout = QtGui.QVBoxLayout()
 
         toolbar_layout = QtGui.QHBoxLayout()
+        toolbar_layout.setContentsMargins(0, 0, 0, 0)
         toolbar_layout.addSpacing(0)
 
         one_button = QtGui.QPushButton("|1|")
+        one_button.setContentsMargins(0, 0, 0, 0)
         one_button.clicked.connect(self.set_to_one_panel)
         toolbar_layout.addWidget(one_button)
 
         two_button = QtGui.QPushButton("|1|2|")
+        two_button.setContentsMargins(0, 0, 0, 0)
         two_button.clicked.connect(self.set_to_two_panel)
         toolbar_layout.addWidget(two_button)
 
@@ -35,7 +39,15 @@ class CodePane(QtGui.QGroupBox):
         toolbar_layout.addWidget(self.three_button)
         self.three_button.setEnabled(False)
 
-        toolbar_layout.addSpacing(10)
+        expand_all_button = QtGui.QPushButton("<>")
+        expand_all_button.clicked.connect(self.expand_all_asts)
+        toolbar_layout.addWidget(expand_all_button)
+
+        collapse_all_button = QtGui.QPushButton("><")
+        collapse_all_button.clicked.connect(self.collapse_all_asts)
+        toolbar_layout.addWidget(collapse_all_button)
+
+        toolbar_layout.addSpacing(1)
 
         del_button = QtGui.QPushButton("Del")
         del_button.clicked.connect(self.code_presenter.delete_last)
@@ -47,19 +59,29 @@ class CodePane(QtGui.QGroupBox):
         self.code_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Horizontal)
 
         self.tab_bar = QtGui.QTabBar()
-        self.tab_bar.setStyle(QtGui.QStyleFactory.create("Plastique"))
+        style = QtGui.QStyleFactory.create(u"Plastique")
+        self.tab_bar.setStyle(style)
         layout.addWidget(self.tab_bar)
 
         layout.addWidget(self.code_splitter)
-        #
-        #
-        # self.search_box = SearchLineEdit(self, on_changed=self.search_box_changed)
-        # layout.addWidget(self.search_box)
-
-        # self.ast_tree_tabs = AstTreeTabs(self, self.code_presenter)
-        # layout.addWidget(self.ast_tree_tabs)
-
         self.setLayout(layout)
+
+    def expand_all_asts(self):
+        self.all_expanded = True
+        for index in range(self.code_splitter.count()):
+            try:
+                self.code_splitter.widget(index).expand_all()
+            except AttributeError:
+                pass
+
+    def collapse_all_asts(self):
+        self.all_expanded = False
+        for index in range(self.code_splitter.count()):
+            try:
+                self.code_splitter.widget(index).collapse_all()
+            except AttributeError:
+                pass
+
 
     def clear(self):
         for index in range(self.code_splitter.count()-1, 0, -1):
@@ -86,13 +108,13 @@ class CodePane(QtGui.QGroupBox):
 
     def set_panel_sizes(self):
         sizes = self.code_splitter.sizes()
-        print("In set panel sizes splitter %s self.panel_count %d sizes %s" %
-              (
-                  [self.code_splitter.size(),self.code_splitter.baseSize(), self.code_splitter.frameSize()],
-                   self.panel_count,
-                   sizes
-              )
-        )
+        # print("In set panel sizes splitter %s self.panel_count %d sizes %s" %
+        #       (
+        #           [self.code_splitter.size(),self.code_splitter.baseSize(), self.code_splitter.frameSize()],
+        #            self.panel_count,
+        #            sizes
+        #       )
+        # )
         total = sum(sizes)
         if total == 0:
             total = ast_viewer.ast_tool_box.AstToolBox.default_left_frame_size
@@ -127,7 +149,7 @@ class CodePane(QtGui.QGroupBox):
             widget = EditorPane()
             widget.setPlainText(code_item.code)
         elif isinstance(code_item, AstTreeItem):
-            widget = AstTreeWidget(self.code_presenter, code_item.code)
+            widget = AstTreePane(self.code_presenter, code_item.code)
         elif isinstance(code_item, GeneratedCodeItem):
             widget = EditorPane()
             widget.setPlainText(code_item.code)

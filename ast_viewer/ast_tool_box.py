@@ -347,26 +347,6 @@ class AstToolBox(QtGui.QMainWindow):
             current_tree.setCurrentItem(items[0])
             current_tree.expandItem(items[0])
 
-    @QtCore.Slot(int)
-    def show_field_column(self, checked):
-        """ Shows or hides the field column"""
-        self.ast_tree.setColumnHidden(AstTreeWidget.COL_FIELD, not checked)
-
-    @QtCore.Slot(int)
-    def show_class_column(self, checked):
-        """ Shows or hides the class column"""
-        self.ast_tree.setColumnHidden(AstTreeWidget.COL_CLASS, not checked)
-
-    @QtCore.Slot(int)
-    def show_value_column(self, checked):
-        """ Shows or hides the value column"""
-        self.ast_tree.setColumnHidden(AstTreeWidget.COL_VALUE, not checked)
-
-    @QtCore.Slot(int)
-    def show_pos_column(self, checked):
-        """ Shows or hides the line:col column"""
-        self.ast_tree.setColumnHidden(AstTreeWidget.COL_POS, not checked)
-
     def my_test(self):
         """ Function for testing """
         pass
