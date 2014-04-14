@@ -1,6 +1,9 @@
 __author__ = 'Chick Markley'
 
 import os
+import sys
+import imp
+import inspect
 
 
 class Util(object):
@@ -14,7 +17,7 @@ class Util(object):
         """
          converts a file name into a path and a package name
         """
-        # print "ptpap got %s and %s" % (file_path, package_name)
+        # print "path_to_path_and_package got %s and %s" % (file_path, package_name)
         if package_name is None:
             file_path, package_name = os.path.split(file_path)
             if package_name.endswith(".py"):
@@ -27,3 +30,18 @@ class Util(object):
             if file_path == "":
                 file_path = '.'
             return file_path, package_name
+
+    @staticmethod
+    def get_module(package_name):
+        if package_name in sys.modules:
+            return sys.modules[package_name]
+        return None
+
+    @staticmethod
+    def clear_classes_and_reload_package(loaded_module):
+        keys = loaded_module.__dict__.keys()[:]
+        for key in keys:
+            if inspect.isclass(loaded_module.__dict__[key]):
+                del loaded_module.__dict__[key]
+
+        imp.reload(loaded_module)

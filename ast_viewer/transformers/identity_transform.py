@@ -11,6 +11,10 @@ class ChickTransform(ast.NodeTransformer):
     pass
 
 
+# class Chick2Transform(ChickTransform):
+#     pass
+
+
 class NoisyIdentityTransform(ast.NodeTransformer):
     def __init__(self):
         super(NoisyIdentityTransform, self).__init__()
