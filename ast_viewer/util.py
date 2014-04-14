@@ -4,6 +4,7 @@ import os
 import sys
 import imp
 import inspect
+from pprint import pprint
 
 
 class Util(object):
@@ -38,10 +39,14 @@ class Util(object):
         return None
 
     @staticmethod
-    def clear_classes_and_reload_package(loaded_module):
+    def clear_classes_and_reload_package(name):
+        loaded_module = sys.modules[name]
         keys = loaded_module.__dict__.keys()[:]
         for key in keys:
             if inspect.isclass(loaded_module.__dict__[key]):
+                # print("deleting %s" % key)
                 del loaded_module.__dict__[key]
 
-        imp.reload(loaded_module)
+        del sys.modules[name]
+        __import__(name)
+        # imp.reload(loaded_module)

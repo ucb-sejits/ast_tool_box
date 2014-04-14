@@ -165,26 +165,27 @@ class TransformPresenter(object):
 
     @staticmethod
     def delete_module(module_name, paranoid=None):
-        from sys import modules
-        try:
-            this_module = modules[module_name]
-        except KeyError:
-            raise ValueError(module_name)
-        these_symbols = dir(this_module)
-
-        if paranoid:
-            try:
-                paranoid[:]  # sequence support
-            except:
-                raise ValueError('must supply a finite list for paranoid')
-            else:
-                these_symbols = paranoid[:]
-
-        print("deleting module %s" % module_name)
-        try:
-            del modules[module_name]
-        except Exception as e:
-            print("Error failed del %s error %s" % (module_name, e))
+        Util.clear_classes_and_reload_package(module_name)
+        # from sys import modules
+        # try:
+        #     this_module = modules[module_name]
+        # except KeyError:
+        #     raise ValueError(module_name)
+        # these_symbols = dir(this_module)
+        #
+        # if paranoid:
+        #     try:
+        #         paranoid[:]  # sequence support
+        #     except:
+        #         raise ValueError('must supply a finite list for paranoid')
+        #     else:
+        #         these_symbols = paranoid[:]
+        #
+        # print("deleting module %s" % module_name)
+        # try:
+        #     del modules[module_name]
+        # except Exception as e:
+        #     print("Error failed del %s error %s" % (module_name, e))
 
         # for mod in modules.values():
         #     try:
