@@ -7,6 +7,10 @@ class IdentityTransform(ast.NodeTransformer):
     pass
 
 
+class ChickTransform(ast.NodeTransformer):
+    pass
+
+
 class NoisyIdentityTransform(ast.NodeTransformer):
     def __init__(self):
         super(NoisyIdentityTransform, self).__init__()

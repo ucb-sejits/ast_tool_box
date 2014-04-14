@@ -89,7 +89,7 @@ class AstTransformViewer(QtGui.QGroupBox):
             # filter="Python Files (*.py);;All Files (*);;"
         )
         print("got file_name %s" % file_name)
-        self.controller.load_transformers(file_name)
+        self.controller.load_transforms(file_name)
         self.reload_list()
 
     def load_package(self):
@@ -102,7 +102,7 @@ class AstTransformViewer(QtGui.QGroupBox):
         )
         if ok and package_name != '':
             print("Got package name %s" % package_name)
-            self.controller.load_transformers(package_name)
+            self.controller.load_transforms(package_name)
             self.reload_list()
 
     def contextMenuEvent(self, event):

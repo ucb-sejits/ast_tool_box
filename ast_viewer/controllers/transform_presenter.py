@@ -30,15 +30,23 @@ class TransformPresenter(object):
         self.transform_items = []
         self.transforms_by_name = {}
 
-        self.load_transforms('ctree.transformations')
-        self.load_transforms('ctree.c.codegen')
-        # self.load_transforms('ctree.ocl.codegen')
-        # self.load_transforms('ctree.omp.codegen')
+        to_load = start_packages + [
+            'ctree.transformations',
+            'ctree.c.codegen',
+            'ctree.ocl.codegen',
+            'ctree.omp.codegen',
+        ]
+        self.load_transforms(to_load)
 
-        for package_name in start_packages:
-            self.load_transforms(package_name)
+    def reload_transforms(self):
+        to_load = self.transforms_loaded[:]
 
-        self.transform_pane.reload_list()
+        for module in to_load:
+            TransformPresenter.delete_module(module)
+
+        self.transforms_loaded = []
+        print("calling load transforms now")
+        self.load_transforms(to_load)
 
     def set_code_presenter(self, code_presenter):
         # assert isinstance(code_presenter, controllers.TransformPresenter)
@@ -91,7 +99,6 @@ class TransformPresenter(object):
 
         try:
             __import__(module_name)
-            self.reload()
         except Exception as exception:
             print("cannot load %s message %s" % (module_name, exception.message))
 
@@ -102,11 +109,16 @@ class TransformPresenter(object):
             lambda transform: transform_model.AstTransformItem(transform),
             ast.NodeTransformer.__subclasses__()
         )
+        print("transform_presenter.reload so far %s" %
+              map(lambda i: i.name(), self.transform_items))
 
         self.transform_items += map(
             lambda transform: transform_model.CodeGeneratorItem(transform),
             CodeGenVisitor.__subclasses__()
         )
+
+        print("transform_presenter.reload final %s" %
+              map(lambda i: i.name(), self.transform_items))
 
         for transform_item in self.transform_items:
             print("loaded %s" % transform_item.name())
@@ -123,7 +135,11 @@ class TransformPresenter(object):
         """Todo"""
         pass
 
-    def load_transforms(self, key):
+    def load_transform(self, key):
+        """
+        ONLY do import, finding transforms imported is separate
+        step
+        """
         self.transforms_loaded.append(key)
 
         path, package_name = Util.path_to_path_and_package(key)
@@ -134,6 +150,53 @@ class TransformPresenter(object):
             sys.path.append(path)
 
         self.get_ast_transforms(package_name)
-        self.reload()
+
+    def load_transforms(self, key_list):
+        if not isinstance(key_list, list):
+            key_list = [key_list]
+
+        for key in key_list:
+            self.load_transform(key)
 
         print("AstTransformManager %s" % self)
+
+        self.reload()
+        self.transform_pane.update_view()
+
+    @staticmethod
+    def delete_module(module_name, paranoid=None):
+        from sys import modules
+        try:
+            this_module = modules[module_name]
+        except KeyError:
+            raise ValueError(module_name)
+        these_symbols = dir(this_module)
+
+        if paranoid:
+            try:
+                paranoid[:]  # sequence support
+            except:
+                raise ValueError('must supply a finite list for paranoid')
+            else:
+                these_symbols = paranoid[:]
+
+        print("deleting module %s" % module_name)
+        try:
+            del modules[module_name]
+        except Exception as e:
+            print("Error failed del %s error %s" % (module_name, e))
+
+        # for mod in modules.values():
+        #     try:
+        #         delattr(mod, module_name)
+        #     except AttributeError:
+        #         print("Error failed del %s" % module_name)
+        #     if paranoid:
+        #         for symbol in these_symbols:
+        #             if symbol[:2] == '__':  # ignore special symbols
+        #                 continue
+        #             try:
+        #                 delattr(mod, symbol)
+        #             except AttributeError:
+        #                 pass
+

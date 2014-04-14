@@ -31,9 +31,13 @@ class TransformPane(QtGui.QGroupBox):
         package_button = QtGui.QPushButton("Load Package")
         package_button.clicked.connect(self.load_package)
 
+        reload_button = QtGui.QPushButton("Reload")
+        reload_button.clicked.connect(self.transform_presenter.reload_transforms)
+
         button_layout.addWidget(package_button)
         button_layout.addWidget(open_button)
         button_layout.addWidget(go_button)
+        button_layout.addWidget(reload_button)
 
         button_box.setLayout(button_layout)
 
@@ -57,7 +61,7 @@ class TransformPane(QtGui.QGroupBox):
         transformer = item.transform_item.transform
         self.editor.setPlainText(inspect.getsource(transformer))
 
-    def reload_list(self):
+    def update_view(self):
         self.transform_list.clear()
         for transformer in self.transform_presenter.transform_items:
             print("adding transformer %s" % transformer.name)
@@ -77,7 +81,7 @@ class TransformPane(QtGui.QGroupBox):
         )
         print("got file_name %s" % file_name)
         self.transform_presenter.load_transformers(file_name)
-        self.reload_list()
+        self.update_view()
 
     def load_package(self):
         package_name, ok = QtGui.QInputDialog.getText(
@@ -89,8 +93,8 @@ class TransformPane(QtGui.QGroupBox):
         )
         if ok and package_name != '':
             print("Got package name %s" % package_name)
-            self.controller.load_transformers(package_name)
-            self.reload_list()
+            self.transform_presenter.load_transforms(package_name)
+            self.update_view()
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
