@@ -86,10 +86,14 @@ class CodePresenter(object):
 
             # transform all files a combined source string
             combined_source = ""
-            for f in ast_root.files:
-                combined_source += "File %s\n" % f.name
-                combined_source += f.codegen()
-            return combined_source
+            if ast_root.files and len(ast_root.files) > 0:
+                for f in ast_root.files:
+                    combined_source += "File %s\n" % f.name
+                    combined_source += f.codegen()
+                return combined_source
+            else:
+                return ast_root.codegen()
+
 
         if isinstance(code_item, code_model.FileItem):
             self.show_error("Transformation cannot be applied to source code")
