@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import ast
 import sys
+import inspect
 from PySide import QtCore, QtGui
 
 import ast_viewer.controllers as controllers
@@ -105,21 +106,32 @@ class TransformPresenter(object):
     def reload(self):
         """rebuild list of all in memory subclasses of ast.NodeTransformer"""
 
-        self.transform_items = map(
-            lambda transform: transform_model.AstTransformItem(transform),
-            ast.NodeTransformer.__subclasses__()
-        )
-        print("transform_presenter.reload so far %s" %
-              map(lambda i: i.name(), self.transform_items))
+        self.transform_items = []
+        for transform_name in self.transforms_loaded:
+            module = sys.modules[transform_name]
 
-        self.transform_items += map(
-            lambda transform: transform_model.CodeGeneratorItem(transform),
-            CodeGenVisitor.__subclasses__()
-        )
-
-        print("transform_presenter.reload final %s" %
-              map(lambda i: i.name(), self.transform_items))
-
+            for key in module.__dict__:
+                thing = module.__dict__[key]
+                if inspect.isclass(thing):
+                    if issubclass(thing, ast.NodeTransformer):
+                        self.transform_items.append(transform_model.AstTransformItem(thing))
+                    if issubclass(thing, CodeGenVisitor):
+                        self.transform_items.append(transform_model.CodeGeneratorItem(thing))
+        # self.transform_items = map(
+        #     lambda transform: transform_model.AstTransformItem(transform),
+        #     ast.NodeTransformer.__subclasses__()
+        # )
+        # print("transform_presenter.reload so far %s" %
+        #       map(lambda i: i.name(), self.transform_items))
+        #
+        # self.transform_items += map(
+        #     lambda transform: transform_model.CodeGeneratorItem(transform),
+        #     CodeGenVisitor.__subclasses__()
+        # )
+        #
+        # print("transform_presenter.reload final %s" %
+        #       map(lambda i: i.name(), self.transform_items))
+        #
         for transform_item in self.transform_items:
             print("loaded %s" % transform_item.name())
             self.transforms_by_name[transform_item.name()] = transform_item
