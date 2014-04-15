@@ -2,8 +2,9 @@ __author__ = 'Chick Markley'
 
 from PySide import QtGui, QtCore
 
+
 class SearchLineEdit(QtGui.QLineEdit):
-    def __init__(self, parent=None, on_changed=None):
+    def __init__(self, parent=None, on_changed=None, on_next=None):
         QtGui.QLineEdit.__init__(self, parent)
 
         self.clearButton = QtGui.QToolButton(self)
@@ -32,6 +33,8 @@ class SearchLineEdit(QtGui.QLineEdit):
 #        self.searchButton.setIcon(QtGui.QIcon(search_pixmap))
         #self.searchButton.setIconSize(search_pixmap.size())
         self.searchButton.setStyleSheet("QToolButton { border: none; padding: 0px;}")
+        if on_next:
+            self.searchButton.clicked.connect(on_next)
 
         frameWidth = self.style().pixelMetric(QtGui.QStyle.PM_DefaultFrameWidth)
         self.setStyleSheet(

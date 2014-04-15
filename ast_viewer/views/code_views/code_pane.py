@@ -25,16 +25,17 @@ class CodePane(QtGui.QGroupBox):
         toolbar_layout.addSpacing(0)
 
         one_button = QtGui.QPushButton("|1|")
-        one_button.setContentsMargins(0, 0, 0, 0)
+        one_button.setStyleSheet("QToolButton { border: none; padding: 0px;}")
         one_button.clicked.connect(self.set_to_one_panel)
         toolbar_layout.addWidget(one_button)
 
         two_button = QtGui.QPushButton("|1|2|")
-        two_button.setContentsMargins(0, 0, 0, 0)
+        two_button.setStyleSheet("QToolButton { border: none; padding: 0px;}")
         two_button.clicked.connect(self.set_to_two_panel)
         toolbar_layout.addWidget(two_button)
 
         self.three_button = QtGui.QPushButton("|1|2|3|")
+        self.three_button.setStyleSheet("QToolButton { border: none; padding: 0px;}")
         self.three_button.clicked.connect(self.set_to_three_panel)
         toolbar_layout.addWidget(self.three_button)
         self.three_button.setEnabled(False)
@@ -95,7 +96,11 @@ class CodePane(QtGui.QGroupBox):
     def delete_at(self, index):
         item = self.code_splitter.widget(index)
         item.deleteLater()
+        # item.destroy(destroyWindow=True, destroySubWindows=True)
         self.tab_bar.removeTab(index)
+        #
+        # TODO the following call does not work as expected due to the deleteLater above
+        #
         self.set_panel_sizes()
 
     def set_to_one_panel(self):
@@ -111,12 +116,15 @@ class CodePane(QtGui.QGroupBox):
         self.set_panel_sizes()
 
     def set_panel_sizes(self):
+        """
+        resize the panel based on current panel pattern
+        """
         sizes = self.code_splitter.sizes()
         # print("In set panel sizes splitter %s self.panel_count %d sizes %s" %
         #       (
         #           [self.code_splitter.size(),self.code_splitter.baseSize(), self.code_splitter.frameSize()],
-        #            self.panel_count,
-        #            sizes
+        #           self.panel_count,
+        #           sizes
         #       )
         # )
         total = sum(sizes)

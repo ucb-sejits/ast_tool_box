@@ -11,8 +11,8 @@ class ChickTransform(ast.NodeTransformer):
     pass
 
 
-# class Chick2Transform(ChickTransform):
-#     pass
+class Chick2Transform(ChickTransform):
+    pass
 
 
 class NoisyIdentityTransform(ast.NodeTransformer):

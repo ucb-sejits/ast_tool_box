@@ -14,6 +14,9 @@ class AstTreePane(QtGui.QGroupBox):
         super(AstTreePane, self).__init__()
         self.code_presenter = code_presenter
 
+        self.search_next_index = 0
+        self.last_search = ''
+
         layout = QtGui.QVBoxLayout()
 
         # button_box = QtGui.QGroupBox()
@@ -35,7 +38,7 @@ class AstTreePane(QtGui.QGroupBox):
         #
         # layout.addWidget(button_box)
 
-        self.search_box = SearchLineEdit(on_changed=self.search_box_changed)
+        self.search_box = SearchLineEdit(on_changed=self.search_box_changed, on_next=self.search_next)
         layout.addWidget(self.search_box)
 
         self.ast_tree_widget = AstTreeWidget(code_presenter=self.code_presenter, ast_root=ast_root)
@@ -53,6 +56,30 @@ class AstTreePane(QtGui.QGroupBox):
 
     def make_tree_from(self, syntax_tree, file_name="", display_depth=1):
         self.ast_tree_widget.make_tree_from(syntax_tree, file_name=file_name, display_depth=display_depth)
+
+    def search_next(self):
+        if self.search_box.text() != self.last_search:
+            self.search_next_index = 0
+        else:
+            self.search_next_index += 1
+
+        self.last_search = self.search_box.text()
+
+        current_tree = self.ast_tree_widget
+        items = current_tree.findItems(
+            self.search_box.text(),
+            QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive,
+            column=AstTreeWidget.COL_NODE
+        )
+        # print("Found %d items" % len(items))
+        if len(items) > 0:
+            if self.search_next_index >= len(items):
+                self.search_next_index = 0
+
+            # print(items[0])
+            current_tree.setCurrentItem(items[self.search_next_index])
+            current_tree.expandItem(items[self.search_next_index])
+
 
     def search_box_changed(self):
         if not self.search_box.text():

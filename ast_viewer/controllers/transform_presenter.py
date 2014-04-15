@@ -114,9 +114,11 @@ class TransformPresenter(object):
                 thing = module.__dict__[key]
                 if inspect.isclass(thing):
                     if issubclass(thing, ast.NodeTransformer):
-                        self.transform_items.append(transform_model.AstTransformItem(thing))
+                        if thing.__name__ != "NodeTransformer":
+                            self.transform_items.append(transform_model.AstTransformItem(thing))
                     if issubclass(thing, CodeGenVisitor):
-                        self.transform_items.append(transform_model.CodeGeneratorItem(thing))
+                        if thing.__name__ != "CodeGenVisitor":
+                            self.transform_items.append(transform_model.CodeGeneratorItem(thing))
         # self.transform_items = map(
         #     lambda transform: transform_model.AstTransformItem(transform),
         #     ast.NodeTransformer.__subclasses__()
