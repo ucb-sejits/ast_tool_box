@@ -55,8 +55,10 @@ class CodePane(QtGui.QGroupBox):
         self.code_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Horizontal)
 
         self.tab_bar = QtGui.QTabBar()
-        style = QtGui.QStyleFactory.create(u"Plastique")
-        self.tab_bar.setStyle(style)
+        # style = QtGui.QStyleFactory.create(u"Plastique")
+        # self.tab_bar.setStyle(style)
+        self.tab_bar.setTabsClosable(True)
+        self.tab_bar.tabCloseRequested.connect(self.delete_at)
         layout.addWidget(self.tab_bar)
 
         layout.addWidget(self.code_splitter)
@@ -89,6 +91,7 @@ class CodePane(QtGui.QGroupBox):
             self.tab_bar.removeTab(index)
             self.code_splitter.widget(index).deleteLater()
 
+    @QtCore.Slot(int)
     def delete_at(self, index):
         item = self.code_splitter.widget(index)
         item.deleteLater()
