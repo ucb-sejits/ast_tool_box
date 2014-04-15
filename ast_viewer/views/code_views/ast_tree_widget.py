@@ -158,8 +158,11 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
         sub_menu = QtGui.QMenu(self)
         sub_menu.setTitle("Available transformers")
-        for transformer_name in self.code_presenter.transform_presenter.transforms_by_name:
-            sub_menu_action = TransformerAction(transformer_name, self)
+        # for transformer_name in self.code_presenter.transform_presenter.transforms_by_name:
+        #     sub_menu_action = TransformerAction(transformer_name, self)
+        #     sub_menu.addAction(sub_menu_action)
+        for transform_item in self.code_presenter.transform_presenter.transform_items:
+            sub_menu_action = TransformerAction(transform_item=transform_item, ast_tree_widget=self)
             sub_menu.addAction(sub_menu_action)
         menu.addMenu(sub_menu)
         menu.addAction(self.make_root_action)
@@ -300,13 +303,17 @@ class AstTreeWidgetItem(QtGui.QTreeWidgetItem):
 
 
 class TransformerAction(QtGui.QAction):
-    def __init__(self, text, tree_widget, **kwargs):
-        super(TransformerAction, self).__init__(text, tree_widget, **kwargs)
-        self.tree_widget = tree_widget
-        self.text = text
+    def __init__(self, transform_item, ast_tree_widget, **kwargs):
+        super(TransformerAction, self).__init__(transform_item.name(), ast_tree_widget, **kwargs)
+        self.ast_tree_widget = ast_tree_widget
+        self.transform_item = transform_item
+        self.text = transform_item.name()
         self.triggered.connect(self.do_transform)
 
     def do_transform(self):
         print("Triggered with string %s" % self.text)
-        self.tree_widget.transform_current_ast(self.text)
+        self.ast_tree_widget.code_presenter.apply_transform(
+            code_item=self.ast_tree_widget.currentItem().ast_node,
+            transform_item=self.transform_item
+        )
 

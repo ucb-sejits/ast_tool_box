@@ -71,6 +71,9 @@ class CodePresenter(object):
         transform some kind of code thing into another kind of code thing
         using some kind of transform thing, update views accordingly
         """
+        if isinstance(code_item, ast.AST):
+            code_item = code_model.AstTreeItem(code_item)
+
         assert isinstance(code_item, code_model.CodeItem)
         assert isinstance(transform_item, transform_model.TransformItem)
 

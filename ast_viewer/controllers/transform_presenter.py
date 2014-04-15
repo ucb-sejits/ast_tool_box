@@ -3,6 +3,7 @@ from __future__ import print_function
 import ast
 import sys
 import inspect
+from operator import methodcaller
 from PySide import QtCore, QtGui
 
 import ast_viewer.controllers as controllers
@@ -134,6 +135,7 @@ class TransformPresenter(object):
         # print("transform_presenter.reload final %s" %
         #       map(lambda i: i.name(), self.transform_items))
         #
+        self.transform_items.sort(key=methodcaller('name'))
         for transform_item in self.transform_items:
             print("loaded %s" % transform_item.name())
             self.transforms_by_name[transform_item.name()] = transform_item
