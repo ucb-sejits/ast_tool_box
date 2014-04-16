@@ -24,16 +24,19 @@ class CodePane(QtGui.QGroupBox):
         toolbar_layout.setContentsMargins(0, 0, 0, 0)
         toolbar_layout.addSpacing(0)
 
+        # one_button = QtGui.QPushButton(QtGui.QIcon(QtGui.QPixmap("images/one_windows.png")), "")
         one_button = QtGui.QPushButton("|1|")
         one_button.setStyleSheet("QToolButton { border: none; padding: 0px;}")
         one_button.clicked.connect(self.set_to_one_panel)
         toolbar_layout.addWidget(one_button)
 
+        # two_button = QtGui.QPushButton(QtGui.QIcon(QtGui.QPixmap("images/two_windows.png")), "")
         two_button = QtGui.QPushButton("|1|2|")
         two_button.setStyleSheet("QToolButton { border: none; padding: 0px;}")
         two_button.clicked.connect(self.set_to_two_panel)
         toolbar_layout.addWidget(two_button)
 
+        # self.three_button = QtGui.QPushButton(QtGui.QIcon(QtGui.QPixmap("images/three_windows.png")), "")
         self.three_button = QtGui.QPushButton("|1|2|3|")
         self.three_button.setStyleSheet("QToolButton { border: none; padding: 0px;}")
         self.three_button.clicked.connect(self.set_to_three_panel)

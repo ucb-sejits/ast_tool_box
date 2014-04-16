@@ -12,9 +12,6 @@ import copy
 from PySide import QtCore, QtGui
 
 import ast_viewer
-from ast_viewer.views.ast_tree_widget import AstTreeWidget
-from ast_viewer.views.ast_tree_tabs import AstTreePane
-from ast_viewer.views.ast_transform_viewer import AstTransformViewer
 
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
 
@@ -269,106 +266,6 @@ class AstToolBox(QtGui.QMainWindow):
             msg = "Unable to open file: {}".format(file_name)
             logger.warn(msg)
             QtGui.QMessageBox.warning(self, 'error', msg)
-
-    def add_tree_tab(self, ast_tree=None, transformer=None, name=None):
-        """
-        Adds a new ast tab after running the specified transformer
-        on the current tab's ast
-        """
-        if not ast_tree:
-            ast_tree = self.ast_tree_tabs.current_ast()
-
-        if transformer:
-            new_ast_tree = copy.deepcopy(ast_tree)
-            # print("got transformer %s" % transformer)
-            try:
-                transformer.visit(new_ast_tree)
-            except Exception as e:
-                print("Exception calling transformer %s" % e.message)
-
-        new_tree_tab = AstTreeWidget(self, main_window=self)
-        new_tree_tab.make_tree_from(new_ast_tree)
-
-        if not name:
-            name = "Tree %d" % (self.ast_tree_tabs.count() + 1)
-
-        self.ast_tree_tabs.addTab(new_tree_tab, name)
-        self.ast_tree_tabs.setCurrentWidget(new_tree_tab)
-
-    @QtCore.Slot(QtGui.QTreeWidgetItem, QtGui.QTreeWidgetItem)
-    def highlight_node(self, current_item, _previous_item):
-        """ Highlights the node if it has line:col information.
-        """
-        highlight_str = current_item.text(AstTreeWidget.COL_HIGHLIGHT)
-        from_line_str, from_col_str, to_line_str, to_col_str = highlight_str.split(":")
-
-        try:
-            from_line_col = (int(from_line_str), int(from_col_str))
-        except ValueError:
-            from_line_col = None
-
-        try:
-            to_line_col = (int(to_line_str), int(to_col_str))
-        except ValueError:
-            to_line_col = None
-
-        logger.debug("Highlighting ({!r}) : ({!r})".format(from_line_col, to_line_col))
-        self.select_text(from_line_col, to_line_col)
-
-    def select_text(self, from_line_col, to_line_col):
-        """ Selects a text in the range from_line:col ... to_line:col
-            from_line_col and to_line_col should be a (line, column) tuple
-            If from_line_col is None, the selection starts at the beginning of the document
-            If to_line_col is None, the selection goes to the end of the document
-        """
-        text_cursor = self.editor.textCursor()
-
-        if from_line_col is None:
-            text_cursor.movePosition(QtGui.QTextCursor.Start, QtGui.QTextCursor.MoveAnchor)
-        else:
-            from_line, from_col = from_line_col
-            # findBlockByLineNumber seems to be 0-based.
-            from_text_block = self.editor.document().findBlockByLineNumber(from_line - 1)
-            from_pos = from_text_block.position() + from_col
-            text_cursor.setPosition(from_pos, QtGui.QTextCursor.MoveAnchor)
-
-        if to_line_col is None:
-            text_cursor.movePosition(QtGui.QTextCursor.End, QtGui.QTextCursor.KeepAnchor)
-        else:
-            to_line, to_col = to_line_col
-            to_text_block = self.editor.document().findBlockByLineNumber(to_line - 1)
-            to_pos = to_text_block.position() + to_col
-            text_cursor.setPosition(to_pos, QtGui.QTextCursor.KeepAnchor)
-
-        self.editor.setTextCursor(text_cursor)
-
-    def search_box_changed(self):
-        # print("search_box is now '%s'" % self.search_box.text())
-
-        if not self.search_box.text():
-            return
-
-        current_tree = self.ast_tree_tabs.currentWidget()
-        # print("current tree %s" % current_tree)
-        #
-        # for widget_index in range(self.ast_tree_tabs.count()):
-        #     widget = self.ast_tree_tabs.widget(widget_index)
-        #     print("widget %s ast_tree %s" % (widget, widget.ast_root))
-
-        items = current_tree.findItems(
-            self.search_box.text(),
-            QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive,
-            column=AstTreeWidget.COL_NODE
-        )
-        # print("Found %d items" % len(items))
-        if len(items) > 0:
-            print(items[0])
-            current_tree.setCurrentItem(items[0])
-            current_tree.expandItem(items[0])
-
-    def my_test(self):
-        """ Function for testing """
-        pass
 
     def about(self):
         """ Shows the about message window. """
