@@ -1,7 +1,7 @@
 __author__ = 'Chick Markley'
 
 from PySide import QtGui
-
+from ast_viewer.views.highlighter import Highlighter
 class EditorPane(QtGui.QPlainTextEdit):
     def __init__(self):
         # Editor widget
@@ -15,3 +15,5 @@ class EditorPane(QtGui.QPlainTextEdit):
         self.setFont(font)
         self.setWordWrapMode(QtGui.QTextOption.NoWrap)
         self.setStyleSheet("selection-color: black; selection-background-color: yellow;")
+
+        self.highlighter = Highlighter(self.document())
