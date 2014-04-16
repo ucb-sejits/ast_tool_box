@@ -47,11 +47,10 @@ class CodePane(QtGui.QGroupBox):
         self.expand_all_button.clicked.connect(self.expand_all_asts)
         toolbar_layout.addWidget(self.expand_all_button)
 
-        toolbar_layout.addSpacing(1)
+        # del_button = QtGui.QPushButton("Del")
+        # del_button.clicked.connect(self.code_presenter.delete_last)
+        # toolbar_layout.addWidget(del_button)
 
-        del_button = QtGui.QPushButton("Del")
-        del_button.clicked.connect(self.code_presenter.delete_last)
-        toolbar_layout.addWidget(del_button)
         toolbar_layout.addStretch(1)
 
         layout.addLayout(toolbar_layout)

@@ -12,7 +12,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
                 "\\bdouble\\b", "\\benum\\b", "\\bexplicit\\b", "\\bfriend\\b",
                 "\\binline\\b", "\\bint\\b", "\\blong\\b", "\\bnamespace\\b",
                 "\\boperator\\b", "\\bprivate\\b", "\\bprotected\\b",
-                "\\bpublic\\b", "\\bshort\\b", "\\bsignals\\b", "\\bsigned\\b",
+                "\\bpublic\\b", "\\bself\\b", "\\bshort\\b", "\\bsignals\\b", "\\bsigned\\b",
                 "\\bslots\\b", "\\bstatic\\b", "\\bstruct\\b",
                 "\\btemplate\\b", "\\btypedef\\b", "\\btypename\\b",
                 "\\bunion\\b", "\\bunsigned\\b", "\\bvirtual\\b", "\\bvoid\\b",
@@ -20,6 +20,11 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 
         self.highlightingRules = [(QtCore.QRegExp(pattern), keywordFormat)
                 for pattern in keywordPatterns]
+
+        assertFormat = QtGui.QTextCharFormat()
+        assertFormat.setForeground(QtCore.Qt.darkYellow)
+        assertFormat.setFontWeight(QtGui.QFont.Bold)
+        self.highlightingRules.append((QtCore.QRegExp("\\bassert\\w*\\b"), assertFormat))
 
         classFormat = QtGui.QTextCharFormat()
         classFormat.setFontWeight(QtGui.QFont.Bold)
