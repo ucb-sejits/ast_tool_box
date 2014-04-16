@@ -92,7 +92,7 @@ class AstToolBox(QtGui.QMainWindow):
     The main application.
     """
 
-    default_left_frame_size = 700
+    default_left_frame_size = 900
 
     def __init__(self, file_name=None, mode='exec', packages=None, width=None, height=None):
         """ Constructor
@@ -154,7 +154,7 @@ class AstToolBox(QtGui.QMainWindow):
         # Splitter parameters
         central_splitter.setCollapsible(0, True)
         central_splitter.setCollapsible(1, True)
-        central_splitter.setSizes([AstToolBox.default_left_frame_size, 300])
+        central_splitter.setSizes([AstToolBox.default_left_frame_size, 250])
         central_splitter.setStretchFactor(0, 0.5)
         central_splitter.setStretchFactor(1, 0.5)
 

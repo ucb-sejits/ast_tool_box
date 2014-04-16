@@ -42,7 +42,7 @@ def main():
     exit_code = ast_tool_box.view(
         file_name=args.file_name,
         packages=args.packages,
-        width=1100, height=800
+        width=1400, height=900
     )
 
     logging.info('Done {}'.format(ast_tool_box.PROGRAM_NAME))

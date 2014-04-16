@@ -59,7 +59,10 @@ class CodePane(QtGui.QGroupBox):
         # style = QtGui.QStyleFactory.create(u"Plastique")
         # self.tab_bar.setStyle(style)
         self.tab_bar.setTabsClosable(True)
+        self.tab_bar.setUsesScrollButtons(True)
+
         self.tab_bar.tabCloseRequested.connect(self.delete_at)
+        self.tab_bar.currentChanged.connect(self.tab_selected)
         layout.addWidget(self.tab_bar)
 
         layout.addWidget(self.code_splitter)
@@ -93,6 +96,12 @@ class CodePane(QtGui.QGroupBox):
             self.code_splitter.widget(index).deleteLater()
 
     @QtCore.Slot(int)
+    def tab_selected(self, index):
+        if index < self.tab_bar.count():
+            print("Tab selected %d" % index)
+            self.set_panel_sizes(emphasize_index=index)
+
+    @QtCore.Slot(int)
     def delete_at(self, index):
         item = self.code_splitter.widget(index)
         item.deleteLater()
@@ -115,7 +124,7 @@ class CodePane(QtGui.QGroupBox):
         self.panel_count = 3
         self.set_panel_sizes()
 
-    def set_panel_sizes(self):
+    def set_panel_sizes(self, emphasize_index=None):
         """
         resize the panel based on current panel pattern
         """
@@ -135,15 +144,35 @@ class CodePane(QtGui.QGroupBox):
         if panel_count > len(sizes):
             panel_count = len(sizes)
 
+        if emphasize_index is not None:
+            print("emphasize_index %d len sizes %d" % (emphasize_index, len(sizes)))
+        if emphasize_index is None or emphasize_index >= len(sizes):
+            main_emphasis_index = -1
+            second_emphasis_index = -2
+            third_emphasis_index = -3
+        elif isinstance(emphasize_index, int):
+            main_emphasis_index = emphasize_index
+            current_max_tab = max(sizes)
+            second_emphasis_index = sizes.index(current_max_tab)
+            sizes[second_emphasis_index] = 0
+            current_max_tab = max(sizes)
+            third_emphasis_index = sizes.index(current_max_tab)
+        else:
+            main_emphasis_index = -1
+            second_emphasis_index = -2
+            third_emphasis_index = -3
+
+        print("%d %d %d %d" % (main_emphasis_index, second_emphasis_index, third_emphasis_index, len(new_sizes)))
+
         if panel_count == 1:
-            new_sizes[-1] = total
+            new_sizes[main_emphasis_index] = total
         elif panel_count == 2:
-            new_sizes[-2] = int(total * 0.4)
-            new_sizes[-1] = int(total * 0.6)
+            new_sizes[second_emphasis_index] = int(total * 0.4)
+            new_sizes[main_emphasis_index] = int(total * 0.6)
         elif panel_count > 2:
-            new_sizes[-3] = int(total * 0.2)
-            new_sizes[-2] = int(total * 0.3)
-            new_sizes[-1] = int(total * 0.5)
+            new_sizes[third_emphasis_index] = int(total * 0.2)
+            new_sizes[second_emphasis_index] = int(total * 0.3)
+            new_sizes[main_emphasis_index] = int(total * 0.5)
 
         self.code_splitter.setSizes(new_sizes)
 
@@ -170,6 +199,7 @@ class CodePane(QtGui.QGroupBox):
             return
 
         self.tab_bar.addTab(code_item.code_name)
+        self.tab_bar.setCurrentIndex(self.tab_bar.count()-1)
 
         self.code_splitter.addWidget(widget)
         if self.code_splitter.count() > 2:
