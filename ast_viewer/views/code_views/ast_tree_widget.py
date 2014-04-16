@@ -186,33 +186,21 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
     def expand_descendants(self, item=None):
         """Expand all descendants of the current item"""
-        print("XXX got to expand descendants item %s" % item)
-
         if item is None:
             print("item is none")
             item = self.currentItem()
             print("item is %s" % item)
 
-        print("XXX got to expand descendants item %s %s" % (item, item.childCount()))
-
         item.setExpanded(True)
-        print("at_node %s children count %d" % (item, item.childCount()))
         for child_index in range(item.childCount()):
             self.expand_descendants(item.child(child_index))
 
     def collapse_descendants(self, item=None):
         """Expand all descendants of the current item"""
-        print("XXX got to collapse descendants item %s" % item)
-
         if item is None:
-            print("item is none")
             item = self.currentItem()
-            print("item is %s" % item)
-
-        print("XXX got to collpase descendants item %s %s" % (item, item.childCount()))
 
         item.setExpanded(False)
-        print("at_node %s children count %d" % (item, item.childCount()))
         for child_index in range(item.childCount()):
             self.collapse_descendants(item.child(child_index))
 
