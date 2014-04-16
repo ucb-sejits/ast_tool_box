@@ -65,6 +65,16 @@ class CodePane(QtGui.QGroupBox):
         self.tab_bar.currentChanged.connect(self.tab_selected)
         layout.addWidget(self.tab_bar)
 
+        # delete_signal = QtCore.Signal(int)
+        # delete_signal.connect(self.delete_tab_happened)
+
+        class XXX(QtCore.QObject):
+            delete_signal = QtCore.Signal(int)
+
+        self.xxx = XXX(self)
+        self.xxx.delete_signal.connect(self.delete_tab_happened)
+
+
         layout.addWidget(self.code_splitter)
         self.setLayout(layout)
 
@@ -110,6 +120,12 @@ class CodePane(QtGui.QGroupBox):
         #
         # TODO the following call does not work as expected due to the deleteLater above
         #
+        # self.set_panel_sizes()
+        self.xxx.delete_signal.emit(index)
+
+    @QtCore.Slot(int)
+    def delete_tab_happened(self, index):
+        print("deleted_tab_happened %d %s" % (index, self.code_splitter.sizes()))
         self.set_panel_sizes()
 
     def set_to_one_panel(self):
@@ -144,8 +160,6 @@ class CodePane(QtGui.QGroupBox):
         if panel_count > len(sizes):
             panel_count = len(sizes)
 
-        if emphasize_index is not None:
-            print("emphasize_index %d len sizes %d" % (emphasize_index, len(sizes)))
         if emphasize_index is None or emphasize_index >= len(sizes):
             main_emphasis_index = -1
             second_emphasis_index = -2
@@ -161,8 +175,6 @@ class CodePane(QtGui.QGroupBox):
             main_emphasis_index = -1
             second_emphasis_index = -2
             third_emphasis_index = -3
-
-        print("%d %d %d %d" % (main_emphasis_index, second_emphasis_index, third_emphasis_index, len(new_sizes)))
 
         if panel_count == 1:
             new_sizes[main_emphasis_index] = total

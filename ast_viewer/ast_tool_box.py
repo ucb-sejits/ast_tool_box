@@ -161,8 +161,21 @@ class AstToolBox(QtGui.QMainWindow):
         self._setup_menu()
         self.setWindowTitle('{}'.format(PROGRAM_NAME))
 
-        if width and height:
-            self.resize(width, height)
+        self.read_settings()
+
+    def write_settings(self):
+        self.settings = QtCore.QSettings("AspireLab", "SEJITS")
+        self.settings.beginGroup("MainWindow")
+        self.settings.setValue("size", self.size())
+        self.settings.setValue("pos", self.pos())
+        self.settings.endGroup()
+
+    def read_settings(self):
+        self.settings = QtCore.QSettings("AspireLab", "SEJITS")
+        self.settings.beginGroup("MainWindow")
+        self.resize(self.settings.value("size", QtCore.QSize(1100, 900)))
+        self.move(self.settings.value("pos", QtCore.QPoint(200, 200)))
+        self.settings.endGroup()
 
     def _setup_menu(self):
         """ Sets up the main menu.
@@ -360,6 +373,10 @@ class AstToolBox(QtGui.QMainWindow):
     def close_window(self):
         """ Closes the window """
         self.close()
+
+    def closeEvent(self, event):
+        self.write_settings()
+        event.accept()
 
     @staticmethod
     def quit_application():
