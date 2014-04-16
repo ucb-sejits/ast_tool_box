@@ -99,7 +99,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
     def show_with_dot(self):
         from ctree.visual.dot_manager import DotManager
         print("calling open")
-        DotManager.dot_ast_to_browser(self.ast_root, "ast_%s.png" % "tree")
+        DotManager.dot_ast_to_browser(self.currentItem().ast_node, "ast_%s.png" % "tree")
 
     def make_root(self):
         """make the current item the displayed root of the tree"""

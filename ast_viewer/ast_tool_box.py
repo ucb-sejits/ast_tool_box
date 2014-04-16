@@ -82,6 +82,10 @@ def class_name(obj):
 from ast_viewer.controllers.code_presenter import CodePresenter
 from ast_viewer.controllers.transform_presenter import TransformPresenter
 
+QtCore.QCoreApplication.setOrganizationName("Aspire Lab")
+QtCore.QCoreApplication.setOrganizationDomain("aspire.eecs.berkeley.edu")
+QtCore.QCoreApplication.setApplicationName("AstToolBox")
+
 # The main window inherits from a Qt class, therefore it has many 
 # ancestors public methods and attributes.
 # pylint: disable=R0901, R0902, R0904, W0201, R0913 
@@ -164,14 +168,14 @@ class AstToolBox(QtGui.QMainWindow):
         self.read_settings()
 
     def write_settings(self):
-        self.settings = QtCore.QSettings("AspireLab", "SEJITS")
+        self.settings = QtCore.QSettings()
         self.settings.beginGroup("MainWindow")
         self.settings.setValue("size", self.size())
         self.settings.setValue("pos", self.pos())
         self.settings.endGroup()
 
     def read_settings(self):
-        self.settings = QtCore.QSettings("AspireLab", "SEJITS")
+        self.settings = QtCore.QSettings()
         self.settings.beginGroup("MainWindow")
         self.resize(self.settings.value("size", QtCore.QSize(1100, 900)))
         self.move(self.settings.value("pos", QtCore.QPoint(200, 200)))

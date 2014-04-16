@@ -2,6 +2,7 @@ from __future__ import print_function
 
 from PySide import QtGui, QtCore
 import inspect
+import os
 from ast_viewer.views.editor_widget import EditorPane
 
 
@@ -13,10 +14,16 @@ class TransformPane(QtGui.QGroupBox):
     transformers can be applied to nodes other than the root
     """
     def __init__(self, transform_presenter=None):
-        super(TransformPane, self).__init__("Transformers & CodeGenerators")
+        super(TransformPane, self).__init__("Transformers && CodeGenerators")
         self.transform_presenter = transform_presenter
 
-        self.last_used_directory = "."
+        self.last_used_directory = None
+
+        settings = QtCore.QSettings()
+        settings.beginGroup("transforms")
+        self.last_used_directory = settings.value("load_directory", ".")
+        self.last_package_name = settings.value("load_package", "")
+        settings.endGroup()
 
         layout = QtGui.QVBoxLayout()
 
@@ -74,14 +81,21 @@ class TransformPane(QtGui.QGroupBox):
 
     def load(self):
         file_name, _ = QtGui.QFileDialog.getOpenFileName(
-            self.parent_viewer,
+            self,
             caption="Select a file containing Node Transformers",
-            # dir=os.getcwd(),
+            dir=self.last_used_directory,
             # filter="Python Files (*.py);;All Files (*);;"
         )
-        print("got file_name %s" % file_name)
-        self.transform_presenter.load_transformers(file_name)
-        self.update_view()
+        if file_name:
+            settings = QtCore.QSettings()
+            settings.beginGroup("transforms")
+            settings.setValue("load_directory", os.path.dirname(file_name))
+            settings.setValue("load_package", self.last_package_name)
+            settings.endGroup()
+
+            print("got file_name %s" % file_name)
+            self.transform_presenter.load_transforms(file_name)
+            self.update_view()
 
     def load_package(self):
         package_name, ok = QtGui.QInputDialog.getText(
@@ -89,9 +103,17 @@ class TransformPane(QtGui.QGroupBox):
             "Load additional tranformers",
             "package name or path to file",
             QtGui.QLineEdit.Normal,
-            "ast_viewer.transformers.identity_transform"
+            self.last_package_name,
         )
         if ok and package_name != '':
+            self.last_package_name = package_name
+
+            settings = QtCore.QSettings()
+            settings.beginGroup("transforms")
+            settings.setValue("load_directory", self.last_used_directory)
+            settings.setValue("load_package", self.last_package_name)
+            settings.endGroup()
+
             print("Got package name %s" % package_name)
             self.transform_presenter.load_transforms(package_name)
             self.update_view()

@@ -156,8 +156,6 @@ class TransformPresenter(object):
         ONLY do import, finding transforms imported is separate
         step
         """
-        self.transforms_loaded.append(key)
-
         path, package_name = Util.path_to_path_and_package(key)
 
         print("path %s package %s" % (path, package_name))
@@ -166,6 +164,8 @@ class TransformPresenter(object):
             sys.path.append(path)
 
         self.get_ast_transforms(package_name)
+        self.transforms_loaded.append(package_name)
+
 
     def load_transforms(self, key_list):
         if not isinstance(key_list, list):
