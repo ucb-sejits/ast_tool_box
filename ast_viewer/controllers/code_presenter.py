@@ -19,12 +19,17 @@ class CodePresenter(object):
 
         self.code_pane = CodePane(code_presenter=self)
 
+    def new_file(self, file_name):
+        self.clear()
+        self.new_item_from_file(file_name)
+
     def set_transform_presenter(self, transform_presenter):
         assert isinstance(transform_presenter, transform_controllers.TransformPresenter)
         self.transform_presenter = transform_presenter
 
     def clear(self):
-        self.code_items = []
+        while len(self.code_items) > 0:
+            self.delete_last_item()
         self.code_pane.clear()
 
     def delete_last(self):

@@ -1,9 +1,13 @@
-astviewer
-=========
+AstToolBox
+==========
 
-Python Abstract Syntax Tree Tool built on PySide
-It can show a GUI tree representation of an AST.  Any tree or node can be
-used to produce a new tree by the application of ast.NodeTransformer
+The AstToolBox allows a developer to start from a python source file and
+see how a series of ast.NodeTransformers change it, and how a CodeGenerator
+will render the AST at any given point.
+
+Files and transforms can be reloaded at any time which facilitates development.
+If a tree does not look right after some transformation, the transform can be
+edited and reloaded and reapplied.
 
 This tool was derived from `AstViewer <https://github.com/titusjan/astviewer>`_
 
@@ -13,7 +17,7 @@ Usage:
 ======
 *	Command line example:
 	
-		%> pyastviewer myprog.py
+		%> ast_tool_box myprog.py
 	
 *	Examples to use from within Python:
 
@@ -35,5 +39,5 @@ Installation:
 
 2.	Run the installer:
 
-		%> sudo python setup.py install
+		%> python setup.py install
 

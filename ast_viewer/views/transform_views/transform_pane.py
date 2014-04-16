@@ -84,7 +84,7 @@ class TransformPane(QtGui.QGroupBox):
             self,
             caption="Select a file containing Node Transformers",
             dir=self.last_used_directory,
-            # filter="Python Files (*.py);;All Files (*);;"
+            filter="Python Files (*.py);;All Files (*);;"
         )
         if file_name:
             settings = QtCore.QSettings()

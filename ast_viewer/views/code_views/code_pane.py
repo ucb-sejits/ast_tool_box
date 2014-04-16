@@ -103,7 +103,7 @@ class CodePane(QtGui.QGroupBox):
                     pass
 
     def clear(self):
-        for index in range(self.code_splitter.count()-1, 0, -1):
+        for index in range(self.code_splitter.count()-1, -1, -1):
             self.tab_bar.removeTab(index)
             self.code_splitter.widget(index).deleteLater()
 

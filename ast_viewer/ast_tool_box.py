@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 DEBUGGING = False
 
-PROGRAM_NAME = 'AST Toolkit'
+PROGRAM_NAME = 'AstToolBox'
 PROGRAM_VERSION = '1.0.0'
 ABOUT_MESSAGE = u"""
 %(prog)s version %(version)s
@@ -48,7 +48,9 @@ def get_qapplication_instance():
     """
     app = QtGui.QApplication.instance()
     if app is None:
-        app = QtGui.QApplication(sys.argv)
+        # sys.argv[0] = PROGRAM_NAME
+        print("here I am")
+        app = QtGui.QApplication(sys.argv[1:])
         app.setStyle(QtGui.QMacStyle)
         QtGui.QApplication.setStyle(QtGui.QMacStyle())
     check_class(app, QtGui.QApplication)
@@ -186,10 +188,6 @@ class AstToolBox(QtGui.QMainWindow):
         #file_menu.addAction("C&lose", self.close_window, "Ctrl+W")
         file_menu.addAction("E&xit", AstToolBox.quit_application, "Ctrl+Q")
 
-        if DEBUGGING is True:
-            file_menu.addSeparator()
-            file_menu.addAction("&Test", self.my_test, "Ctrl+T")
-
         view_menu = self.menuBar().addMenu("&View")
 
         self.auto_expand_ast = QtGui.QAction("Expand AST trees on create", self, checkable=True, checked=True)
@@ -206,23 +204,24 @@ class AstToolBox(QtGui.QMainWindow):
         """ Clears the widgets """
         self.ast_tree.make_tree_from()
 
-
     def open_file(self, file_name=None):
         """ Opens a new file. Show the open file dialog if file_name is None.
         """
         if not file_name:
             file_name = self._get_file_name_from_dialog()
 
-        self._update_widgets(file_name)
-
+        self.code_presenter.new_file(file_name)
 
     def _get_file_name_from_dialog(self):
         """ Opens a file dialog and returns the file name selected by the user
         """
-        file_name, _ = QtGui.QFileDialog.getOpenFileName(self, "Open File",
-                                                         '', "Python Files (*.py);;All Files (*)")
+        file_name, _ = QtGui.QFileDialog.getOpenFileName(
+            self,
+            "Open File",
+            '',
+            "Python Files (*.py);;All Files (*)"
+        )
         return file_name
-
 
     def _update_widgets(self, file_name):
         """ Reads source from a file and updates the tree and editor widgets.. 
