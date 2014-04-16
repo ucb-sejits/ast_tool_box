@@ -221,6 +221,14 @@ class AstTreeWidget(QtGui.QTreeWidget):
                 :param parent_item: The parent QTreeWidgetItem to which this node will be added
                 :param field_label: Labels how this node is known to the parent
             """
+
+            if isinstance(ast_node, types.ListType) or isinstance(ast_node, types.TupleType):
+                value_str = ''
+                node_str = "{} = {}".format(field_label, class_name(ast_node))
+                for idx, node in enumerate(ast_node):
+                    add_node(node, parent_item, "{}[{:d}]".format(field_label, idx))
+                return
+
             node_item = AstTreeWidgetItem(parent_item)
             if parent_item is self:
                self.setCurrentItem(node_item)
