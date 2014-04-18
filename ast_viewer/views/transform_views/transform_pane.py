@@ -65,15 +65,14 @@ class TransformPane(QtGui.QGroupBox):
     @QtCore.Slot(QtGui.QListWidgetItem)
     def load_editor_from(self, item):
         print("show item %s" % item)
-        transformer = item.transform_item.transform
-        self.editor.setPlainText(inspect.getsource(transformer))
+        transform = item.transform_item.transform
+        self.editor.setPlainText(inspect.getsource(transform))
 
     def update_view(self):
         self.transform_list.clear()
-        for transformer in self.transform_presenter.transform_items:
-            print("adding transformer %s" % transformer.name)
+        for transform in self.transform_presenter.transform_items:
             self.transform_list.addItem(
-                TransformWidgetItem(transformer)
+                TransformWidgetItem(transform)
             )
 
     def current_item(self):

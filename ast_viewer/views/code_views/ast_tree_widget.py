@@ -136,7 +136,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
             triggered=self.show_with_dot
         )
         self.make_root_action = QtGui.QAction(
-            "&Make this node be root",
+            "&Make new panel with this node as root",
             self,
             statusTip="This node will be made the current root in this window",
             triggered=self.make_root
@@ -158,12 +158,11 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
         sub_menu = QtGui.QMenu(self)
         sub_menu.setTitle("Available transformers")
-        # for transformer_name in self.code_presenter.transform_presenter.transforms_by_name:
-        #     sub_menu_action = TransformerAction(transformer_name, self)
-        #     sub_menu.addAction(sub_menu_action)
+
         for transform_item in self.code_presenter.transform_presenter.transform_items:
             sub_menu_action = TransformerAction(transform_item=transform_item, ast_tree_widget=self)
             sub_menu.addAction(sub_menu_action)
+
         menu.addMenu(sub_menu)
         menu.addAction(self.make_root_action)
         menu.exec_(event.globalPos())
@@ -182,7 +181,9 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
     def make_root(self):
         """make the current item the displayed root of the tree"""
-        self.make_tree_from(self.currentItem().ast_node)
+        # self.ast_root = self.currentItem().ast_node
+        # self.make_tree_from(self.ast_root)
+        self.code_presenter.apply_transform(code_item=self.currentItem().ast_node, transform_item=None)
 
     def expand_descendants(self, item=None):
         """Expand all descendants of the current item"""
@@ -261,10 +262,7 @@ class AstTreeWidget(QtGui.QTreeWidget):
                     if val:
                         add_node(val, node_item, key)
             elif isinstance(ast_node, types.ListType) or isinstance(ast_node, types.TupleType):
-                value_str = ''
-                node_str = "{} = {}".format(field_label, class_name(ast_node))
-                for idx, node in enumerate(ast_node):
-                    add_node(node, node_item, "{}[{:d}]".format(field_label, idx))
+                raise Exception("%s list should have been handled earlier in function" % ast_node)
             else:
                 value_str = repr(ast_node)
                 node_str = "{}: {}".format(field_label, value_str)

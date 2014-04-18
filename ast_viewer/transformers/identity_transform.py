@@ -14,6 +14,22 @@ class ChickTransform(ast.NodeTransformer):
 class Chick2Transform(ChickTransform):
     pass
 
+class Chick4Transform(Chick2Transform):
+    def __init__(self, *variable_args):
+        self.args = variable_args
+
+
+class Chick3Transform(Chick2Transform):
+    def __init__(self, arg1, arg2='cat', arg3=Chick4Transform((1,2))):
+        self.arg1 = arg1
+        self.arg2 = arg2
+        self.arg3 = arg3
+
+
+class Chick5Transform(Chick2Transform):
+    def __init__(self, **kwargs):
+        self.args = kwargs
+
 
 class NoisyIdentityTransform(ast.NodeTransformer):
     def __init__(self):

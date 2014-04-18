@@ -3,6 +3,7 @@ from __future__ import print_function
 import ast
 import sys
 import inspect
+from pprint import pprint
 from operator import methodcaller
 from PySide import QtCore, QtGui
 
@@ -100,6 +101,8 @@ class TransformPresenter(object):
         """Use module_name to discover some transforms"""
 
         try:
+            print("--> importing module %s" % module_name)
+            pprint(sys.path)
             __import__(module_name)
         except Exception as exception:
             print("cannot load %s message %s" % (module_name, exception.message))
@@ -120,24 +123,10 @@ class TransformPresenter(object):
                     if issubclass(thing, CodeGenVisitor):
                         if thing.__name__ != "CodeGenVisitor":
                             self.transform_items.append(transform_model.CodeGeneratorItem(thing))
-        # self.transform_items = map(
-        #     lambda transform: transform_model.AstTransformItem(transform),
-        #     ast.NodeTransformer.__subclasses__()
-        # )
-        # print("transform_presenter.reload so far %s" %
-        #       map(lambda i: i.name(), self.transform_items))
-        #
-        # self.transform_items += map(
-        #     lambda transform: transform_model.CodeGeneratorItem(transform),
-        #     CodeGenVisitor.__subclasses__()
-        # )
-        #
-        # print("transform_presenter.reload final %s" %
-        #       map(lambda i: i.name(), self.transform_items))
-        #
+
         self.transform_items.sort(key=methodcaller('name'))
         for transform_item in self.transform_items:
-            print("loaded %s" % transform_item.name())
+            # print("loaded %s" % transform_item.name())
             self.transforms_by_name[transform_item.name()] = transform_item
 
     def get_instance_by_name(self, transform_name):
@@ -182,38 +171,5 @@ class TransformPresenter(object):
     @staticmethod
     def delete_module(module_name, paranoid=None):
         Util.clear_classes_and_reload_package(module_name)
-        # from sys import modules
-        # try:
-        #     this_module = modules[module_name]
-        # except KeyError:
-        #     raise ValueError(module_name)
-        # these_symbols = dir(this_module)
-        #
-        # if paranoid:
-        #     try:
-        #         paranoid[:]  # sequence support
-        #     except:
-        #         raise ValueError('must supply a finite list for paranoid')
-        #     else:
-        #         these_symbols = paranoid[:]
-        #
-        # print("deleting module %s" % module_name)
-        # try:
-        #     del modules[module_name]
-        # except Exception as e:
-        #     print("Error failed del %s error %s" % (module_name, e))
 
-        # for mod in modules.values():
-        #     try:
-        #         delattr(mod, module_name)
-        #     except AttributeError:
-        #         print("Error failed del %s" % module_name)
-        #     if paranoid:
-        #         for symbol in these_symbols:
-        #             if symbol[:2] == '__':  # ignore special symbols
-        #                 continue
-        #             try:
-        #                 delattr(mod, symbol)
-        #             except AttributeError:
-        #                 pass
 

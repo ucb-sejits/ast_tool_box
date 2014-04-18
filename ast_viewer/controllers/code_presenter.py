@@ -4,6 +4,7 @@ from ast_viewer.controllers.tree_transform_controller import TreeTransformContro
 import ast_viewer.models.code_models.code_model as code_model
 import ast_viewer.models.transform_models.transform_model as transform_model
 import ast_viewer.controllers.transform_presenter as transform_controllers
+from ast_viewer.transformers.identity_transform import IdentityTransform
 
 from ast_viewer.views.code_views.code_pane import CodePane
 import ast
@@ -80,7 +81,8 @@ class CodePresenter(object):
             code_item = code_model.AstTreeItem(code_item)
 
         assert isinstance(code_item, code_model.CodeItem)
-        assert isinstance(transform_item, transform_model.TransformItem)
+        if transform_item is not None:
+            assert isinstance(transform_item, transform_model.TransformItem)
 
         def apply_codegen_transform(ast_root):
             """
@@ -122,6 +124,17 @@ class CodePresenter(object):
                     parent_link=code_model.CodeTransformLink(code_item=code_item, transform_item=transform_item),
                 )
                 self.add_code_item(new_code_item)
+            elif transform_item is None:
+                new_tree = code_item.ast_tree
+                new_ast_tree_item = code_model.AstTreeItem(
+                    new_tree,
+                    name="SubTree",
+                    parent_link=code_model.CodeTransformLink(
+                        code_item=code_item,
+                        transform_item=None
+                    ),
+                )
+                self.add_code_item(new_ast_tree_item)
             else:
                 self.show_error("Cannot transform\n%s\n with\n%s" % (code_item, transform_item))
         else:
