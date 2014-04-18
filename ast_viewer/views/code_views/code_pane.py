@@ -20,40 +20,42 @@ class CodePane(QtGui.QGroupBox):
 
         layout = QtGui.QVBoxLayout()
 
+        button_box = QtGui.QGroupBox()
+        button_box.setMaximumHeight(40)
         toolbar_layout = QtGui.QHBoxLayout()
-        toolbar_layout.setContentsMargins(0, 0, 0, 0)
+        # toolbar_layout.setContentsMargins(0, 0, 0, 0)
         toolbar_layout.addSpacing(0)
 
-        # one_button = QtGui.QPushButton(QtGui.QIcon(QtGui.QPixmap("images/one_windows.png")), "")
-        one_button = QtGui.QPushButton("|1|")
-        one_button.setStyleSheet("QToolButton { border: none; padding: 0px;}")
+        one_button = QtGui.QPushButton(u"\u20DE")
+        one_button.setToolTip("Show one window below")
         one_button.clicked.connect(self.set_to_one_panel)
         toolbar_layout.addWidget(one_button)
 
-        # two_button = QtGui.QPushButton(QtGui.QIcon(QtGui.QPixmap("images/two_windows.png")), "")
-        two_button = QtGui.QPushButton("|1|2|")
-        two_button.setStyleSheet("QToolButton { border: none; padding: 0px;}")
+        two_button = QtGui.QPushButton(u"\u20DE\u20DE")
+        two_button.setToolTip("Show two windows below")
         two_button.clicked.connect(self.set_to_two_panel)
         toolbar_layout.addWidget(two_button)
 
-        # self.three_button = QtGui.QPushButton(QtGui.QIcon(QtGui.QPixmap("images/three_windows.png")), "")
-        self.three_button = QtGui.QPushButton("|1|2|3|")
-        self.three_button.setStyleSheet("QToolButton { border: none; padding: 0px;}")
+        self.three_button = QtGui.QPushButton(u"\u20DE\u20DE\u20DE")
+        self.three_button.setToolTip("Show three window below")
         self.three_button.clicked.connect(self.set_to_three_panel)
         toolbar_layout.addWidget(self.three_button)
         self.three_button.setEnabled(False)
 
-        self.expand_all_button = QtGui.QPushButton("><")
+        self.expand_all_button = QtGui.QPushButton(u"\u27F9\u27F8")
+        self.expand_all_button.setToolTip("Expand all AST trees")
         self.expand_all_button.clicked.connect(self.expand_all_asts)
         toolbar_layout.addWidget(self.expand_all_button)
 
-        # del_button = QtGui.QPushButton("Del")
-        # del_button.clicked.connect(self.code_presenter.delete_last)
-        # toolbar_layout.addWidget(del_button)
+        reload_button = QtGui.QPushButton(u"\u27F2")
+        reload_button.setToolTip("Reload file")
+        reload_button.clicked.connect(self.reload_panel)
+        toolbar_layout.addWidget(reload_button)
 
         toolbar_layout.addStretch(1)
 
-        layout.addLayout(toolbar_layout)
+        button_box.setLayout(toolbar_layout)
+        layout.addWidget(button_box)
 
         self.code_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Horizontal)
 
@@ -76,7 +78,6 @@ class CodePane(QtGui.QGroupBox):
         self.xxx = XXX(self)
         self.xxx.delete_signal.connect(self.delete_tab_happened)
 
-
         layout.addWidget(self.code_splitter)
         self.setLayout(layout)
 
@@ -84,8 +85,8 @@ class CodePane(QtGui.QGroupBox):
         if self.all_expanded:
             self.all_expanded = False
             AstTreeWidget.expand_all_at_create = False
-            self.expand_all_button.setText("<>")
-            self.expand_all_button.setToolTip("Expand all ast trees")
+            self.expand_all_button.setText(u"\u27FA")
+            self.expand_all_button.setToolTip("Expand all AST trees")
             for index in range(self.code_splitter.count()):
                 try:
                     self.code_splitter.widget(index).collapse_all()
@@ -94,13 +95,19 @@ class CodePane(QtGui.QGroupBox):
         else:
             self.all_expanded = True
             AstTreeWidget.expand_all_at_create = True
-            self.expand_all_button.setText("><")
+            self.expand_all_button.setText(u"\u27F9\u27F8")
             self.expand_all_button.setToolTip("Collapse all ast trees")
             for index in range(self.code_splitter.count()):
                 try:
                     self.code_splitter.widget(index).expand_all()
                 except AttributeError:
                     pass
+
+    def reload_panel(self):
+        for index in range(self.code_splitter.count()-1, 1, -1):
+            self.tab_bar.removeTab(index)
+            self.code_splitter.widget(index).deleteLater()
+
 
     def clear(self):
         for index in range(self.code_splitter.count()-1, -1, -1):

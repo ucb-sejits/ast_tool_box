@@ -119,7 +119,9 @@ class TransformPresenter(object):
                 if inspect.isclass(thing):
                     if issubclass(thing, ast.NodeTransformer):
                         if thing.__name__ != "NodeTransformer":
-                            self.transform_items.append(transform_model.AstTransformItem(thing))
+                            self.transform_items.append(
+                                transform_model.AstTransformItem(thing, package_name=transform_name)
+                            )
                     if issubclass(thing, CodeGenVisitor):
                         if thing.__name__ != "CodeGenVisitor":
                             self.transform_items.append(transform_model.CodeGeneratorItem(thing))

@@ -28,6 +28,7 @@ class TransformPane(QtGui.QGroupBox):
         layout = QtGui.QVBoxLayout()
 
         button_box = QtGui.QGroupBox()
+        button_box.setMaximumHeight(40)
         button_layout = QtGui.QHBoxLayout()
         go_button = QtGui.QPushButton("Apply")
         go_button.clicked.connect(self.transform_presenter.apply_current_transform)
@@ -133,5 +134,7 @@ class TransformPane(QtGui.QGroupBox):
 
 class TransformWidgetItem(QtGui.QListWidgetItem):
     def __init__(self, transform_item):
-        super(TransformWidgetItem, self).__init__(transform_item.name())
+        super(TransformWidgetItem, self).__init__(
+            transform_item.package_name() + "." + transform_item.name()
+        )
         self.transform_item = transform_item

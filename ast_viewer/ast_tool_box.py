@@ -165,6 +165,7 @@ class AstToolBox(QtGui.QMainWindow):
         self.setWindowTitle('{}'.format(PROGRAM_NAME))
 
         self.read_settings()
+        self.code_presenter.code_pane.transform_list.currentItem().setFocus()
 
     def write_settings(self):
         self.settings = QtCore.QSettings()
