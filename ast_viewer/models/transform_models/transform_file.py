@@ -27,7 +27,9 @@ class TransformThing(object):
         self.positional_args = []
         self._has_varargs = False
         self._has_kwargs = False
+        self._super_classes = []
         self.get_args()
+        self.figure_super_classes()
 
     def name(self):
         return self.transform.__name__
@@ -42,10 +44,18 @@ class TransformThing(object):
         return self._has_kwargs
 
     def super_classes(self):
-        return map(
-            lambda x: "%s.%s" % (x.__module__, x.__name__),
-            inspect.getmro(self.transform)[1:]
-        )
+        return self._super_classes
+
+    def figure_super_classes(self):
+        do_copy = True
+        for clazz in inspect.getmro(self.transform):
+            if do_copy:
+                self._super_classes.append(
+                    "%s.%s" % (clazz.__module__, clazz.__name__)
+                )
+            if clazz.__module__ == 'ast':
+                if clazz.__name__ == 'NodeTransformer':
+                    do_copy = False
 
     def get_args(self):
         class_def = self.find_node(self.ast_root, tipe=ast.ClassDef)
@@ -71,12 +81,13 @@ class TransformThing(object):
             defaults.insert(0, None)
 
         for index, val in enumerate(init_func.args.args):
-            if defaults[index] is not None:
-                default_st = codegen.to_source(defaults[index])
-            else:
-                default_st = None
-            print("args args field val %s %s" % (val.id, default_st))
-            self.positional_args.append(PositionalArg(val.id, default_st))
+            if not val.id == 'self':
+                if defaults[index] is not None:
+                    default_st = codegen.to_source(defaults[index])
+                else:
+                    default_st = None
+                print("args args field val %s %s" % (val.id, default_st))
+                self.positional_args.append(PositionalArg(val.id, default_st))
 
         # for val in init_func.args.defaults:
         #     if isinstance(val, str):
