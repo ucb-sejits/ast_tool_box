@@ -9,18 +9,43 @@ from ctree.codegen import CodeGenVisitor
 from pprint import pprint
 from ast_viewer.util import Util
 from collections import namedtuple
+import codegen
 
 
 PositionalArg = namedtuple('PositionalArg', ['name', 'default_source'])
 
 
 class TransformThing(object):
-    def __init__(self, transform):
+    def __init__(self, transform, package_name=None):
         self.transform = transform
+        self.package_name = package_name
         self.source = inspect.getsource(self.transform)
         # print(self.source)
         self.ast_root = ast.parse(self.source)
-        self.args = self.get_args()
+        # self.line_number = self.ast_root.lineno
+        # self.column_offset = self.col_offset
+        self.positional_args = []
+        self._has_varargs = False
+        self._has_kwargs = False
+        self.get_args()
+
+    def name(self):
+        return self.transform.__name__
+
+    def has_positional_args(self):
+        return len(self.positional_args) > 0
+
+    def has_varargs(self):
+        return self._has_varargs
+
+    def has_kwargs(self):
+        return self._has_kwargs
+
+    def super_classes(self):
+        return map(
+            lambda x: "%s.%s" % (x.__module__, x.__name__),
+            inspect.getmro(self.transform)[1:]
+        )
 
     def get_args(self):
         class_def = self.find_node(self.ast_root, tipe=ast.ClassDef)
@@ -39,15 +64,28 @@ class TransformThing(object):
         for key, val in ast.iter_fields(init_func.args):
             print("args field key %s val %s %s" % (key, val, type(val)))
 
-        for val in init_func.args.args:
-            print("args args field val %s" % val.id)
+        if hasattr(init_func.args, 'defaults'):
+            defaults = init_func.args.defaults
 
-        for val in init_func.args.defaults:
-            if isinstance(val, str):
-                print("default %s" % val)
+        while len(defaults) < len(init_func.args.args):
+            defaults.insert(0, None)
+
+        for index, val in enumerate(init_func.args.args):
+            if defaults[index] is not None:
+                default_st = codegen.to_source(defaults[index])
             else:
-                print("")
+                default_st = None
+            print("args args field val %s %s" % (val.id, default_st))
+            self.positional_args.append(PositionalArg(val.id, default_st))
 
+        # for val in init_func.args.defaults:
+        #     if isinstance(val, str):
+        #         print("default %s" % val)
+        #     else:
+        #         print("")
+
+        self._has_varargs = hasattr(init_func.args, 'vararg') and init_func.args.vararg
+        self._has_kwargs = hasattr(init_func.args, 'kwarg') and init_func.args.kwarg
         # if init_func.args.vararg:
         #     for val in init_func.args.vararg:
         #         print("vargs field val %s" % val)
@@ -62,7 +100,18 @@ class TransformThing(object):
         # for child in ast.iter_child_nodes(self.ast_root):
         #     print("---------")
         #     pprint(child.__dict)
-        return []
+
+    def __str__(self):
+        return "\n".join(
+            ["%s(%s)" % (self.name(), self.super_classes())] +
+            map(lambda x: x.__str__(), self.positional_args) +
+            [
+                "has varargs %s" % self.has_varargs(),
+                "has kwargs %s" % self.has_kwargs(),
+            ]
+        )
+
+
 
     def find_node(self, node, name=None, tipe=None):
 
@@ -123,15 +172,12 @@ class TransformFile(object):
                         self.code_generators.append(thing)
 
 
-
-
-
-
 if __name__ == '__main__':
     tf = TransformFile(sys.argv[1])
 
     print("path %s" % tf.path)
     print("package %s" % tf.package_name)
     print("transforms", end="")
-    pprint(tf.transforms)
+    for transform_thing in tf.transforms:
+        print(transform_thing)
 
