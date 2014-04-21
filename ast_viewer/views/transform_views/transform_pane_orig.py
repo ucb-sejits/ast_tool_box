@@ -4,10 +4,9 @@ from PySide import QtGui, QtCore
 import inspect
 import os
 from ast_viewer.views.editor_widget import EditorPane
-from ast_viewer.views.transform_views.transform_tree_widget import TransformTreeWidget, TransformTreeWidgetItem
 
 
-class TransformPane(QtGui.QGroupBox):
+class TransformPaneOrig(QtGui.QGroupBox):
     """
     Show a list of transformers
     ast_transformers create a new tree from an existing tree
@@ -52,24 +51,16 @@ class TransformPane(QtGui.QGroupBox):
 
         layout.addWidget(button_box)
 
-        self.main_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Vertical)
-
         self.transform_list = QtGui.QListWidget()
-        self.transform_list.setMaximumHeight(200)
 
         self.transform_list.itemClicked.connect(self.load_editor_from)
         self.transform_list.doubleClicked.connect(self.transform_presenter.apply_current_transform)
 
-        # disable this as we move to a tree display
-        # self.main_splitter.addWidget(self.transform_list)
-
-        self.transform_tree_widget = TransformTreeWidget(self.transform_presenter)
-        self.main_splitter.addWidget(self.transform_tree_widget)
+        layout.addWidget(self.transform_list)
 
         self.editor = EditorPane()
-        self.main_splitter.addWidget(self.editor)
+        layout.addWidget(self.editor)
 
-        layout.addWidget(self.main_splitter)
         self.setLayout(layout)
 
     @QtCore.Slot(QtGui.QListWidgetItem)
@@ -87,10 +78,6 @@ class TransformPane(QtGui.QGroupBox):
 
     def current_item(self):
         return self.transform_list.currentItem()
-
-    @staticmethod
-    def show_error(message):
-        QtGui.QErrorMessage.showMessage(message)
 
     def load(self):
         file_name, _ = QtGui.QFileDialog.getOpenFileName(

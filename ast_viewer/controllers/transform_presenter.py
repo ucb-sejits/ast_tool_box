@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import ast
 import sys
+import os
 import inspect
 from pprint import pprint
 from operator import methodcaller
@@ -9,6 +10,7 @@ from PySide import QtCore, QtGui
 
 import ast_viewer.controllers as controllers
 import ast_viewer.models.transform_models.transform_model as transform_model
+from ast_viewer.models.transform_models.transform_file import TransformFile, TransformThing
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
 from ast_viewer.views.transform_views.transform_pane import TransformPane
 from ctree.codegen import CodeGenVisitor
@@ -17,11 +19,11 @@ from ast_viewer.util import Util
 
 class TransformPresenter(object):
     """
-    coordinate between various transformer, either
+    coordinate between various transforms, either
     ast transformers or code generators
     have direct connection to a code code_presenter
-    TODO: Do more investigation of managing transforms in separate namespace
     """
+    # TODO : Do more investigation of managing transforms in separate namespace
     def __init__(self, tree_transform_controller=None, start_packages=None):
         assert isinstance(tree_transform_controller, TreeTransformController)
 
@@ -29,6 +31,7 @@ class TransformPresenter(object):
         self.tree_transform_controller = tree_transform_controller
         self.transform_pane = TransformPane(transform_presenter=self)
 
+        self.transform_files = []
         self.transforms_loaded = []
         self.transform_items = []
         self.transforms_by_name = {}
@@ -40,6 +43,7 @@ class TransformPresenter(object):
             'ctree.omp.codegen',
         ]
         self.load_transforms(to_load)
+        self.transform_pane.transform_tree_widget.build(self.transform_files)
 
     def reload_transforms(self):
         to_load = self.transforms_loaded[:]
@@ -101,8 +105,8 @@ class TransformPresenter(object):
         """Use module_name to discover some transforms"""
 
         try:
-            print("--> importing module %s" % module_name)
-            pprint(sys.path)
+            # print("--> importing module %s" % module_name)
+            # pprint(sys.path)
             __import__(module_name)
         except Exception as exception:
             print("cannot load %s message %s" % (module_name, exception.message))
@@ -138,9 +142,18 @@ class TransformPresenter(object):
     def __iter__(self):
         return iter(self.transform_items)
 
-    def load_transforms_by_file_name(self, file_name):
-        """Todo"""
-        pass
+    def load_file(self, file_name):
+        if not os.path.isfile(file_name):
+            TransformPane.show_error("Cannot open %s" % file_name)
+            return
+        transform_file = TransformFile(file_name)
+        self.transform_files.append(transform_file)
+
+    def load_files(self, file_names):
+        for file_name in file_names:
+            self.load_file(file_name)
+
+        self.transform_pane.transform_tree_widget.build(self.transform_files)
 
     def load_transform(self, key):
         """
@@ -171,7 +184,7 @@ class TransformPresenter(object):
         self.transform_pane.update_view()
 
     @staticmethod
-    def delete_module(module_name, paranoid=None):
+    def delete_module(module_name):
         Util.clear_classes_and_reload_package(module_name)
 
 

@@ -9,6 +9,7 @@ from PySide import QtGui, QtCore
 
 DEBUGGING = False
 
+
 class AstTreePane(QtGui.QGroupBox):
     def __init__(self, code_presenter=None, ast_root=None):
         super(AstTreePane, self).__init__()
@@ -102,6 +103,7 @@ class AstTreePane(QtGui.QGroupBox):
             # print(items[0])
             current_tree.setCurrentItem(items[0])
             current_tree.expandItem(items[0])
+
 
 class AstTreeWidget(QtGui.QTreeWidget):
     """

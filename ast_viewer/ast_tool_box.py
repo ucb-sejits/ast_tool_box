@@ -114,8 +114,6 @@ class AstToolBox(QtGui.QMainWindow):
             expression statements that evaluate to something other than None 
             will be printed).
             (see http://docs.python.org/2/library/functions.html#compile)
-            
-            If width and height are both set, the window is resized.
         """
         super(AstToolBox, self).__init__()
 
@@ -137,6 +135,8 @@ class AstToolBox(QtGui.QMainWindow):
             tree_transform_controller=self.tree_transform_controller,
             start_packages=self.start_packages,
         )
+        self.transform_presenter.load_files(self.start_packages)
+
         self.code_presenter.set_transform_presenter(self.transform_presenter)
         self.transform_presenter.set_code_presenter(self.code_presenter)
 
@@ -165,7 +165,7 @@ class AstToolBox(QtGui.QMainWindow):
         self.setWindowTitle('{}'.format(PROGRAM_NAME))
 
         self.read_settings()
-        self.code_presenter.code_pane.transform_list.currentItem().setFocus()
+        # self.code_presenter.code_pane.transform_list.currentItem().setFocus()
 
     def write_settings(self):
         self.settings = QtCore.QSettings()

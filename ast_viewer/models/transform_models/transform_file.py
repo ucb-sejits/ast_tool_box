@@ -3,6 +3,7 @@ read files, look for transforms and figure out what arguments that they need
 """
 from __future__ import print_function
 import sys
+import os.path
 import inspect
 import ast
 from ctree.codegen import CodeGenVisitor
@@ -28,6 +29,7 @@ class TransformThing(object):
         self._has_varargs = False
         self._has_kwargs = False
         self._super_classes = []
+        self.doc = "TODO to get doc string from transform"
         self.get_args()
         self.figure_super_classes()
 
@@ -122,8 +124,6 @@ class TransformThing(object):
             ]
         )
 
-
-
     def find_node(self, node, name=None, tipe=None):
 
         def name_match():
@@ -151,11 +151,14 @@ class TransformThing(object):
         return None
 
 
-
-
 class TransformFile(object):
+    """
+    a list of transforms contained in file
+    """
     def __init__(self, file_name):
         self.file_name = file_name
+        self.base_name = os.path.basename(file_name)
+
         self.transforms = []
         self.code_generators = []
 
