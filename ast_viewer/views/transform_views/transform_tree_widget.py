@@ -10,6 +10,19 @@ from PySide import QtGui, QtCore
 DEBUGGING = False
 
 
+class TransformTreeWidgetItem(QtGui.QTreeWidgetItem):
+    """
+    connects a gui tree item with the corresponding node in the actual ast tree
+    """
+    def __init__(self, parent, name=None, source=None):
+        super(TransformTreeWidgetItem, self).__init__(parent)
+        self.name = name
+        self.source = source
+
+    def picked(self):
+        print("got selected %s" % self.name)
+
+
 class TransformTreeWidget(QtGui.QTreeWidget):
     """
     displays an ast as a tree widget
@@ -23,10 +36,11 @@ class TransformTreeWidget(QtGui.QTreeWidget):
 
     expand_all_at_create = True
 
-    def __init__(self, transform_presenter=None):
+    def __init__(self, transform_presenter=None, transform_pane=None):
         super(TransformTreeWidget, self).__init__()
 
         self.transform_presenter = transform_presenter
+        self.transform_pane = transform_pane
 
         self.setColumnCount(2)
         self.setHeaderLabels(["Transforms"])
@@ -41,6 +55,17 @@ class TransformTreeWidget(QtGui.QTreeWidget):
             statusTip="Expand all descendant nodes",
             triggered=self.expand_descendants
         )
+        self.itemClicked.connect(self.clicked)
+        self.itemDoubleClicked.connect(self.double_clicked)
+
+    @QtCore.Slot(TransformTreeWidgetItem)
+    def clicked(self, item):
+        self.transform_pane.load_editor_from(item)
+        print("click %s" % item)
+
+    @QtCore.Slot(TransformTreeWidgetItem)
+    def double_clicked(self, info):
+        print("doubleclick on %s" % info)
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
@@ -83,39 +108,40 @@ class TransformTreeWidget(QtGui.QTreeWidget):
     def build(self, transform_files):
         print("calling build")
         for transform_file in transform_files:
-            file_node = TransformTreeWidgetItem(self)
+            file_node = TransformTreeWidgetItem(self, name=transform_file.base_name, source=transform_file)
             file_node.setText(TransformTreeWidget.COL_NODE, transform_file.base_name)
             file_node.setToolTip(TransformTreeWidget.COL_NODE, transform_file.path)
 
             if len(transform_file.transforms) > 0:
                 transforms_node = TransformTreeWidgetItem(file_node)
-                transforms_node.setText(TransformTreeWidget.COL_NODE, "ast.NodeTransformer : (%d)" % len(transform_file.transforms))
+                transforms_node.setText(
+                    TransformTreeWidget.COL_NODE,
+                    "ast.NodeTransformer : (%d)" % len(transform_file.transforms)
+                )
                 for transform in transform_file.transforms:
-                    transform_node = TransformTreeWidgetItem(transforms_node)
+                    transform_node = TransformTreeWidgetItem(transforms_node, name=transform.name, source=transform)
                     transform_node.setText(TransformTreeWidget.COL_NODE, transform.name())
                     print("loaded transform to tree %s" % transform.name)
                     transform_node.setToolTip(TransformTreeWidget.COL_NODE, transform.doc)
 
             if len(transform_file.code_generators) > 0:
                 code_generators_node = TransformTreeWidgetItem(file_node)
-                code_generators_node.setText(TransformTreeWidget.COL_NODE, "ctree.CodeGenVisitor : (%d)" % len(transform_file.code_generators))
+                code_generators_node.setText(
+                    TransformTreeWidget.COL_NODE,
+                    "ctree.CodeGenVisitor : (%d)" % len(transform_file.code_generators)
+                )
                 print("%d code_generators" % len(transform_file.code_generators))
 
                 for code_generator in transform_file.code_generators:
-                    code_generator_node = TransformTreeWidgetItem(code_generators_node)
+                    code_generator_node = TransformTreeWidgetItem(
+                        code_generators_node,
+                        name=code_generator.name,
+                        source=code_generator
+                    )
                     code_generator_node.setText(code_generator.name)
                     code_generator_node.setToolTip(TransformTreeWidget.COL_NODE, code_generator.doc)
 
         self.expandToDepth(100)
-
-
-class TransformTreeWidgetItem(QtGui.QTreeWidgetItem):
-    """
-    connects a gui tree item with the corresponding node in the actual ast tree
-    """
-    def __init__(self, parent, source_node=None):
-        super(TransformTreeWidgetItem, self).__init__(parent)
-        self.ast_node = source_node
 
 
 class TransformerAction(QtGui.QAction):

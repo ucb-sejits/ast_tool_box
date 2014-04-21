@@ -17,10 +17,11 @@ PositionalArg = namedtuple('PositionalArg', ['name', 'default_source'])
 
 
 class TransformThing(object):
-    def __init__(self, transform, package_name=None):
+    def __init__(self, transform, package_name=None, file_name=None):
         self.transform = transform
         self.package_name = package_name
         self.source = inspect.getsource(self.transform)
+        self.file_name = file_name
         # print(self.source)
         self.ast_root = ast.parse(self.source)
         # self.line_number = self.ast_root.lineno
@@ -158,6 +159,9 @@ class TransformFile(object):
     def __init__(self, file_name):
         self.file_name = file_name
         self.base_name = os.path.basename(file_name)
+        self.source_text = ''
+        with open(file_name, "r") as f:
+            self.source_text = f.read()
 
         self.transforms = []
         self.code_generators = []
@@ -180,10 +184,10 @@ class TransformFile(object):
             if inspect.isclass(thing):
                 if issubclass(thing, ast.NodeTransformer):
                     if thing.__name__ != "NodeTransformer":
-                        self.transforms.append(TransformThing(thing))
+                        self.transforms.append(TransformThing(thing, file_name=file_name))
                 if issubclass(thing, CodeGenVisitor):
                     if thing.__name__ != "CodeGenVisitor":
-                        self.code_generators.append(thing)
+                        self.code_generators.append(TransformThing(thing, file_name=file_name))
 
 
 if __name__ == '__main__':

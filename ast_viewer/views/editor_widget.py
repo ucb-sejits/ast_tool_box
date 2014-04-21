@@ -11,7 +11,7 @@ class EditorPane(QtGui.QPlainTextEdit):
         font.setFixedPitch(True)
         font.setPointSize(13)
 
-        self.setReadOnly(True)
+        # self.setReadOnly(True)
         self.setFont(font)
         self.setWordWrapMode(QtGui.QTextOption.NoWrap)
         self.setStyleSheet("selection-color: black; selection-background-color: yellow;")

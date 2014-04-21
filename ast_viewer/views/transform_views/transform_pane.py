@@ -5,7 +5,7 @@ import inspect
 import os
 from ast_viewer.views.editor_widget import EditorPane
 from ast_viewer.views.transform_views.transform_tree_widget import TransformTreeWidget, TransformTreeWidgetItem
-
+from ast_viewer.models.transform_models.transform_file import TransformFile, TransformThing
 
 class TransformPane(QtGui.QGroupBox):
     """
@@ -19,6 +19,7 @@ class TransformPane(QtGui.QGroupBox):
         self.transform_presenter = transform_presenter
 
         self.last_used_directory = None
+        self.current_editor_item = None
 
         settings = QtCore.QSettings()
         settings.beginGroup("transforms")
@@ -63,7 +64,7 @@ class TransformPane(QtGui.QGroupBox):
         # disable this as we move to a tree display
         # self.main_splitter.addWidget(self.transform_list)
 
-        self.transform_tree_widget = TransformTreeWidget(self.transform_presenter)
+        self.transform_tree_widget = TransformTreeWidget(self.transform_presenter, self)
         self.main_splitter.addWidget(self.transform_tree_widget)
 
         self.editor = EditorPane()
@@ -75,8 +76,14 @@ class TransformPane(QtGui.QGroupBox):
     @QtCore.Slot(QtGui.QListWidgetItem)
     def load_editor_from(self, item):
         print("show item %s" % item)
-        transform = item.transform_item.transform
-        self.editor.setPlainText(inspect.getsource(transform))
+        if isinstance(item.source, TransformFile):
+            if self.current_editor_item != item.source.file_name:
+                self.current_editor_item = item.source.file_name
+                self.editor.setPlainText(item.source.source_text)
+        elif isinstance(item.source, TransformThing):
+            if self.current_editor_item != item.source.file_name:
+                self.current_editor_item = item.source.file_name
+                self.editor.setPlainText(item.source.source)
 
     def update_view(self):
         self.transform_list.clear()

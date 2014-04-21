@@ -18,6 +18,7 @@ class TransformPaneOrig(QtGui.QGroupBox):
         self.transform_presenter = transform_presenter
 
         self.last_used_directory = None
+        self.current_displayed_file_name = None
 
         settings = QtCore.QSettings()
         settings.beginGroup("transforms")
