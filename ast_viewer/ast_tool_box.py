@@ -125,9 +125,9 @@ class AstToolBox(QtGui.QMainWindow):
         self.start_packages = packages if packages else []
         self.start_packages += [
             'ctree.transformations',
-            'ctree.c.codegen',
-            'ctree.ocl.codegen',
-            'ctree.omp.codegen',
+            # 'ctree.c.codegen',
+            # 'ctree.ocl.codegen',
+            # 'ctree.omp.codegen',
         ]
 
         self.settings = None

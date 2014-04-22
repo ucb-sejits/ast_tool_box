@@ -116,13 +116,13 @@ class TransformTreeWidget(QtGui.QTreeWidget):
             )
             file_node.setToolTip(TransformTreeWidget.COL_NODE, transform_file.path)
 
-            if len(transform_file.transforms) > 0:
+            if len(transform_file.node_transforms) > 0:
                 transforms_node = TransformTreeWidgetItem(file_node)
                 transforms_node.setText(
                     TransformTreeWidget.COL_NODE,
-                    "ast.NodeTransformer : (%d)" % len(transform_file.transforms)
+                    "ast.NodeTransformer : (%d)" % len(transform_file.node_transforms)
                 )
-                for transform in transform_file.transforms:
+                for transform in transform_file.node_transforms:
                     transform_node = TransformTreeWidgetItem(transforms_node, name=transform.name, source=transform)
                     if not first_node:
                         first_node = transform_node

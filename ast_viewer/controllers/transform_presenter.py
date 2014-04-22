@@ -29,7 +29,7 @@ class TransformPresenter(object):
         self.tree_transform_controller = tree_transform_controller
         self.transform_pane = TransformPane(transform_presenter=self)
 
-        self.transform_source_names = []
+        self.transform_collections = []
         self.transforms_loaded = []
         self.transform_items = []
         self.transforms_by_name = {}
@@ -38,12 +38,12 @@ class TransformPresenter(object):
         """
         reload all transforms, clearing everything first
         """
-        to_load = self.transform_source_names[:]
+        to_load = self.transform_collections[:]
 
         for module in to_load:
             TransformPresenter.delete_module(module)
 
-        self.transform_source_names = []
+        self.transform_collections = []
         self.load_transforms(to_load)
 
     def set_code_presenter(self, code_presenter):
@@ -104,20 +104,20 @@ class TransformPresenter(object):
         print("loading %s" % file_name)
         if not os.path.isfile(file_name):
             transform_package = TransformPackage(file_name)
-            if len(transform_package.transforms) > 0:
-                self.transform_source_names.append(transform_package)
+            if len(transform_package.node_transforms) > 0:
+                self.transform_collections.append(transform_package)
             else:
                 TransformPane.show_error("Cannot open %s" % file_name)
             return
 
         transform_file = TransformFile(file_name)
-        self.transform_source_names.append(transform_file)
+        self.transform_collections.append(transform_file)
 
     def load_files(self, file_names):
         for file_name in file_names:
             self.load_file(file_name)
 
-        self.transform_pane.transform_tree_widget.build(self.transform_source_names)
+        self.transform_pane.transform_tree_widget.build(self.transform_collections)
 
     @staticmethod
     def delete_module(module_name):

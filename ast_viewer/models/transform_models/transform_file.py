@@ -193,26 +193,33 @@ class AstParseItem(TransformThing):
         return None
 
 
-class TransformFile(object):
+class TransformCollection(object):
+    """
+    a list of transforms contained in file
+    """
+    def __init__(self, collection_name):
+        self.collection_name = collection_name
+        self.node_transforms = []
+        self.code_generators = []
+
+class TransformFile(TransformCollection):
     """
     a list of transforms contained in file
     """
     def __init__(self, file_name):
+        super(TransformFile, self).__init__(file_name)
         self.file_name = file_name
         self.base_name = os.path.basename(file_name)
         self.source_text = ''
         with open(file_name, "r") as f:
             self.source_text = f.read()
 
-        self.transforms = []
-        self.code_generators = []
         self.class_def_nodes = {}
 
         self.ast_tree = ast.parse(self.source_text)
         for node in ast.walk(self.ast_tree):
             if isinstance(node, ast.ClassDef):
                 self.class_def_nodes[node.name] = node
-                print("Found class def for %s" % node.name)
 
         self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
 
@@ -232,35 +239,32 @@ class TransformFile(object):
             if inspect.isclass(thing):
                 if issubclass(thing, ast.NodeTransformer):
                     if thing.__name__ != "NodeTransformer":
-                        self.transforms.append(AstTransformItem(
+                        self.node_transforms.append(AstTransformItem(
                             thing,
                             file_name=file_name,
                             transform_file=self
                         ))
                 if issubclass(thing, CodeGenVisitor):
                     if thing.__name__ != "CodeGenVisitor":
-                        self.code_generators.append(TransformThing(
+                        self.code_generators.append(CodeGeneratorItem(
                             thing,
                             file_name=file_name,
                             transform_file=self
                         ))
 
-        self.transforms.sort(key=methodcaller('name'))
+        self.node_transforms.sort(key=methodcaller('name'))
         self.code_generators.sort(key=methodcaller('name'))
 
 
-class TransformPackage(object):
+class TransformPackage(TransformCollection):
     """
     a list of transforms contained in package
     """
-    def __init__(self, file_name):
-        self.file_name = file_name
-        self.base_name = os.path.basename(file_name)
+    def __init__(self, raw_package_name):
+        super(TransformPackage, self).__init__(raw_package_name)
+        self.file_name = raw_package_name
+        self.base_name = raw_package_name.split(".")[0]
         self.source_text = ''
-
-        self.transforms = []
-        self.code_generators = []
-        self.class_def_nodes = {}
 
         self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
         print("transform package %s %s" % (self.path, self.package_name))
@@ -283,21 +287,22 @@ class TransformPackage(object):
             if inspect.isclass(thing):
                 if issubclass(thing, ast.NodeTransformer):
                     if thing.__name__ != "NodeTransformer":
-                        self.transforms.append(TransformThing(
+                        self.node_transforms.append(AstTransformItem(
                             thing,
-                            file_name=file_name,
+                            file_name=self.file_name,
                             transform_file=self
                         ))
                 if issubclass(thing, CodeGenVisitor):
                     if thing.__name__ != "CodeGenVisitor":
                         self.code_generators.append(CodeGeneratorItem(
                             thing,
-                            file_name=file_name,
+                            file_name=self.file_name,
                             transform_file=self
                         ))
 
-        self.transforms.sort(key=methodcaller('name'))
+        self.node_transforms.sort(key=methodcaller('name'))
         self.code_generators.sort(key=methodcaller('name'))
+
 
 if __name__ == '__main__':
     tf = TransformFile(sys.argv[1])
@@ -305,6 +310,6 @@ if __name__ == '__main__':
     print("path %s" % tf.path)
     print("package %s" % tf.package_name)
     print("transforms", end="")
-    for transform_thing in tf.transforms:
+    for transform_thing in tf.node_transforms:
         print(transform_thing)
 
