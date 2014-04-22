@@ -66,6 +66,7 @@ class TransformTreeWidget(QtGui.QTreeWidget):
     @QtCore.Slot(TransformTreeWidgetItem)
     def double_clicked(self, info):
         print("doubleclick on %s" % info)
+        self.transform_presenter.apply_current_transform()
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
