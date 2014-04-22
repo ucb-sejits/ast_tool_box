@@ -67,20 +67,31 @@ class TransformPane(QtGui.QGroupBox):
 
     @QtCore.Slot(QtGui.QListWidgetItem)
     def load_editor_from(self, item):
+        """
+        When a transform is clicked in the list, we put the cursor on that line in
+        the file. Don't redraw or reload if cursor is already there.  If there is
+        no file level source try and load from the inspect.getsource text from
+        loading transform
+        """
         file_name = ''
         source_text = ''
         line_number = 0
         column_number = 0
+        read_only = False
         if isinstance(item.source, TransformThing):
             if item.source.transform_file:
                 file_item = item.source.transform_file
                 file_name = file_item.file_name
-                source_text = file_item.source_text
-                if item.name() in file_item.class_def_nodes:
-                    node = file_item.class_def_nodes[item.name()]
-                    if hasattr(node, 'lineno'):
-                        line_number = node.lineno
-                        column_number = node.col_offset
+                if not file_item.source_text:
+                    source_text = item.source.source_text
+                    read_only = True
+                else:
+                    source_text = file_item.source_text
+                    if item.name() in file_item.class_def_nodes:
+                        node = file_item.class_def_nodes[item.name()]
+                        if hasattr(node, 'lineno'):
+                            line_number = node.lineno
+                            column_number = node.col_offset
             else:
                 self.current_editor_item = item.source.file_name
                 self.editor.setPlainText(item.source.source_text)
@@ -93,11 +104,14 @@ class TransformPane(QtGui.QGroupBox):
             self.current_editor_item = item.source.file_name
             self.editor.setPlainText(source_text)
 
+        self.editor.setCenterOnScroll(True)
         text_cursor = self.editor.textCursor()
         text_block = self.editor.document().findBlockByLineNumber(line_number - 1)
         pos = text_block.position() + column_number
         text_cursor.setPosition(pos)
         self.editor.setTextCursor(text_cursor)
+        self.editor.setReadOnly(read_only)
+        self.editor.setCenterOnScroll(False)
 
     def update_view(self):
         self.transform_tree_widget.build(self.transform_presenter.transform_files)
@@ -107,6 +121,7 @@ class TransformPane(QtGui.QGroupBox):
 
     @staticmethod
     def show_error(message):
+        print("In show error with message %s" % message)
         QtGui.QErrorMessage().showMessage(message)
 
     def load(self):

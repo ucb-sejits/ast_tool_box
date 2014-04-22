@@ -143,12 +143,11 @@ class AstToolBox(QtGui.QMainWindow):
             tree_transform_controller=self.tree_transform_controller,
             start_packages=self.start_packages,
         )
-        self.transform_presenter.load_files(self.start_packages)
-
         self.code_presenter.set_transform_presenter(self.transform_presenter)
         self.transform_presenter.set_code_presenter(self.code_presenter)
 
         self.code_presenter.new_item_from_file(file_name)
+        self.transform_presenter.load_files(self.start_packages)
 
         central_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Horizontal)
         self.setCentralWidget(central_splitter)
@@ -172,7 +171,6 @@ class AstToolBox(QtGui.QMainWindow):
 
         self.read_settings()
 
-        self.transform_presenter.load_files(self.start_packages)
         #
         # TODO: figure out where and how to set the focus of this thing as it starts up
 
@@ -221,60 +219,6 @@ class AstToolBox(QtGui.QMainWindow):
             file_name = self._get_file_name_from_dialog()
 
         self.code_presenter.new_file(file_name)
-
-    def _get_file_name_from_dialog(self):
-        """ Opens a file dialog and returns the file name selected by the user
-        """
-        file_name, _ = QtGui.QFileDialog.getOpenFileName(
-            self,
-            "Open File",
-            '',
-            "Python Files (*.py);;All Files (*)"
-        )
-        return file_name
-
-    def _update_widgets(self, file_name):
-        """ Reads source_text from a file and updates the tree and editor widgets..
-        """
-        if file_name:
-            self._load_file(file_name)
-
-        self.setWindowTitle('{} - {}'.format(PROGRAM_NAME, self._file_name))
-        # self.editor.setPlainText(self._source_code)
-
-        try:
-            self._fill_ast_tree_widget()
-        except StandardError, ex:
-            if DEBUGGING:
-                raise
-            else:
-                stack_trace = traceback.format_exc()
-                msg = "Unable to parse file: {}\n\n{}\n\n{}" \
-                    .format(self._file_name, ex, stack_trace)
-                logger.exception(ex)
-                QtGui.QMessageBox.warning(self, 'error', msg)
-
-    def _load_file(self, file_name):
-        """
-        Opens a file and sets self._file_name and self._source code if successful
-        """
-        logger.debug("Opening {!r}".format(file_name))
-
-        in_file = QtCore.QFile(file_name)
-        if in_file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text):
-            text = in_file.readAll()
-            try:
-                source_code = str(text, encoding='ascii')  # Python 3
-            except TypeError:
-                source_code = str(text)  # Python 2
-
-            self._file_name = file_name
-            self._source_code = source_code
-
-        else:
-            msg = "Unable to open file: {}".format(file_name)
-            logger.warn(msg)
-            QtGui.QMessageBox.warning(self, 'error', msg)
 
     def about(self):
         """ Shows the about message window. """

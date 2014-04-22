@@ -26,8 +26,6 @@ class TransformThing(object):
         self.file_name = file_name
         # print(self.source_text)
         self.ast_root = ast.parse(self.source_text)
-        # self.line_number = self.ast_root.lineno
-        # self.column_offset = self.col_offset
         self.positional_args = []
         self._has_varargs = False
         self._has_kwargs = False
@@ -190,6 +188,56 @@ class TransformFile(object):
 
         for key in module.__dict__:
             thing = module.__dict__[key]
+            if inspect.isclass(thing):
+                if issubclass(thing, ast.NodeTransformer):
+                    if thing.__name__ != "NodeTransformer":
+                        self.transforms.append(TransformThing(
+                            thing,
+                            file_name=file_name,
+                            transform_file=self
+                        ))
+                if issubclass(thing, CodeGenVisitor):
+                    if thing.__name__ != "CodeGenVisitor":
+                        self.code_generators.append(TransformThing(
+                            thing,
+                            file_name=file_name,
+                            transform_file=self
+                        ))
+
+        self.transforms.sort(key=methodcaller('name'))
+        self.code_generators.sort(key=methodcaller('name'))
+
+class TransformPackage(object):
+    """
+    a list of transforms contained in file
+    """
+    def __init__(self, file_name):
+        self.file_name = file_name
+        self.base_name = os.path.basename(file_name)
+        self.source_text = ''
+
+        self.transforms = []
+        self.code_generators = []
+        self.class_def_nodes = {}
+
+        self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
+        print("transform package %s %s" % (self.path, self.package_name))
+
+        if not self.path in sys.path:
+            sys.path.append(self.path)
+
+        try:
+            __import__(self.package_name)
+        except Exception as exception:
+            print("cannot load %s message %s" % (self.package_name, exception.message))
+            return
+
+        module = sys.modules[self.package_name]
+        print("module %s" % module)
+
+        for key in module.__dict__:
+            thing = module.__dict__[key]
+            print("  got %s -> %s" % (key, thing))
             if inspect.isclass(thing):
                 if issubclass(thing, ast.NodeTransformer):
                     if thing.__name__ != "NodeTransformer":
