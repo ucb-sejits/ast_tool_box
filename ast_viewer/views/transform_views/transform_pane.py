@@ -121,8 +121,9 @@ class TransformPane(QtGui.QGroupBox):
 
     @staticmethod
     def show_error(message):
-        print("In show error with message %s" % message)
-        QtGui.QErrorMessage().showMessage(message)
+        message_box = QtGui.QMessageBox()
+        message_box.setText("Error:\n%s" % message)
+        message_box.exec_()
 
     def load(self):
         file_name, _ = QtGui.QFileDialog.getOpenFileName(

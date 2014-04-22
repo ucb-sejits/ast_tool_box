@@ -57,7 +57,8 @@ class TransformPresenter(object):
         return self.transform_pane.current_item()
 
     def apply_current_transform(self):
-        transform_item = self.current_item().source.transform_item
+        transform_item = self.current_item().source
+        print("just got transform item %s" % transform_item)
         code_item = self.code_presenter.current_item()
         self.apply_transform(code_item, transform_item)
 

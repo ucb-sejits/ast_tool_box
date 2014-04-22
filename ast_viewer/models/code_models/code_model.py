@@ -4,7 +4,7 @@ __author__ = 'Chick Markley'
 
 import ast
 import os
-import ast_viewer.models.transform_models.transform_model as transform_model
+import ast_viewer.models.transform_models.transform_file as transform_model
 
 
 class CodeItem(object):
@@ -72,6 +72,6 @@ class GeneratedCodeItem(CodeItem):
 class CodeTransformLink(object):
     def __init__(self, code_item=None, transform_item=None):
         assert isinstance(code_item, CodeItem)
-        assert transform_item is None or isinstance(transform_item, transform_model.TransformItem)
+        assert transform_item is None or isinstance(transform_item, transform_model.TransformThing)
         self.code_item = code_item
         self.transform_item = transform_item

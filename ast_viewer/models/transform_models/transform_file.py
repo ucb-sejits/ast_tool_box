@@ -49,6 +49,9 @@ class TransformThing(object):
     def super_classes(self):
         return self._super_classes
 
+    def get_instance(self):
+        return self.transform()
+
     def figure_super_classes(self):
         do_copy = True
         for clazz in inspect.getmro(self.transform):
@@ -152,6 +155,44 @@ class TransformThing(object):
         return None
 
 
+class AstTransformItem(TransformThing):
+    def __init__(self, transform, package_name=None, file_name=None, transform_file=None):
+        super(AstTransformItem, self).__init__(
+            transform=transform,
+            package_name=package_name,
+            file_name=file_name,
+            transform_file=transform_file
+        )
+
+
+class CodeGeneratorItem(TransformThing):
+    def __init__(self, transform, package_name=None, file_name=None, transform_file=None):
+        super(CodeGeneratorItem, self).__init__(
+            transform=transform,
+            package_name=package_name,
+            file_name=file_name,
+            transform_file=transform_file
+        )
+
+
+class AstParseItem(TransformThing):
+    def __init__(self):
+        # super(AstParseItem, self).__init__(self)
+        pass
+
+    def package(self):
+        """override base class method"""
+        return ""
+
+    def name(self):
+        """override base class method"""
+        return "ast.parse"
+
+    def get_instance(self):
+        """override base class method"""
+        return None
+
+
 class TransformFile(object):
     """
     a list of transforms contained in file
@@ -191,7 +232,7 @@ class TransformFile(object):
             if inspect.isclass(thing):
                 if issubclass(thing, ast.NodeTransformer):
                     if thing.__name__ != "NodeTransformer":
-                        self.transforms.append(TransformThing(
+                        self.transforms.append(AstTransformItem(
                             thing,
                             file_name=file_name,
                             transform_file=self
@@ -207,9 +248,10 @@ class TransformFile(object):
         self.transforms.sort(key=methodcaller('name'))
         self.code_generators.sort(key=methodcaller('name'))
 
+
 class TransformPackage(object):
     """
-    a list of transforms contained in file
+    a list of transforms contained in package
     """
     def __init__(self, file_name):
         self.file_name = file_name
@@ -248,7 +290,7 @@ class TransformPackage(object):
                         ))
                 if issubclass(thing, CodeGenVisitor):
                     if thing.__name__ != "CodeGenVisitor":
-                        self.code_generators.append(TransformThing(
+                        self.code_generators.append(CodeGeneratorItem(
                             thing,
                             file_name=file_name,
                             transform_file=self

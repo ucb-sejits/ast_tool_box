@@ -230,7 +230,10 @@ class CodePane(QtGui.QGroupBox):
 
     @staticmethod
     def show_error(message):
-        QtGui.QErrorMessage.showMessage(message)
+        # QtGui.QErrorMessage().showMessage(message)
+        message_box = QtGui.QMessageBox()
+        message_box.setText("Error:\n%s" % message)
+        message_box.exec_()
 
     def search_box_changed(self):
         if not self.search_box.text():

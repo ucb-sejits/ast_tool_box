@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
 import ast_viewer.models.code_models.code_model as code_model
-import ast_viewer.models.transform_models.transform_model as transform_model
+import ast_viewer.models.transform_models.transform_file as transform_model
 import ast_viewer.controllers.transform_presenter as transform_controllers
 from ast_viewer.transformers.identity_transform import IdentityTransform
 
@@ -82,7 +82,7 @@ class CodePresenter(object):
 
         assert isinstance(code_item, code_model.CodeItem)
         if transform_item is not None:
-            assert isinstance(transform_item, transform_model.TransformItem)
+            assert isinstance(transform_item, transform_model.TransformThing)
 
         def apply_codegen_transform(ast_root):
             """
@@ -103,7 +103,6 @@ class CodePresenter(object):
                 return combined_source
             else:
                 return ast_root.codegen()
-
 
         if isinstance(code_item, code_model.FileItem):
             self.show_error("Transformation cannot be applied to source_text code")
@@ -137,6 +136,7 @@ class CodePresenter(object):
                 self.add_code_item(new_ast_tree_item)
             else:
                 self.show_error("Cannot transform\n%s\n with\n%s" % (code_item, transform_item))
+                raise Exception()
         else:
             self.show_error("Unknown transform of\n%s\n with\n%s" % (code_item, transform_item))
 
