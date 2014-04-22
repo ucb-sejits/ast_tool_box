@@ -19,11 +19,11 @@ from ast_viewer.util import Util
 
 class TransformPresenter(object):
     """
-    coordinate between various transforms, either
-    ast transformers or code generators
-    have direct connection to a code code_presenter
+    keeps track of transforms (subclasses of ast.NodeTransformers or
+    ctree.codegen.CodeGenVisitor) that are found in either a package
+    or a file, transforms can be applied to the code objects in the
+    code pane
     """
-    # TODO : Do more investigation of managing transforms in separate namespace
     def __init__(self, tree_transform_controller=None, start_packages=None):
         assert isinstance(tree_transform_controller, TreeTransformController)
 
@@ -31,19 +31,10 @@ class TransformPresenter(object):
         self.tree_transform_controller = tree_transform_controller
         self.transform_pane = TransformPane(transform_presenter=self)
 
-        self.transform_files = []
+        self.load_name_list = []
         self.transforms_loaded = []
         self.transform_items = []
         self.transforms_by_name = {}
-
-        to_load = start_packages + [
-            'ctree.transformations',
-            'ctree.c.codegen',
-            'ctree.ocl.codegen',
-            'ctree.omp.codegen',
-        ]
-        self.load_transforms(to_load)
-        self.transform_pane.transform_tree_widget.build(self.transform_files)
 
     def reload_transforms(self):
         to_load = self.transforms_loaded[:]
@@ -147,41 +138,13 @@ class TransformPresenter(object):
             TransformPane.show_error("Cannot open %s" % file_name)
             return
         transform_file = TransformFile(file_name)
-        self.transform_files.append(transform_file)
+        self.load_name_list.append(transform_file)
 
     def load_files(self, file_names):
         for file_name in file_names:
             self.load_file(file_name)
 
-        self.transform_pane.transform_tree_widget.build(self.transform_files)
-
-    def load_transform(self, key):
-        """
-        ONLY do import, finding transforms imported is separate
-        step
-        """
-        path, package_name = Util.path_to_path_and_package(key)
-
-        print("path %s package %s" % (path, package_name))
-
-        if not path in sys.path:
-            sys.path.append(path)
-
-        self.get_ast_transforms(package_name)
-        self.transforms_loaded.append(package_name)
-
-
-    def load_transforms(self, key_list):
-        if not isinstance(key_list, list):
-            key_list = [key_list]
-
-        for key in key_list:
-            self.load_transform(key)
-
-        print("AstTransformManager %s" % self)
-
-        self.reload()
-        self.transform_pane.update_view()
+        self.transform_pane.transform_tree_widget.build(self.load_name_list)
 
     @staticmethod
     def delete_module(module_name):

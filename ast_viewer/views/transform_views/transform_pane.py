@@ -55,16 +55,8 @@ class TransformPane(QtGui.QGroupBox):
 
         self.main_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Vertical)
 
-        self.transform_list = QtGui.QListWidget()
-        self.transform_list.setMaximumHeight(200)
-
-        self.transform_list.itemClicked.connect(self.load_editor_from)
-        self.transform_list.doubleClicked.connect(self.transform_presenter.apply_current_transform)
-
-        # disable this as we move to a tree display
-        # self.main_splitter.addWidget(self.transform_list)
-
         self.transform_tree_widget = TransformTreeWidget(self.transform_presenter, self)
+        self.transform_tree_widget.setMaximumHeight(200)
         self.main_splitter.addWidget(self.transform_tree_widget)
 
         self.editor = EditorPane()
@@ -107,20 +99,15 @@ class TransformPane(QtGui.QGroupBox):
         text_cursor.setPosition(pos)
         self.editor.setTextCursor(text_cursor)
 
-
     def update_view(self):
-        self.transform_list.clear()
-        for transform in self.transform_presenter.transform_items:
-            self.transform_list.addItem(
-                TransformWidgetItem(transform)
-            )
+        self.transform_tree_widget.build(self.transform_presenter.transform_files)
 
     def current_item(self):
-        return self.transform_list.currentItem()
+        return self.transform_tree_widget.currentItem()
 
     @staticmethod
     def show_error(message):
-        QtGui.QErrorMessage.showMessage(message)
+        QtGui.QErrorMessage().showMessage(message)
 
     def load(self):
         file_name, _ = QtGui.QFileDialog.getOpenFileName(

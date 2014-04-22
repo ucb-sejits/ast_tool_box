@@ -123,6 +123,14 @@ class AstToolBox(QtGui.QMainWindow):
         self._mode = 'exec'
 
         self.start_packages = packages if packages else []
+        self.start_packages += [
+            'ctree.transformations',
+            'ctree.c.codegen',
+            'ctree.ocl.codegen',
+            'ctree.omp.codegen',
+        ]
+
+        self.settings = None
 
         # Set up the UI
         self.tree_transform_controller = TreeTransformController()
@@ -150,8 +158,6 @@ class AstToolBox(QtGui.QMainWindow):
         # Create base tree widget
         central_layout.addWidget(self.code_presenter.code_pane)
 
-        # central_layout.addWidget(self.editor)
-
         central_layout.addWidget(self.transform_presenter.transform_pane)
 
         # Splitter parameters
@@ -165,7 +171,10 @@ class AstToolBox(QtGui.QMainWindow):
         self.setWindowTitle('{}'.format(PROGRAM_NAME))
 
         self.read_settings()
-        # self.code_presenter.code_pane.transform_list.currentItem().setFocus()
+
+        self.transform_presenter.load_files(self.start_packages)
+        #
+        # TODO: figure out where and how to set the focus of this thing as it starts up
 
     def write_settings(self):
         self.settings = QtCore.QSettings()
