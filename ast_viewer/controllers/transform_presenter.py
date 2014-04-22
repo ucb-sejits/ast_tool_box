@@ -31,8 +31,14 @@ class TransformPresenter(object):
 
         self.transform_collections = []
         self.transforms_loaded = []
-        self.transform_items = []
         self.transforms_by_name = {}
+
+    def transform_items(self):
+        for collection in self.transform_collections:
+            for item in collection.node_transforms:
+                yield item
+            for item in collection.code_generators:
+                yield item
 
     def reload_transforms(self):
         """
@@ -63,42 +69,41 @@ class TransformPresenter(object):
         self.apply_transform(code_item, transform_item)
 
     def clear(self):
-        self.transform_items = []
         self.transforms_by_name = {}
 
     def count(self):
         """return current transforms"""
-        return len(self.transform_items)
+        return len(list(self.transform_items()))
 
-    def __getitem__(self, item):
-        if isinstance(item, int):
-            return self.transform_items[item]
-        elif isinstance(item, str):
-            return self.transforms_by_name[item]
+    # def __getitem__(self, item):
+    #     if isinstance(item, int):
+    #         return self.transform_items[item]
+    #     elif isinstance(item, str):
+    #         return self.transforms_by_name[item]
 
-    def get_valid_index(self, index):
-        """
-        convenience method for checking index
-        if index is a string make it an int
-        None returned if failed to convert or index out of range
-        """
-        if not isinstance(index, int):
-            try:
-                index = int(index)
-            except ValueError:
-                return None
+    # def get_valid_index(self, index):
+    #     """
+    #     convenience method for checking index
+    #     if index is a string make it an int
+    #     None returned if failed to convert or index out of range
+    #     """
+    #     if not isinstance(index, int):
+    #         try:
+    #             index = int(index)
+    #         except ValueError:
+    #             return None
+    #
+    #     if index >= 0:
+    #         if index < len(self.transform_items):
+    #             return index
+    #     return None
 
-        if index >= 0:
-            if index < len(self.transform_items):
-                return index
-        return None
+    # def get_instance_by_name(self, transform_name):
+    #     transform_item = self.transforms_by_name[transform_name]
+    #     return transform_item.get_instance()
 
-    def get_instance_by_name(self, transform_name):
-        transform_item = self.transforms_by_name[transform_name]
-        return transform_item.get_instance()
-
-    def __iter__(self):
-        return iter(self.transform_items)
+    # def __iter__(self):
+    #     return iter(self.transform_items)
 
     def load_file(self, file_name):
         print("loading %s" % file_name)
