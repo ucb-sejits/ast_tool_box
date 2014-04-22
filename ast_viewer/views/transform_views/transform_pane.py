@@ -75,15 +75,38 @@ class TransformPane(QtGui.QGroupBox):
 
     @QtCore.Slot(QtGui.QListWidgetItem)
     def load_editor_from(self, item):
-        print("show item %s" % item)
-        if isinstance(item.source, TransformFile):
+        file_name = ''
+        source_text = ''
+        line_number = 0
+        column_number = 0
+        if isinstance(item.source, TransformThing):
+            if item.source.transform_file:
+                file_item = item.source.transform_file
+                file_name = file_item.file_name
+                source_text = file_item.source_text
+                if item.name() in file_item.class_def_nodes:
+                    node = file_item.class_def_nodes[item.name()]
+                    if hasattr(node, 'lineno'):
+                        line_number = node.lineno
+                        column_number = node.col_offset
+            else:
+                self.current_editor_item = item.source.file_name
+                self.editor.setPlainText(item.source.source_text)
+        elif isinstance(item.source, TransformFile):
             if self.current_editor_item != item.source.file_name:
                 self.current_editor_item = item.source.file_name
                 self.editor.setPlainText(item.source.source_text)
-        elif isinstance(item.source, TransformThing):
-            if self.current_editor_item != item.source.file_name:
-                self.current_editor_item = item.source.file_name
-                self.editor.setPlainText(item.source.source)
+
+        if file_name and file_name != self.current_editor_item:
+            self.current_editor_item = item.source.file_name
+            self.editor.setPlainText(source_text)
+
+        text_cursor = self.editor.textCursor()
+        text_block = self.editor.document().findBlockByLineNumber(line_number - 1)
+        pos = text_block.position() + column_number
+        text_cursor.setPosition(pos)
+        self.editor.setTextCursor(text_cursor)
+
 
     def update_view(self):
         self.transform_list.clear()
@@ -141,7 +164,7 @@ class TransformPane(QtGui.QGroupBox):
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
         menu.addAction(
-            QtGui.QAction("Show source", self)
+            QtGui.QAction("Show source_text", self)
         )
         menu.addAction(
             QtGui.QAction("Apply to current tree", self)

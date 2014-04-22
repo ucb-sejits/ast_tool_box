@@ -122,7 +122,7 @@ class TransformPaneOrig(QtGui.QGroupBox):
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
         menu.addAction(
-            QtGui.QAction("Show source", self)
+            QtGui.QAction("Show source_text", self)
         )
         menu.addAction(
             QtGui.QAction("Apply to current tree", self)

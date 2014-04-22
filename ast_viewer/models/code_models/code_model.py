@@ -9,7 +9,7 @@ import ast_viewer.models.transform_models.transform_model as transform_model
 
 class CodeItem(object):
     """
-    Base class for python source, ast trees and generated c code
+    Base class for python source_text, ast trees and generated c code
     """
     def __init__(self, code=None, code_name=None, path_name=None, parent_link=None):
         assert parent_link is None or isinstance(parent_link, CodeTransformLink)

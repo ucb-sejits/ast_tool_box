@@ -109,7 +109,10 @@ class TransformTreeWidget(QtGui.QTreeWidget):
         first_node = None
         for transform_file in transform_files:
             file_node = TransformTreeWidgetItem(self, name=transform_file.base_name, source=transform_file)
-            file_node.setText(TransformTreeWidget.COL_NODE, transform_file.base_name)
+            file_node.setText(
+                TransformTreeWidget.COL_NODE,
+                "%s (%s)" % (transform_file.base_name, transform_file.package_name)
+            )
             file_node.setToolTip(TransformTreeWidget.COL_NODE, transform_file.path)
 
             if len(transform_file.transforms) > 0:

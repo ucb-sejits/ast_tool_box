@@ -10,7 +10,7 @@ import ast_viewer.ast_tool_box
 class CodePane(QtGui.QGroupBox):
     """
     A pane that can show one or more code_items
-    A code item can be source ast
+    A code item can be source_text ast
     """
     def __init__(self, code_presenter=None, panel_count=2):
         super(CodePane, self).__init__("Code && Trees")

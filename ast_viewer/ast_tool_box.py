@@ -101,14 +101,14 @@ class AstToolBox(QtGui.QMainWindow):
         """ Constructor
             
             AST browser windows that displays the Abstract Syntax Tree
-            of source code. 
+            of source_text code.
             
-            The source can be given as text in the source parameter, or
+            The source_text can be given as text in the source_text parameter, or
             can be read from a file. The file_name parameter overrides
-            the source parameter.
+            the source_text parameter.
             
             The mode argument specifies what kind of code must be compiled; 
-            it can be 'exec' if source consists of a sequence of statements, 
+            it can be 'exec' if source_text consists of a sequence of statements,
             'eval' if it consists of a single expression, or 'single' if it 
             consists of a single interactive statement (in the latter case, 
             expression statements that evaluate to something other than None 
@@ -225,7 +225,7 @@ class AstToolBox(QtGui.QMainWindow):
         return file_name
 
     def _update_widgets(self, file_name):
-        """ Reads source from a file and updates the tree and editor widgets.. 
+        """ Reads source_text from a file and updates the tree and editor widgets..
         """
         if file_name:
             self._load_file(file_name)

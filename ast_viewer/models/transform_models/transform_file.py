@@ -6,6 +6,7 @@ import sys
 import os.path
 import inspect
 import ast
+from operator import methodcaller
 from ctree.codegen import CodeGenVisitor
 from pprint import pprint
 from ast_viewer.util import Util
@@ -17,13 +18,14 @@ PositionalArg = namedtuple('PositionalArg', ['name', 'default_source'])
 
 
 class TransformThing(object):
-    def __init__(self, transform, package_name=None, file_name=None):
+    def __init__(self, transform, package_name=None, file_name=None, transform_file=None):
         self.transform = transform
         self.package_name = package_name
-        self.source = inspect.getsource(self.transform)
+        self.transform_file = transform_file
+        self.source_text = inspect.getsource(self.transform)
         self.file_name = file_name
-        # print(self.source)
-        self.ast_root = ast.parse(self.source)
+        # print(self.source_text)
+        self.ast_root = ast.parse(self.source_text)
         # self.line_number = self.ast_root.lineno
         # self.column_offset = self.col_offset
         self.positional_args = []
@@ -74,8 +76,8 @@ class TransformThing(object):
         # for key, val in ast.iter_fields(init_func):
         #     print("field key %s val %s" % (key, val))
 
-        for key, val in ast.iter_fields(init_func.args):
-            print("args field key %s val %s %s" % (key, val, type(val)))
+        # for key, val in ast.iter_fields(init_func.args):
+        #     print("args field key %s val %s %s" % (key, val, type(val)))
 
         if hasattr(init_func.args, 'defaults'):
             defaults = init_func.args.defaults
@@ -89,7 +91,7 @@ class TransformThing(object):
                     default_st = codegen.to_source(defaults[index])
                 else:
                     default_st = None
-                print("args args field val %s %s" % (val.id, default_st))
+                # print("args args field val %s %s" % (val.id, default_st))
                 self.positional_args.append(PositionalArg(val.id, default_st))
 
         # for val in init_func.args.defaults:
@@ -165,6 +167,13 @@ class TransformFile(object):
 
         self.transforms = []
         self.code_generators = []
+        self.class_def_nodes = {}
+
+        self.ast_tree = ast.parse(self.source_text)
+        for node in ast.walk(self.ast_tree):
+            if isinstance(node, ast.ClassDef):
+                self.class_def_nodes[node.name] = node
+                print("Found class def for %s" % node.name)
 
         self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
 
@@ -184,11 +193,21 @@ class TransformFile(object):
             if inspect.isclass(thing):
                 if issubclass(thing, ast.NodeTransformer):
                     if thing.__name__ != "NodeTransformer":
-                        self.transforms.append(TransformThing(thing, file_name=file_name))
+                        self.transforms.append(TransformThing(
+                            thing,
+                            file_name=file_name,
+                            transform_file=self
+                        ))
                 if issubclass(thing, CodeGenVisitor):
                     if thing.__name__ != "CodeGenVisitor":
-                        self.code_generators.append(TransformThing(thing, file_name=file_name))
+                        self.code_generators.append(TransformThing(
+                            thing,
+                            file_name=file_name,
+                            transform_file=self
+                        ))
 
+        self.transforms.sort(key=methodcaller('name'))
+        self.code_generators.sort(key=methodcaller('name'))
 
 if __name__ == '__main__':
     tf = TransformFile(sys.argv[1])

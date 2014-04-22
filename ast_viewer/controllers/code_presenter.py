@@ -94,7 +94,7 @@ class CodePresenter(object):
 
             # TODO: stay more in line with ctree and use ResolveGeneratedPathRefs
 
-            # transform all files a combined source string
+            # transform all files a combined source_text string
             combined_source = ""
             if ast_root.files and len(ast_root.files) > 0:
                 for f in ast_root.files:
@@ -106,7 +106,7 @@ class CodePresenter(object):
 
 
         if isinstance(code_item, code_model.FileItem):
-            self.show_error("Transformation cannot be applied to source code")
+            self.show_error("Transformation cannot be applied to source_text code")
         elif isinstance(code_item, code_model.AstTreeItem):
             if isinstance(transform_item, transform_model.AstTransformItem):
                 new_tree = transform_item.get_instance().visit(code_item.ast_tree)
