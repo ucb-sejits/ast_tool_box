@@ -58,4 +58,4 @@ class CodeGenX(CodeGenVisitor):
 
 class CodeGenY(CodeGenX):
     def __init__(self, dog='dog', cat='cat'):
-        super(CodeGenX, self).__init__()
+        super(CodeGenY, self).__init__()
