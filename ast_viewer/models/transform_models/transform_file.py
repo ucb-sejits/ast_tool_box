@@ -26,6 +26,7 @@ class TransformThing(object):
         self.file_name = file_name
         # print(self.source_text)
         self.ast_root = ast.parse(self.source_text)
+        self.init_source = ''
         self.positional_args = []
         self._has_varargs = False
         self._has_kwargs = False

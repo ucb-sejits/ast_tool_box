@@ -230,14 +230,46 @@ class CodePane(QtGui.QGroupBox):
 
     def resolve_transform_arguments(self, transform_thing):
         dialog = QtGui.QDialog()
+        dialog.setSizeGripEnabled(True)
+
+        class ThreeLineEditor(QtGui.QPlainTextEdit):
+            def sizeHint(self):
+                return QtCore.QSize(200,25)
+
+        form_text_boxes = []
+
         form_layout = QtGui.QFormLayout()
+        form_layout.addRow(QtGui.QLabel("Parameters required for this transform"))
+
         for positional_arg in transform_thing.positional_args:
-            form_layout.addRow(
-                QtGui.QLabel(positional_arg.name),
-                QtGui.QPlainTextEdit(),
+            text_editor = ThreeLineEditor()
+            form_text_boxes.append(text_editor)
+
+            label_text = "%s\n%s" % (
+                positional_arg.name,
+                positional_arg.default_source if positional_arg.default_source else "No default value"
             )
+            form_layout.addRow(
+                QtGui.QLabel(label_text),
+                text_editor,
+            )
+
+        cancel_button = QtGui.QPushButton("Cancel")
+        cancel_button.clicked.connect(dialog.reject)
+        accept_button = QtGui.QPushButton("Go")
+        accept_button.clicked.connect(dialog.accept)
+        form_layout.addRow(
+            cancel_button,
+            accept_button,
+        )
         dialog.setLayout(form_layout)
-        dialog.exec_()
+        accept_button.setFocus()
+        result = dialog.exec_()
+
+        print("result %s" % result)
+        for index, text_editor in enumerate(form_text_boxes):
+            print("hey param %s is %s" % (transform_thing.positional_args[index], text_editor.document().toPlainText()))
+
         return True
 
     @staticmethod

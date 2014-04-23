@@ -107,6 +107,8 @@ class TransformTreeWidget(QtGui.QTreeWidget):
             self.collapse_descendants(item.child(child_index))
 
     def build(self, transform_files):
+        self.clear()
+
         first_node = None
         for transform_file in transform_files:
             file_node = TransformTreeWidgetItem(self, name=transform_file.base_name, source=transform_file)
@@ -146,7 +148,7 @@ class TransformTreeWidget(QtGui.QTreeWidget):
                     )
                     if not first_node:
                         first_node = code_generator_node
-                    code_generator_node.setText(code_generator.name)
+                    code_generator_node.setText(TransformTreeWidget.COL_NODE, code_generator.name)
                     code_generator_node.setToolTip(TransformTreeWidget.COL_NODE, code_generator.doc)
 
         self.expandToDepth(100)

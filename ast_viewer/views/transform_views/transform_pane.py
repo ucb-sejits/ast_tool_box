@@ -141,7 +141,7 @@ class TransformPane(QtGui.QGroupBox):
             settings.endGroup()
 
             print("got file_name %s" % file_name)
-            self.transform_presenter.load_transforms(file_name)
+            self.transform_presenter.load_files([file_name])
             self.update_view()
 
     def load_package(self):
