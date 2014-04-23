@@ -85,7 +85,7 @@ class CodePresenter(object):
 
         assert isinstance(code_item, code_model.CodeItem)
         if transform_item is not None:
-            assert isinstance(transform_item, transform_model.TransformThing)
+            assert isinstance(transform_item, transform_model.TransformThing), "bad type %s" % transform_item
 
         def apply_codegen_transform(ast_root):
             """

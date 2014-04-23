@@ -35,6 +35,8 @@ class TransformThing(object):
         self.get_args()
         self.figure_super_classes()
 
+        print("new transform thing type %s package %s has args %s" % (type(self), package_name, self.has_args))
+
     def name(self):
         return self.transform.__name__
 
@@ -77,7 +79,6 @@ class TransformThing(object):
             return []
 
         init_func = self.find_node(class_def, name='__init__')
-        print("init_func %s" % init_func)
         if init_func is None:
             return []
 
@@ -229,6 +230,9 @@ class TransformFile(TransformCollection):
                 self.class_def_nodes[node.name] = node
 
         self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
+        self.path = os.path.abspath(self.path)
+
+        print("transform file %s %s" % (self.path, self.package_name))
 
         if not self.path in sys.path:
             sys.path.append(self.path)
@@ -274,6 +278,8 @@ class TransformPackage(TransformCollection):
         self.source_text = ''
 
         self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
+        self.path = os.path.abspath(self.path)
+
         print("transform package %s %s" % (self.path, self.package_name))
 
         if not self.path in sys.path:
