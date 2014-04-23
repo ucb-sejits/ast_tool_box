@@ -248,19 +248,31 @@ class CodePane(QtGui.QGroupBox):
         for positional_arg in transform_thing.positional_args:
             default_text = positional_arg.default_source if positional_arg.default_source else ""
             default_text = settings.value(positional_arg.name, default_text)
-            text_editor = ThreeLineEditor()
-            text_editor.document().setPlainText(default_text)
+            # text_editor = ThreeLineEditor()
+            # text_editor.document().setPlainText(default_text)
+            # form_text_boxes.append(text_editor)
+            text_editor = QtGui.QLineEdit()
+            text_editor.setText(default_text)
             form_text_boxes.append(text_editor)
 
-            label_text = "%s\n%s" % (
-                positional_arg.name,
-                positional_arg.default_source if positional_arg.default_source else "No default value"
-            )
+            label_text = positional_arg.name
+            # label_text = "%s\n%s" % (
+            #     positional_arg.name,
+            #     positional_arg.default_source if positional_arg.default_source else "No default value"
+            # )
             form_layout.addRow(
                 QtGui.QLabel(label_text),
                 text_editor,
             )
         settings.endGroup()
+
+        form_layout.addRow(
+            QtGui.QLabel("""
+            Check source in editor for default values, if any.  The text in each box
+            will be processed by the python eval() function so if you want a string
+            be sure to put quotes around it
+            """)
+        )
 
         cancel_button = QtGui.QPushButton("Cancel")
         cancel_button.clicked.connect(dialog.reject)
@@ -279,15 +291,16 @@ class CodePane(QtGui.QGroupBox):
         if not result:
             return None
 
-        result = [x.document().toPlainText().strip() for x in form_text_boxes]
+        # result = [x.document().toPlainText().strip() for x in form_text_boxes]
+        result = [x.document().text().strip() for x in form_text_boxes]
         settings = QtCore.QSettings()
         settings.beginGroup(group_name)
-        for index, text_editor in enumerate(form_text_boxes):
+        for index, text in enumerate(result):
             settings.setValue(transform_thing.positional_args[index].name, result[index])
             print("saving group %s param %s value %s" % (
                 group_name,
                 transform_thing.positional_args[index],
-                text_editor.document().toPlainText()
+                result[index]
             ))
         settings.endGroup()
 

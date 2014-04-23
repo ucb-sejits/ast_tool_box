@@ -148,7 +148,8 @@ class TransformTreeWidget(QtGui.QTreeWidget):
                     )
                     if not first_node:
                         first_node = code_generator_node
-                    code_generator_node.setText(TransformTreeWidget.COL_NODE, code_generator.name)
+                    print("XXXXXXXXX codegenerator.name %s" % code_generator.name())
+                    code_generator_node.setText(TransformTreeWidget.COL_NODE, code_generator.name())
                     code_generator_node.setToolTip(TransformTreeWidget.COL_NODE, code_generator.doc)
 
         self.expandToDepth(100)

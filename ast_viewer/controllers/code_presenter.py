@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import copy
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
 import ast_viewer.models.code_models.code_model as code_model
 import ast_viewer.models.transform_models.transform_file as transform_model
@@ -87,7 +88,7 @@ class CodePresenter(object):
         if transform_item is not None:
             assert isinstance(transform_item, transform_model.TransformThing), "bad type %s" % transform_item
 
-        def apply_codegen_transform(ast_root):
+        def apply_codegen_transform(ast_root, argument_list):
             """
             Code generates each file in the project
             """
@@ -120,7 +121,8 @@ class CodePresenter(object):
                         print("got arg %s" % a)
                     argument_values = [eval(x) for x in argument_values]
 
-                new_tree = transform_item.get_instance(argument_values).visit(code_item.ast_tree)
+                tree_copy = copy.deepcopy(code_item.ast_tree)
+                new_tree = transform_item.get_instance(argument_values).visit(tree_copy)
                 new_ast_tree_item = code_model.AstTreeItem(
                     new_tree,
                     name=transform_item.name(),
@@ -138,7 +140,8 @@ class CodePresenter(object):
                         print("got arg %s" % a)
                     argument_values = [eval(x) for x in argument_values]
 
-                new_code = apply_codegen_transform(code_item.ast_tree)
+                tree_copy = copy.deepcopy(code_item.ast_tree)
+                new_code = apply_codegen_transform(tree_copy)
                 new_code_item = code_model.GeneratedCodeItem(
                     new_code,
                     parent_link=code_model.CodeTransformLink(code_item=code_item, transform_item=transform_item),

@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import ast
+from ctree.codegen import CodeGenVisitor
 
 
 class IdentityTransform(ast.NodeTransformer):
@@ -49,3 +50,12 @@ class LambdaIdentityTransform(ast.NodeTransformer):
         self.lambda_func(node)
         return super(LambdaIdentityTransform, self).visit(node)
 
+
+class CodeGenX(CodeGenVisitor):
+    def __init__(self, dog='dog', cat='cat'):
+        super(CodeGenX, self).__init__()
+
+
+class CodeGenY(CodeGenX):
+    def __init__(self, dog='dog', cat='cat'):
+        super(CodeGenX, self).__init__()
