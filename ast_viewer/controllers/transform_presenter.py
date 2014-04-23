@@ -47,10 +47,12 @@ class TransformPresenter(object):
         to_load = self.transform_collections[:]
 
         for module in to_load:
-            TransformPresenter.delete_module(module)
+            TransformPresenter.delete_module(module.package_name)
 
         self.transform_collections = []
-        self.load_transforms(to_load)
+        self.load_files(
+            map(lambda x: x.collection_name, to_load)
+        )
 
     def set_code_presenter(self, code_presenter):
         # assert isinstance(code_presenter, controllers.TransformPresenter)

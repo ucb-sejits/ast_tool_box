@@ -72,6 +72,9 @@ class CodePresenter(object):
         self.code_items.append(code_item)
         self.code_pane.add_code_item(code_item)
 
+    def resolve_transform_args(self, transform_thing):
+        self.code_pane.resolve_transform_arguments(transform_thing)
+
     def apply_transform(self, code_item, transform_item):
         """
         transform some kind of code thing into another kind of code thing
@@ -108,6 +111,10 @@ class CodePresenter(object):
             self.show_error("Transformation cannot be applied to source_text code")
         elif isinstance(code_item, code_model.AstTreeItem):
             if isinstance(transform_item, transform_model.AstTransformItem):
+                if transform_item.has_args():
+                    if not self.resolve_transform_args(transform_item):
+                        return
+
                 new_tree = transform_item.get_instance().visit(code_item.ast_tree)
                 new_ast_tree_item = code_model.AstTreeItem(
                     new_tree,

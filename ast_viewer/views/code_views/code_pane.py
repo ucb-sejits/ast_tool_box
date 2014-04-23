@@ -228,6 +228,18 @@ class CodePane(QtGui.QGroupBox):
         self.code_splitter.setCollapsible(self.code_splitter.count()-1, True)
         self.set_panel_sizes()
 
+    def resolve_transform_arguments(self, transform_thing):
+        dialog = QtGui.QDialog()
+        form_layout = QtGui.QFormLayout()
+        for positional_arg in transform_thing.positional_args:
+            form_layout.addRow(
+                QtGui.QLabel(positional_arg.name),
+                QtGui.QPlainTextEdit(),
+            )
+        dialog.setLayout(form_layout)
+        dialog.exec_()
+        return True
+
     @staticmethod
     def show_error(message):
         # QtGui.QErrorMessage().showMessage(message)

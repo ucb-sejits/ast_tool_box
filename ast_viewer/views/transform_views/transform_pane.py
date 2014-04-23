@@ -56,11 +56,12 @@ class TransformPane(QtGui.QGroupBox):
         self.main_splitter = QtGui.QSplitter(self, orientation=QtCore.Qt.Vertical)
 
         self.transform_tree_widget = TransformTreeWidget(self.transform_presenter, self)
-        self.transform_tree_widget.setMaximumHeight(200)
+        # self.transform_tree_widget.setMaximumHeight(200)
         self.main_splitter.addWidget(self.transform_tree_widget)
 
         self.editor = EditorPane()
         self.main_splitter.addWidget(self.editor)
+        self.main_splitter.setSizes([300, 700])
 
         layout.addWidget(self.main_splitter)
         self.setLayout(layout)

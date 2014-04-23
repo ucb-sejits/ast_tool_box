@@ -37,6 +37,9 @@ class TransformThing(object):
     def name(self):
         return self.transform.__name__
 
+    def has_args(self):
+        return self.has_positional_args() or self.has_varargs() or self.has_kwargs()
+
     def has_positional_args(self):
         return len(self.positional_args) > 0
 
