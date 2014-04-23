@@ -115,7 +115,7 @@ class TransformPane(QtGui.QGroupBox):
         self.editor.setCenterOnScroll(False)
 
     def update_view(self):
-        self.transform_tree_widget.build(self.transform_presenter.transform_files)
+        self.transform_tree_widget.build(self.transform_presenter.transform_collections)
 
     def current_item(self):
         return self.transform_tree_widget.currentItem()

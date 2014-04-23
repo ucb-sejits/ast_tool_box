@@ -129,6 +129,15 @@ class CodePresenter(object):
                 self.add_code_item(new_ast_tree_item)
             elif isinstance(transform_item, transform_model.CodeGeneratorItem):
                 # new_code = transform_item.get_instance().visit(code_item.ast_tree)
+                argument_values = []
+                if transform_item.has_args():
+                    argument_values = self.resolve_transform_args(transform_item)
+                    if not argument_values:
+                        return
+                    for a in argument_values:
+                        print("got arg %s" % a)
+                    argument_values = [eval(x) for x in argument_values]
+
                 new_code = apply_codegen_transform(code_item.ast_tree)
                 new_code_item = code_model.GeneratedCodeItem(
                     new_code,
