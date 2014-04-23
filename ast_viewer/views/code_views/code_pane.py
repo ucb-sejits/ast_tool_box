@@ -234,7 +234,7 @@ class CodePane(QtGui.QGroupBox):
 
         class ThreeLineEditor(QtGui.QPlainTextEdit):
             def sizeHint(self):
-                return QtCore.QSize(200,25)
+                return QtCore.QSize(200, 25)
 
         form_text_boxes = []
 
@@ -267,10 +267,15 @@ class CodePane(QtGui.QGroupBox):
         result = dialog.exec_()
 
         print("result %s" % result)
+
+        if not result:
+            return None
+
+        result = [x.document().toPlainText() for x in form_text_boxes]
         for index, text_editor in enumerate(form_text_boxes):
             print("hey param %s is %s" % (transform_thing.positional_args[index], text_editor.document().toPlainText()))
 
-        return True
+        return result
 
     @staticmethod
     def show_error(message):

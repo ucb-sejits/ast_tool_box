@@ -53,8 +53,11 @@ class TransformThing(object):
     def super_classes(self):
         return self._super_classes
 
-    def get_instance(self):
-        return self.transform()
+    def get_instance(self, positional_args=None):
+        if positional_args:
+            return self.transform(*positional_args)
+        else:
+            return self.transform()
 
     def figure_super_classes(self):
         do_copy = True
