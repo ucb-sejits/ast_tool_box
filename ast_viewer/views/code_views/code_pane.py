@@ -229,6 +229,9 @@ class CodePane(QtGui.QGroupBox):
         self.set_panel_sizes()
 
     def resolve_transform_arguments(self, transform_thing):
+        settings = QtCore.QSettings()
+        group_name = "transforms/%s/parameters" % transform_thing.package_name
+
         dialog = QtGui.QDialog()
         dialog.setSizeGripEnabled(True)
 
@@ -241,8 +244,12 @@ class CodePane(QtGui.QGroupBox):
         form_layout = QtGui.QFormLayout()
         form_layout.addRow(QtGui.QLabel("Parameters required for this transform"))
 
+        settings.beginGroup(group_name)
         for positional_arg in transform_thing.positional_args:
+            default_text = positional_arg.default_source if positional_arg.default_source else ""
+            default_text = settings.value(positional_arg.name, default_text)
             text_editor = ThreeLineEditor()
+            text_editor.document().setPlainText(default_text)
             form_text_boxes.append(text_editor)
 
             label_text = "%s\n%s" % (
@@ -253,6 +260,7 @@ class CodePane(QtGui.QGroupBox):
                 QtGui.QLabel(label_text),
                 text_editor,
             )
+        settings.endGroup()
 
         cancel_button = QtGui.QPushButton("Cancel")
         cancel_button.clicked.connect(dialog.reject)
@@ -271,9 +279,17 @@ class CodePane(QtGui.QGroupBox):
         if not result:
             return None
 
-        result = [x.document().toPlainText() for x in form_text_boxes]
+        result = [x.document().toPlainText().strip() for x in form_text_boxes]
+        settings = QtCore.QSettings()
+        settings.beginGroup(group_name)
         for index, text_editor in enumerate(form_text_boxes):
-            print("hey param %s is %s" % (transform_thing.positional_args[index], text_editor.document().toPlainText()))
+            settings.setValue(transform_thing.positional_args[index].name, result[index])
+            print("saving group %s param %s value %s" % (
+                group_name,
+                transform_thing.positional_args[index],
+                text_editor.document().toPlainText()
+            ))
+        settings.endGroup()
 
         return result
 
