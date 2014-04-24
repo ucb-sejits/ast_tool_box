@@ -5,7 +5,7 @@ import inspect
 import os
 from ast_viewer.views.editor_widget import EditorPanel
 from ast_viewer.views.transform_views.transform_tree_widget import TransformTreeWidget, TransformTreeWidgetItem
-from ast_viewer.models.transform_models.transform_file import TransformFile, TransformThing
+from ast_viewer.models.transform_models.transform_file import TransformFile, TransformThing, TransformPackage
 
 class TransformPane(QtGui.QGroupBox):
     """
@@ -72,7 +72,7 @@ class TransformPane(QtGui.QGroupBox):
         self.setLayout(layout)
 
     @QtCore.Slot(QtGui.QListWidgetItem)
-    def load_editor_from(self, item):
+    def load_editor_from(self, widget_item):
         """
         When a transform is clicked in the list, we put the cursor on that line in
         the file. Don't redraw or reload if cursor is already there.  If there is
@@ -84,40 +84,52 @@ class TransformPane(QtGui.QGroupBox):
         line_number = 0
         column_number = 0
         read_only = False
-        if isinstance(item.source, TransformThing):
-            if item.source.transform_file:
-                file_item = item.source.transform_file
+
+        transform_item = widget_item.source
+        if isinstance(transform_item, TransformThing):
+            if transform_item.transform_file:
+                file_item = transform_item.transform_file
                 file_name = file_item.file_name
                 if not file_item.source_text:
-                    source_text = item.source.source_text
+                    source_text = transform_item.source_text
                     read_only = True
                 else:
                     source_text = file_item.source_text
-                    if item.name() in file_item.class_def_nodes:
-                        node = file_item.class_def_nodes[item.name()]
+                    if widget_item.name() in file_item.class_def_nodes:
+                        node = file_item.class_def_nodes[widget_item.name()]
                         if hasattr(node, 'lineno'):
                             line_number = node.lineno
                             column_number = node.col_offset
             else:
-                self.current_editor_item = item.source.file_name
-                self.editor.setPlainText(item.source.source_text)
-        elif isinstance(item.source, TransformFile):
-            if self.current_editor_item != item.source.file_name:
-                self.current_editor_item = item.source.file_name
-                self.editor.setPlainText(item.source.source_text)
+                file_name = transform_item.name()
+                source_text = transform_item.source_text
+                read_only = True
+        elif isinstance(transform_item, TransformFile):
+            file_name = transform_item.file_name
+            source_text = transform_item.source_text
+            read_only = False
+        else:
+            print("skipping editor set on click of non file or thing")
+            return
 
+        print("setting file_name %s vs %s" % (file_name, self.current_editor_item))
         if file_name and file_name != self.current_editor_item:
-            self.current_editor_item = item.source.file_name
+            self.current_editor_item = transform_item.file_name
             self.editor.setPlainText(source_text)
+            self.editor.set_file_name(widget_item.source.file_name)
+            self.editor.set_read_only(read_only)
+            self.editor_panel.disable_buttons()
+            title = "Edit: %s" % widget_item.source.file_name
+            if read_only:
+                title += " READ ONLY"
+            self.editor_panel.setTitle(title)
 
-        self.editor.set_file_name(item.source.file_name)
         self.editor.setCenterOnScroll(True)
         text_cursor = self.editor.textCursor()
         text_block = self.editor.document().findBlockByLineNumber(line_number - 1)
         pos = text_block.position() + column_number
         text_cursor.setPosition(pos)
         self.editor.setTextCursor(text_cursor)
-        self.editor.set_read_only(read_only)
         self.editor.setCenterOnScroll(False)
 
     def update_view(self):
