@@ -62,7 +62,7 @@ class TransformPane(QtGui.QGroupBox):
         # self.editor = EditorPane()
         # self.main_splitter.addWidget(self.editor)
 
-        self.editor_panel = EditorPanel()
+        self.editor_panel = EditorPanel(transform_pane=self)
         self.editor = self.editor_panel.editor
         self.main_splitter.addWidget(self.editor_panel)
 
@@ -107,6 +107,8 @@ class TransformPane(QtGui.QGroupBox):
         elif isinstance(transform_item, TransformFile):
             file_name = transform_item.file_name
             source_text = transform_item.source_text
+            if transform_item.load_error_line_number:
+                line_number = transform_item.load_error_line_number
             read_only = False
         else:
             print("skipping editor set on click of non file or thing")
