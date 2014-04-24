@@ -5,6 +5,8 @@ import ast
 from ast_viewer.views.editor_widget import EditorPane
 from ast_viewer.views.search_widget import SearchLineEdit
 
+from ast_viewer.models.transform_models.transform_file import AstTransformItem, CodeGeneratorItem
+
 from PySide import QtGui, QtCore
 
 DEBUGGING = False
@@ -66,7 +68,10 @@ class TransformTreeWidget(QtGui.QTreeWidget):
     @QtCore.Slot(TransformTreeWidgetItem)
     def double_clicked(self, info):
         print("doubleclick on %s" % info)
-        self.transform_presenter.apply_current_transform()
+        if isinstance(self.currentItem(), AstTransformItem) or isinstance(self.currentItem(), CodeGeneratorItem):
+            self.transform_presenter.apply_current_transform()
+        else:
+            self.transform_pane.show_error("Only works for Ast Transforms and Code Generators")
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)

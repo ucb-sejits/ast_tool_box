@@ -3,7 +3,7 @@ from __future__ import print_function
 from PySide import QtGui, QtCore
 import inspect
 import os
-from ast_viewer.views.editor_widget import EditorPane
+from ast_viewer.views.editor_widget import EditorPanel
 from ast_viewer.views.transform_views.transform_tree_widget import TransformTreeWidget, TransformTreeWidgetItem
 from ast_viewer.models.transform_models.transform_file import TransformFile, TransformThing
 
@@ -59,8 +59,13 @@ class TransformPane(QtGui.QGroupBox):
         # self.transform_tree_widget.setMaximumHeight(200)
         self.main_splitter.addWidget(self.transform_tree_widget)
 
-        self.editor = EditorPane()
-        self.main_splitter.addWidget(self.editor)
+        # self.editor = EditorPane()
+        # self.main_splitter.addWidget(self.editor)
+
+        self.editor_panel = EditorPanel()
+        self.editor = self.editor_panel.editor
+        self.main_splitter.addWidget(self.editor_panel)
+
         self.main_splitter.setSizes([300, 700])
 
         layout.addWidget(self.main_splitter)
@@ -105,13 +110,14 @@ class TransformPane(QtGui.QGroupBox):
             self.current_editor_item = item.source.file_name
             self.editor.setPlainText(source_text)
 
+        self.editor.set_file_name(item.source.file_name)
         self.editor.setCenterOnScroll(True)
         text_cursor = self.editor.textCursor()
         text_block = self.editor.document().findBlockByLineNumber(line_number - 1)
         pos = text_block.position() + column_number
         text_cursor.setPosition(pos)
         self.editor.setTextCursor(text_cursor)
-        self.editor.setReadOnly(read_only)
+        self.editor.set_read_only(read_only)
         self.editor.setCenterOnScroll(False)
 
     def update_view(self):
