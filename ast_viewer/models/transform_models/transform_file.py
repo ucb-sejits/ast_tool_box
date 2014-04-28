@@ -218,6 +218,10 @@ class TransformFile(TransformCollection):
         super(TransformFile, self).__init__(file_name)
         self.file_name = file_name
         self.base_name = os.path.basename(file_name)
+
+        self.load_error_info = None
+        self.load_error_line_number = None
+
         self.source_text = ''
         with open(file_name, "r") as f:
             self.source_text = f.read()
@@ -240,7 +244,18 @@ class TransformFile(TransformCollection):
         try:
             __import__(self.package_name)
         except Exception as exception:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+
+            message = "Exception: %s" % exception.message
+            message += "\nWhile loading file %s" % self.file_name
+            if hasattr(exc_tb, 'tb_lineno'):
+                message += "\nAt line number %s" % exc_tb.tb_lineno
+
             print("cannot load %s message %s" % (self.package_name, exception.message))
+
+            self.load_error_info = message
+            self.load_error_line_number = exc_tb.tb_lineno
+
             return
 
         module = sys.modules[self.package_name]
@@ -277,6 +292,9 @@ class TransformPackage(TransformCollection):
         self.base_name = raw_package_name.split(".")[0]
         self.source_text = ''
 
+        self.load_error_info = None
+        self.load_error_line_number = None
+
         self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
         self.path = os.path.abspath(self.path)
 
@@ -288,7 +306,18 @@ class TransformPackage(TransformCollection):
         try:
             __import__(self.package_name)
         except Exception as exception:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+
+            message = "Exception: %s" % exception.message
+            message += "\nWhile loading file %s" % self.file_name
+            if hasattr(exc_tb, 'tb_lineno'):
+                message += "\nAt line number %s" % exc_tb.tb_lineno
+
             print("cannot load %s message %s" % (self.package_name, exception.message))
+
+            self.load_error_info = message
+            self.load_error_line_number = exc_tb.tb_lineno
+
             return
 
         module = sys.modules[self.package_name]
@@ -296,7 +325,7 @@ class TransformPackage(TransformCollection):
 
         for key in module.__dict__:
             thing = module.__dict__[key]
-            print("  got %s -> %s" % (key, thing))
+            # print("  got %s -> %s" % (key, thing))
             if inspect.isclass(thing):
                 if issubclass(thing, ast.NodeTransformer):
                     if thing.__name__ != "NodeTransformer":

@@ -119,6 +119,9 @@ class TransformPresenter(object):
 
         transform_file = TransformFile(file_name)
         self.transform_collections.append(transform_file)
+        if transform_file.load_error_info:
+            message = transform_file.load_error_info
+            self.transform_pane.show_error(message)
 
     def load_files(self, file_names):
         for file_name in file_names:
@@ -128,6 +131,6 @@ class TransformPresenter(object):
 
     @staticmethod
     def delete_module(module_name):
-        Util.clear_classes_and_reload_package(module_name)
+        Util.clear_classes_in_package(module_name)
 
 

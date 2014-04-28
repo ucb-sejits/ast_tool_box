@@ -15,6 +15,7 @@ class ChickTransform(ast.NodeTransformer):
 class Chick2Transform(ChickTransform):
     pass
 
+
 class Chick4Transform(Chick2Transform):
     def __init__(self, *variable_args):
         self.args = variable_args

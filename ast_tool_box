@@ -51,4 +51,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    ast_tool_box.main()

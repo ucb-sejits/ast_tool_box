@@ -62,8 +62,8 @@ class TransformTreeWidget(QtGui.QTreeWidget):
 
     @QtCore.Slot(TransformTreeWidgetItem)
     def clicked(self, item):
-        self.transform_pane.load_editor_from(item)
         print("click %s" % item)
+        self.transform_pane.load_editor_from(item)
 
     @QtCore.Slot(TransformTreeWidgetItem)
     def double_clicked(self, info):
@@ -136,6 +136,9 @@ class TransformTreeWidget(QtGui.QTreeWidget):
                     transform_node.setText(TransformTreeWidget.COL_NODE, transform.name())
                     print("loaded transform to tree %s" % transform.name)
                     transform_node.setToolTip(TransformTreeWidget.COL_NODE, transform.doc)
+            else:
+                if transform_file.load_error_info:
+                    first_node = file_node
 
             if len(transform_file.code_generators) > 0:
                 code_generators_node = TransformTreeWidgetItem(file_node)

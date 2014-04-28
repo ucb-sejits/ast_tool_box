@@ -5,7 +5,6 @@ from ast_viewer.controllers.tree_transform_controller import TreeTransformContro
 import ast_viewer.models.code_models.code_model as code_model
 import ast_viewer.models.transform_models.transform_file as transform_model
 import ast_viewer.controllers.transform_presenter as transform_controllers
-from ast_viewer.transformers.identity_transform import IdentityTransform
 
 from ast_viewer.views.code_views.code_pane import CodePane
 import ast

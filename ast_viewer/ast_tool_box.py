@@ -4,14 +4,12 @@
 from __future__ import print_function
 
 import sys
+import argparse
 import logging
-import ast
-import traceback
-import copy
 
 from PySide import QtCore, QtGui
 
-import ast_viewer
+import ast_tool_box
 
 from ast_viewer.controllers.tree_transform_controller import TreeTransformController
 
@@ -24,7 +22,7 @@ PROGRAM_NAME = 'AstToolBox'
 PROGRAM_VERSION = '1.0.0'
 ABOUT_MESSAGE = u"""
 %(prog)s version %(version)s
-""" % {"prog": PROGRAM_NAME, "version": ast_viewer.__version__}
+""" % {"prog": PROGRAM_NAME, "version": ast_tool_box.__version__}
 
 
 def logging_basic_config(level):
@@ -237,6 +235,44 @@ class AstToolBox(QtGui.QMainWindow):
         """ Closes all windows """
         app = QtGui.QApplication.instance()
         app.closeAllWindows()
+
+
+logger = logging.getLogger(__name__)
+
+
+def main():
+    """ Main program to test stand alone
+    """
+    sys.argv[0] = "AstToolBox"
+    app = QtGui.QApplication(sys.argv) # to allow for Qt command line arguments
+    remaining_argv = app.arguments()
+
+    parser = argparse.ArgumentParser(description='Python abstract syntax tree viewer and transformer')
+    parser.add_argument('file_name', help='Python input file')
+    parser.add_argument('packages', metavar='P', nargs='*')
+
+    parser.add_argument(
+        '-l', '--log-level', dest='log_level', default='warn',
+        choices=('debug', 'info', 'warn', 'error', 'critical'),
+        help="Log level. Only log messages with a level higher or equal than this "
+             "will be printed. Default: 'warn'"
+    )
+
+    args = parser.parse_args(args = remaining_argv[1:])
+
+    ast_tool_box.logging_basic_config(args.log_level.upper())
+
+    logger.info('Started {}'.format(ast_tool_box.PROGRAM_NAME))
+
+    exit_code = ast_tool_box.view(
+        file_name=args.file_name,
+        packages=args.packages,
+        width=1400, height=900
+    )
+
+    logging.info('Done {}'.format(ast_tool_box.PROGRAM_NAME))
+    sys.exit(exit_code)
+
 
 # pylint: enable=R0901, R0902, R0904, W0201
 
