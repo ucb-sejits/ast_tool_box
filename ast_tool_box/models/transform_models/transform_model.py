@@ -4,7 +4,7 @@ __author__ = 'Chick Markley'
 
 import sys
 import ast
-from ast_viewer.util import Util
+from ast_tool_box.util import Util
 from ctree.codegen import CodeGenVisitor
 
 

@@ -6,17 +6,15 @@ setup(
 
     author="Chick Markley",
     author_email="chickmarkley@gmail.com",
-    py_modules=['ast_viewer'],
+    py_modules=['ast_tool_box'],
 
     packages=[
-        'ast_viewer',
-        'ast_viewer.models',
-        'ast_viewer.views',
-        'ast_viewer.controllers',
-        'ast_viewer.transformers',
+        'ast_tool_box',
+        'ast_tool_box.models',
+        'ast_tool_box.views',
+        'ast_tool_box.controllers',
+        'ast_tool_box.transformers',
     ],
-
-    scripts=['ast_tool_box'],
 
     requires=[
         'PySide (>=1.1.2)',
@@ -25,7 +23,7 @@ setup(
     ],
 
     entry_points={
-        'console_scripts': ['ast_tool_box = ast_viewer.ast_toolbox:main'],
+        'console_scripts': ['ast_tool_box = ast_tool_box.ast_toolbox:main'],
     }
 
 )

@@ -4,14 +4,14 @@ import inspect
 import subprocess
 from sys import modules
 import imp
-from ast_viewer.util import Util
+from ast_tool_box.util import Util
 from pprint import pprint
 
 from nose.tools import assert_greater, assert_is_instance, assert_equal, assert_not_equal
 
-from ast_viewer.models.ast_transformer_manager import AstTransformerManager
-from ast_viewer.models.ast_transformer_manager import AstTransformerItem
-from ast_viewer.transformers.identity_transform import NoisyIdentityTransform, IdentityTransform
+from ast_tool_box.models.ast_transformer_manager import AstTransformerManager
+from ast_tool_box.models.ast_transformer_manager import AstTransformerItem
+from ast_tool_box.transformers.identity_transform import NoisyIdentityTransform, IdentityTransform
 
 file1 = """
 import ast

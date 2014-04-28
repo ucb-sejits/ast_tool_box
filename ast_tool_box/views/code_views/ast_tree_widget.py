@@ -2,8 +2,8 @@ __author__ = 'Chick Markley'
 
 import types
 import ast
-from ast_viewer.views.editor_widget import EditorPane
-from ast_viewer.views.search_widget import SearchLineEdit
+from ast_tool_box.views.editor_widget import EditorPane
+from ast_tool_box.views.search_widget import SearchLineEdit
 
 from PySide import QtGui, QtCore
 

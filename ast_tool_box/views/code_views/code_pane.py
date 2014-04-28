@@ -1,10 +1,9 @@
 __author__ = 'Chick Markley'
 
 from PySide import QtGui, QtCore
-from ast_viewer.models.code_models.code_model import AstTreeItem, CodeItem, FileItem, GeneratedCodeItem
-from ast_viewer.views.code_views.ast_tree_widget import AstTreePane, AstTreeWidget
-from ast_viewer.views.editor_widget import EditorPane
-import ast_viewer.ast_tool_box
+from ast_tool_box.models.code_models.code_model import AstTreeItem, CodeItem, FileItem, GeneratedCodeItem
+from ast_tool_box.views.code_views.ast_tree_widget import AstTreePane, AstTreeWidget
+from ast_tool_box.views.editor_widget import EditorPane
 
 
 class CodePane(QtGui.QGroupBox):
@@ -12,11 +11,12 @@ class CodePane(QtGui.QGroupBox):
     A pane that can show one or more code_items
     A code item can be source_text ast
     """
-    def __init__(self, code_presenter=None, panel_count=2):
+    def __init__(self, code_presenter=None, panel_count=2, default_pane_size=800):
         super(CodePane, self).__init__("Code && Trees")
         self.code_presenter = code_presenter
         self.panel_count = panel_count
         self.all_expanded = True
+        self.default_pane_size =default_pane_size
 
         layout = QtGui.QVBoxLayout()
 
@@ -163,7 +163,7 @@ class CodePane(QtGui.QGroupBox):
         # )
         total = sum(sizes)
         if total == 0:
-            total = ast_viewer.ast_tool_box.AstToolBox.default_left_frame_size
+            total = self.default_pane_size
         new_sizes = map(lambda x: 0, sizes)
         panel_count = self.panel_count
         if panel_count > len(sizes):

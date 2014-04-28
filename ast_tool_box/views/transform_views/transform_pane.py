@@ -3,9 +3,9 @@ from __future__ import print_function
 from PySide import QtGui, QtCore
 import inspect
 import os
-from ast_viewer.views.editor_widget import EditorPanel
-from ast_viewer.views.transform_views.transform_tree_widget import TransformTreeWidget, TransformTreeWidgetItem
-from ast_viewer.models.transform_models.transform_file import TransformFile, TransformThing, TransformPackage
+from ast_tool_box.views.editor_widget import EditorPanel
+from ast_tool_box.views.transform_views.transform_tree_widget import TransformTreeWidget, TransformTreeWidgetItem
+from ast_tool_box.models.transform_models.transform_file import TransformFile, TransformThing, TransformPackage
 
 class TransformPane(QtGui.QGroupBox):
     """

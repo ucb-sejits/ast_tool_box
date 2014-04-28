@@ -4,6 +4,8 @@
 
 *.ipynb
 
+.DS_Store
+
 *pyc
 
 build

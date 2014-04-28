@@ -8,11 +8,11 @@ from pprint import pprint
 from operator import methodcaller
 from PySide import QtCore, QtGui
 
-from ast_viewer.models.transform_models.transform_file import TransformFile, TransformPackage
-from ast_viewer.controllers.tree_transform_controller import TreeTransformController
-from ast_viewer.views.transform_views.transform_pane import TransformPane
+from ast_tool_box.models.transform_models.transform_file import TransformFile, TransformPackage
+from ast_tool_box.controllers.tree_transform_controller import TreeTransformController
+from ast_tool_box.views.transform_views.transform_pane import TransformPane
 from ctree.codegen import CodeGenVisitor
-from ast_viewer.util import Util
+from ast_tool_box.util import Util
 
 
 class TransformPresenter(object):

@@ -3,9 +3,9 @@ import unittest
 from nose.tools import assert_greater, assert_is_instance, assert_equal, assert_not_equal
 from nose.tools import assert_is_none, assert_is_not_none
 
-from ast_viewer.controllers.tree_transform_controller import TreeTransformController
-from ast_viewer.models.ast_tree_manager import AstTreeManager, AstTreeItem, AstLink
-from ast_viewer.models.ast_transformer_manager import AstTransformerManager, AstTransformerItem
+from ast_tool_box.controllers.tree_transform_controller import TreeTransformController
+from ast_tool_box.models.ast_tree_manager import AstTreeManager, AstTreeItem, AstLink
+from ast_tool_box.models.ast_transformer_manager import AstTransformerManager, AstTransformerItem
 
 class TestTreeTransformController(unittest.TestCase):
     def test_create(self):

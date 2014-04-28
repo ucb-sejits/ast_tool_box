@@ -4,15 +4,15 @@ import inspect
 
 from nose.tools import assert_greater, assert_is_instance, assert_equal, assert_not_equal
 
-from ast_viewer.models.ast_transformer_manager import AstTransformerManager
-from ast_viewer.models.ast_transformer_manager import AstTransformerItem
-from ast_viewer.transformers.identity_transform import NoisyIdentityTransform, IdentityTransform
+from ast_tool_box.models.ast_transformer_manager import AstTransformerManager
+from ast_tool_box.models.ast_transformer_manager import AstTransformerItem
+from ast_tool_box.transformers.identity_transform import NoisyIdentityTransform, IdentityTransform
 
 
 class TestTransformers(unittest.TestCase):
     def test_basic_load(self):
         ntm = AstTransformerManager()
-        ntm.get_ast_transformers("ast_viewer.transformers.identity_transform")
+        ntm.get_ast_transformers("ast_tool_box.transformers.identity_transform")
         ntm.reload()
 
         assert_greater(ntm.count(), 0)
@@ -31,7 +31,7 @@ class TestTransformerItems(unittest.TestCase):
         nti = AstTransformerItem(IdentityTransform)
 
         assert_equal(nti.name(), "IdentityTransform")
-        assert_equal(nti.package(), "ast_viewer.transformers.identity_transform")
+        assert_equal(nti.package(), "ast_tool_box.transformers.identity_transform")
 
     def test_no_arg_transformer(self):
         nti = AstTransformerItem(IdentityTransform)

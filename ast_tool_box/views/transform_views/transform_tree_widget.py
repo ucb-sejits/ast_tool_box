@@ -2,10 +2,10 @@ __author__ = 'Chick Markley'
 
 import types
 import ast
-from ast_viewer.views.editor_widget import EditorPane
-from ast_viewer.views.search_widget import SearchLineEdit
+from ast_tool_box.views.editor_widget import EditorPane
+from ast_tool_box.views.search_widget import SearchLineEdit
 
-from ast_viewer.models.transform_models.transform_file import AstTransformItem, CodeGeneratorItem
+from ast_tool_box.models.transform_models.transform_file import AstTransformItem, CodeGeneratorItem
 
 from PySide import QtGui, QtCore
 
@@ -68,7 +68,12 @@ class TransformTreeWidget(QtGui.QTreeWidget):
     @QtCore.Slot(TransformTreeWidgetItem)
     def double_clicked(self, info):
         print("doubleclick on %s" % info)
-        if isinstance(self.currentItem(), AstTransformItem) or isinstance(self.currentItem(), CodeGeneratorItem):
+        print("doubleclick on %s" % self.currentItem())
+        print("comparing to %s" % AstTransformItem)
+        print("comparing to %s" % AstTransformItem)
+
+        if isinstance(self.currentItem().source, AstTransformItem) or\
+                isinstance(self.currentItem().source, CodeGeneratorItem):
             self.transform_presenter.apply_current_transform()
         else:
             self.transform_pane.show_error("Only works for Ast Transforms and Code Generators")

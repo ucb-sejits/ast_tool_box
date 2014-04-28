@@ -4,7 +4,7 @@ __author__ = 'Chick Markley'
 
 import ast
 import os
-import ast_viewer.models.transform_models.transform_file as transform_model
+import ast_tool_box.models.transform_models.transform_file as transform_model
 
 
 class CodeItem(object):

@@ -1,7 +1,7 @@
 from __future__ import print_function
 
-from ast_viewer.models.ast_tree_manager import AstTreeManager
-from ast_viewer.models.ast_transformer_manager import AstTransformerManager
+from ast_tool_box.models.ast_tree_manager import AstTreeManager
+from ast_tool_box.models.ast_transformer_manager import AstTransformerManager
 
 
 class TreeTransformController(object):

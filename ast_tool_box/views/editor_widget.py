@@ -1,7 +1,7 @@
 __author__ = 'Chick Markley'
 
 from PySide import QtGui, QtCore
-from ast_viewer.views.highlighter import Highlighter
+from ast_tool_box.views.highlighter import Highlighter
 
 
 class EditorPane(QtGui.QPlainTextEdit):

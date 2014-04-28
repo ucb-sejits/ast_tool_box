@@ -11,10 +11,14 @@ from PySide import QtCore, QtGui
 
 import ast_tool_box
 
-from ast_viewer.controllers.tree_transform_controller import TreeTransformController
+from ast_tool_box.controllers.tree_transform_controller import TreeTransformController
+from ast_tool_box.controllers.code_presenter import CodePresenter
 
+from ast_tool_box.controllers.transform_presenter import TransformPresenter
 
-logger = logging.getLogger(__name__)
+QtCore.QCoreApplication.setOrganizationName("Aspire Lab")
+QtCore.QCoreApplication.setOrganizationDomain("aspire.eecs.berkeley.edu")
+QtCore.QCoreApplication.setApplicationName("AstToolBox")
 
 DEBUGGING = False
 
@@ -23,12 +27,6 @@ PROGRAM_VERSION = '1.0.0'
 ABOUT_MESSAGE = u"""
 %(prog)s version %(version)s
 """ % {"prog": PROGRAM_NAME, "version": ast_tool_box.__version__}
-
-
-def logging_basic_config(level):
-    """ Setup basic config logging. Useful for debugging to quickly setup a useful logger"""
-    fmt = '%(filename)20s:%(lineno)-4d : %(levelname)-7s: %(message)s'
-    logging.basicConfig(level=level, format=fmt)
 
 
 def check_class(obj, target_class, allow_none=False):
@@ -76,14 +74,7 @@ def class_name(obj):
     return obj.__class__.__name__
 
 
-from ast_viewer.controllers.code_presenter import CodePresenter
-from ast_viewer.controllers.transform_presenter import TransformPresenter
-
-QtCore.QCoreApplication.setOrganizationName("Aspire Lab")
-QtCore.QCoreApplication.setOrganizationDomain("aspire.eecs.berkeley.edu")
-QtCore.QCoreApplication.setApplicationName("AstToolBox")
-
-# The main window inherits from a Qt class, therefore it has many 
+# The main window inherits from a Qt class, therefore it has many
 # ancestors public methods and attributes.
 # pylint: disable=R0901, R0902, R0904, W0201, R0913 
 
@@ -119,6 +110,8 @@ class AstToolBox(QtGui.QMainWindow):
         if mode not in valid_modes:
             raise ValueError("Mode must be one of: {}".format(valid_modes))
         self._mode = 'exec'
+
+        self.auto_expand_ast = True
 
         self.start_packages = packages if packages else []
         self.start_packages += [
@@ -262,19 +255,19 @@ def main():
 
     ast_tool_box.logging_basic_config(args.log_level.upper())
 
-    logger.info('Started {}'.format(ast_tool_box.PROGRAM_NAME))
+    logger.info('Started {}'.format(PROGRAM_NAME))
 
-    exit_code = ast_tool_box.view(
+    exit_code = view(
         file_name=args.file_name,
         packages=args.packages,
         width=1400, height=900
     )
 
-    logging.info('Done {}'.format(ast_tool_box.PROGRAM_NAME))
+    logging.info('Done {}'.format(PROGRAM_NAME))
     sys.exit(exit_code)
 
 
 # pylint: enable=R0901, R0902, R0904, W0201
 
 if __name__ == '__main__':
-    sys.exit(view(source_code="print a + 5 + 6  / 3.7", mode='eval', width=800, height=600))
+    main()

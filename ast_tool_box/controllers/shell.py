@@ -15,7 +15,7 @@ except IOError:
 atexit.register(readline.write_history_file, history_file)
 del os, history_file
 
-from ast_viewer.controllers.tree_transform_controller import TreeTransformController
+from ast_tool_box.controllers.tree_transform_controller import TreeTransformController
 
 
 class AstTransformInterpreter(object):
