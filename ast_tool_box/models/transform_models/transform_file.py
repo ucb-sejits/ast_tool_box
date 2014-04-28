@@ -8,7 +8,6 @@ import inspect
 import ast
 from operator import methodcaller
 from ctree.codegen import CodeGenVisitor
-from pprint import pprint
 from ast_tool_box.util import Util
 from collections import namedtuple
 import codegen

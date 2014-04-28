@@ -292,7 +292,7 @@ class CodePane(QtGui.QGroupBox):
             return None
 
         # result = [x.document().toPlainText().strip() for x in form_text_boxes]
-        result = [x.document().text().strip() for x in form_text_boxes]
+        result = [x.text().strip() for x in form_text_boxes]
         settings = QtCore.QSettings()
         settings.beginGroup(group_name)
         for index, text in enumerate(result):
