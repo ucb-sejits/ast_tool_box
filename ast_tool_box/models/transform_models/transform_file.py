@@ -21,7 +21,11 @@ class TransformThing(object):
         self.transform = transform
         self.package_name = package_name
         self.transform_file = transform_file
-        self.source_text = inspect.getsource(self.transform)
+        try:
+            self.source_text = inspect.getsource(self.transform)
+        except Exception as e:
+            print("Failed to get source for %s error %s" % (self.transform, e.message))
+            self.source_text = 'Unavailable'
         self.file_name = file_name
         # print(self.source_text)
         self.ast_root = ast.parse(self.source_text)
@@ -182,6 +186,33 @@ class CodeGeneratorItem(TransformThing):
         )
 
 
+class TransformFactory(object):
+    @staticmethod
+    def get(class_def, file_name=None, transform_collection=None):
+        if inspect.isclass(class_def):
+            if issubclass(class_def, ast.NodeTransformer):
+                if class_def.__name__ != "NodeTransformer":
+                    try:
+                        return AstTransformItem(
+                            class_def,
+                            file_name=file_name,
+                            transform_file=transform_collection
+                        )
+                    except Exception as e:
+                        print("Error could not instantiate class %s error %s" % (class_def, e.message))
+                        return None
+            if issubclass(class_def, CodeGenVisitor):
+                if class_def.__name__ != "CodeGenVisitor":
+                    try:
+                        return CodeGeneratorItem(
+                            class_def,
+                            file_name=file_name,
+                            transform_file=transform_collection
+                        )
+                    except Exception as e:
+                        print("Error could not instantiate class %s error %s" % (class_def, e.message))
+                        return None
+
 class AstParseItem(TransformThing):
     def __init__(self):
         # super(AstParseItem, self).__init__(self)
@@ -209,6 +240,9 @@ class TransformCollection(object):
         self.node_transforms = []
         self.code_generators = []
 
+    def update(self):
+        raise Exception("did not implement update method for %s" % self)
+
 class TransformFile(TransformCollection):
     """
     a list of transforms contained in file
@@ -220,20 +254,35 @@ class TransformFile(TransformCollection):
 
         self.load_error_info = None
         self.load_error_line_number = None
+        self.class_def_nodes = {}
+
+        self.ast_tree = None
+        self.source_text = ''
+
+        self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
+        self.path = os.path.abspath(self.path)
+
+        self.update()
+
+    def update(self):
+        self.load_error_info = None
+        self.load_error_line_number = None
+
+        if self.package_name in sys.modules:
+            Util.clear_classes_in_package(self.package_name)
 
         self.source_text = ''
-        with open(file_name, "r") as f:
+        with open(self.file_name, "r") as f:
             self.source_text = f.read()
 
         self.class_def_nodes = {}
+        self.node_transforms = []
+        self.code_generators = []
 
         self.ast_tree = ast.parse(self.source_text)
         for node in ast.walk(self.ast_tree):
             if isinstance(node, ast.ClassDef):
                 self.class_def_nodes[node.name] = node
-
-        self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
-        self.path = os.path.abspath(self.path)
 
         print("transform file %s %s" % (self.path, self.package_name))
 
@@ -261,21 +310,12 @@ class TransformFile(TransformCollection):
 
         for key in module.__dict__:
             thing = module.__dict__[key]
-            if inspect.isclass(thing):
-                if issubclass(thing, ast.NodeTransformer):
-                    if thing.__name__ != "NodeTransformer":
-                        self.node_transforms.append(AstTransformItem(
-                            thing,
-                            file_name=file_name,
-                            transform_file=self
-                        ))
-                if issubclass(thing, CodeGenVisitor):
-                    if thing.__name__ != "CodeGenVisitor":
-                        self.code_generators.append(CodeGeneratorItem(
-                            thing,
-                            file_name=file_name,
-                            transform_file=self
-                        ))
+
+            new_transform = TransformFactory.get(thing, file_name=self.file_name, transform_collection=self)
+            if isinstance(new_transform, AstTransformItem):
+                self.node_transforms.append(new_transform)
+            elif isinstance(new_transform, CodeGeneratorItem):
+                self.code_generators.append(new_transform)
 
         self.node_transforms.sort(key=methodcaller('name'))
         self.code_generators.sort(key=methodcaller('name'))
@@ -297,6 +337,9 @@ class TransformPackage(TransformCollection):
         self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
         self.path = os.path.abspath(self.path)
 
+        self.update()
+
+    def update(self):
         print("transform package %s %s" % (self.path, self.package_name))
 
         if not self.path in sys.path:
