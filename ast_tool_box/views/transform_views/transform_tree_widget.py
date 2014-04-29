@@ -116,6 +116,68 @@ class TransformTreeWidget(QtGui.QTreeWidget):
         for child_index in range(item.childCount()):
             self.collapse_descendants(item.child(child_index))
 
+    def rebuild(self, transform_file):
+        file_node = None
+        for index in range(self.topLevelItemCount()):
+            wi = self.topLevelItem(index)
+            if wi.source is transform_file:
+                file_node = wi
+                break
+
+        if not file_node:
+            print("Could not find %s" % transform_file)
+
+        def remove_children(node):
+            for child_index in xrange(node.childCount()-1, -1, -1):
+                print("removing child %d from node %s" % (child_index, node))
+                remove_children(node.child(child_index))
+                node.takeChild(child_index)
+
+        remove_children(file_node)
+        self.build_children(transform_file, file_node)
+        self.expandToDepth(100)
+
+    def build_children(self, transform_file, file_node):
+        first_node = None
+        if len(transform_file.node_transforms) > 0:
+            transforms_node = TransformTreeWidgetItem(file_node)
+            transforms_node.setText(
+                TransformTreeWidget.COL_NODE,
+                "ast.NodeTransformer : (%d)" % len(transform_file.node_transforms)
+            )
+            for transform in transform_file.node_transforms:
+                transform_node = TransformTreeWidgetItem(transforms_node, name=transform.name, source=transform)
+                if not first_node:
+                    first_node = transform_node
+                transform_node.setText(TransformTreeWidget.COL_NODE, transform.name())
+                # print("loaded transform to tree %s" % transform.name)
+                transform_node.setToolTip(TransformTreeWidget.COL_NODE, transform.doc)
+        else:
+            if transform_file.load_error_info:
+                first_node = file_node
+
+        if len(transform_file.code_generators) > 0:
+            code_generators_node = TransformTreeWidgetItem(file_node)
+            code_generators_node.setText(
+                TransformTreeWidget.COL_NODE,
+                "ctree.CodeGenVisitor : (%d)" % len(transform_file.code_generators)
+            )
+            print("%d code_generators" % len(transform_file.code_generators))
+
+            for code_generator in transform_file.code_generators:
+                code_generator_node = TransformTreeWidgetItem(
+                    code_generators_node,
+                    name=code_generator.name,
+                    source=code_generator
+                )
+                if not first_node:
+                    first_node = code_generator_node
+                code_generator_node.setText(TransformTreeWidget.COL_NODE, code_generator.name())
+                code_generator_node.setToolTip(TransformTreeWidget.COL_NODE, code_generator.doc)
+
+        return first_node
+
+
     def build(self, transform_files):
         self.clear()
 
@@ -127,43 +189,9 @@ class TransformTreeWidget(QtGui.QTreeWidget):
                 "%s (%s)" % (transform_file.base_name, transform_file.package_name)
             )
             file_node.setToolTip(TransformTreeWidget.COL_NODE, transform_file.path)
-
-            if len(transform_file.node_transforms) > 0:
-                transforms_node = TransformTreeWidgetItem(file_node)
-                transforms_node.setText(
-                    TransformTreeWidget.COL_NODE,
-                    "ast.NodeTransformer : (%d)" % len(transform_file.node_transforms)
-                )
-                for transform in transform_file.node_transforms:
-                    transform_node = TransformTreeWidgetItem(transforms_node, name=transform.name, source=transform)
-                    if not first_node:
-                        first_node = transform_node
-                    transform_node.setText(TransformTreeWidget.COL_NODE, transform.name())
-                    print("loaded transform to tree %s" % transform.name)
-                    transform_node.setToolTip(TransformTreeWidget.COL_NODE, transform.doc)
-            else:
-                if transform_file.load_error_info:
-                    first_node = file_node
-
-            if len(transform_file.code_generators) > 0:
-                code_generators_node = TransformTreeWidgetItem(file_node)
-                code_generators_node.setText(
-                    TransformTreeWidget.COL_NODE,
-                    "ctree.CodeGenVisitor : (%d)" % len(transform_file.code_generators)
-                )
-                print("%d code_generators" % len(transform_file.code_generators))
-
-                for code_generator in transform_file.code_generators:
-                    code_generator_node = TransformTreeWidgetItem(
-                        code_generators_node,
-                        name=code_generator.name,
-                        source=code_generator
-                    )
-                    if not first_node:
-                        first_node = code_generator_node
-                    print("XXXXXXXXX codegenerator.name %s" % code_generator.name())
-                    code_generator_node.setText(TransformTreeWidget.COL_NODE, code_generator.name())
-                    code_generator_node.setToolTip(TransformTreeWidget.COL_NODE, code_generator.doc)
+            node = self.build_children(transform_file, file_node)
+            if not first_node:
+                first_node = node
 
         self.expandToDepth(100)
         if first_node:

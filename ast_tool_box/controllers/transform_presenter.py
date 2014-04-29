@@ -77,36 +77,6 @@ class TransformPresenter(object):
         """return current transforms"""
         return len(list(self.transform_items()))
 
-    # def __getitem__(self, item):
-    #     if isinstance(item, int):
-    #         return self.transform_items[item]
-    #     elif isinstance(item, str):
-    #         return self.transforms_by_name[item]
-
-    # def get_valid_index(self, index):
-    #     """
-    #     convenience method for checking index
-    #     if index is a string make it an int
-    #     None returned if failed to convert or index out of range
-    #     """
-    #     if not isinstance(index, int):
-    #         try:
-    #             index = int(index)
-    #         except ValueError:
-    #             return None
-    #
-    #     if index >= 0:
-    #         if index < len(self.transform_items):
-    #             return index
-    #     return None
-
-    # def get_instance_by_name(self, transform_name):
-    #     transform_item = self.transforms_by_name[transform_name]
-    #     return transform_item.get_instance()
-
-    # def __iter__(self):
-    #     return iter(self.transform_items)
-
     def load_file(self, file_name):
         print("loading %s" % file_name)
         if not os.path.isfile(file_name):
@@ -128,6 +98,11 @@ class TransformPresenter(object):
             self.load_file(file_name)
 
         self.transform_pane.transform_tree_widget.build(self.transform_collections)
+
+    def update_file(self, transform_collection):
+        TransformPresenter.delete_module(transform_collection.package_name)
+        transform_collection.update()
+        self.transform_pane.transform_tree_widget.rebuild(transform_collection)
 
     @staticmethod
     def delete_module(module_name):

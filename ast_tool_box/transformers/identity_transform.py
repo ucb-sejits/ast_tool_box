@@ -33,6 +33,11 @@ class Chick5Transform(Chick2Transform):
         self.args = kwargs
 
 
+class Chick7Transform(Chick2Transform):
+    def __init__(self, **kwargs):
+        self.args = kwargs
+
+
 class NoisyIdentityTransform(ast.NodeTransformer):
     def __init__(self):
         super(NoisyIdentityTransform, self).__init__()

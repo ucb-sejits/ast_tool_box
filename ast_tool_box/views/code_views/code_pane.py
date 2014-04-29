@@ -211,7 +211,7 @@ class CodePane(QtGui.QGroupBox):
             widget = EditorPane()
             widget.setPlainText(code_item.code)
         elif isinstance(code_item, AstTreeItem):
-            widget = AstTreePane(self.code_presenter, code_item.code)
+            widget = AstTreePane(self.code_presenter, code_item.code, tab_name=code_item.code_name)
         elif isinstance(code_item, GeneratedCodeItem):
             widget = EditorPane()
             widget.setPlainText(code_item.code)

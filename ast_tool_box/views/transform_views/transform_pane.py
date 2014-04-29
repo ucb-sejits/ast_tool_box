@@ -86,9 +86,11 @@ class TransformPane(QtGui.QGroupBox):
         read_only = False
 
         transform_item = widget_item.source
+        file_item = None
         if isinstance(transform_item, TransformThing):
             if transform_item.transform_file:
                 file_item = transform_item.transform_file
+                print("file_item set to %s" % file_item)
                 file_name = file_item.file_name
                 if not file_item.source_text:
                     source_text = transform_item.source_text
@@ -125,6 +127,12 @@ class TransformPane(QtGui.QGroupBox):
             if read_only:
                 title += " READ ONLY"
             self.editor_panel.setTitle(title)
+
+        if file_item:
+            print("set editor from has a file_item %s" % file_item)
+            self.editor_panel.transform_collection = file_item
+        else:
+            print("set_editor_from does not have a file_item")
 
         self.editor.setCenterOnScroll(True)
         text_cursor = self.editor.textCursor()

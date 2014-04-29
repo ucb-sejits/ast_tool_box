@@ -143,7 +143,7 @@ class CodePresenter(object):
                     argument_values = [eval(x) for x in argument_values]
 
                 tree_copy = copy.deepcopy(code_item.ast_tree)
-                new_code = apply_codegen_transform(tree_copy)
+                new_code = apply_codegen_transform(tree_copy, argument_values)
                 new_code_item = code_model.GeneratedCodeItem(
                     new_code,
                     parent_link=code_model.CodeTransformLink(code_item=code_item, transform_item=transform_item),

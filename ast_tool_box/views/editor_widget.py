@@ -23,6 +23,8 @@ class EditorPane(QtGui.QPlainTextEdit):
 
         if self.parent_panel:
             self.textChanged.connect(self.parent_panel.text_changed)
+            self.undoAvailable.connect(self.parent_panel.enable_undo)
+            self.redoAvailable.connect(self.parent_panel.enable_redo)
 
         self.highlighter = Highlighter(self.document())
 
@@ -45,6 +47,7 @@ class EditorPanel(QtGui.QGroupBox):
     def __init__(self, transform_pane=None):
         super(EditorPanel, self).__init__("Editor")
         self.transform_pane = transform_pane
+        self.transform_collection = None
 
         layout = QtGui.QVBoxLayout()
         button_panel = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal)
@@ -73,15 +76,23 @@ class EditorPanel(QtGui.QGroupBox):
 
     def undo(self):
         self.editor.undo()
-        if not self.editor.undoAvailable():
-            self.undo_button.setEnabled(False)
+        # if not self.editor.undoAvailable():
+        #     self.undo_button.setEnabled(False)
         self.redo_button.setEnabled(True)
+
+    @QtCore.Slot(bool)
+    def enable_undo(self, value):
+        self.undo_button.setEnabled(value)
 
     def redo(self):
         self.editor.redo()
-        if not self.editor.redoAvailable():
-            self.redo_button.setEnabled(False)
+        # if not self.editor.redoAvailable():
+        #     self.redo_button.setEnabled(False)
         self.undo_button.setEnabled(True)
+
+    @QtCore.Slot(bool)
+    def enable_redo(self, value):
+        self.redo_button.setEnabled(value)
 
     def save(self):
         print("Got save file for %s" % self.editor.file_name)
@@ -91,7 +102,12 @@ class EditorPanel(QtGui.QGroupBox):
         self.editor.setPlainText(file_text)
         self.save_button.setEnabled(False)
         if self.transform_pane:
-            self.transform_pane.transform_presenter.reload_transforms()
+            if self.transform_collection:
+                print("calling update file")
+                self.transform_pane.transform_presenter.update_file(self.transform_collection)
+            else:
+                print("calling reload transforms")
+                self.transform_pane.transform_presenter.reload_transforms()
 
     def set_read_only(self, value):
         if value:
