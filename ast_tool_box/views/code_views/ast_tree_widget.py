@@ -2,7 +2,8 @@ __author__ = 'Chick Markley'
 
 import types
 import ast
-from ast_tool_box.views.editor_widget import EditorPane
+import tempfile
+import os
 from ast_tool_box.views.search_widget import SearchLineEdit
 
 from PySide import QtGui, QtCore
@@ -11,7 +12,7 @@ DEBUGGING = False
 
 
 class AstTreePane(QtGui.QGroupBox):
-    def __init__(self, code_presenter=None, ast_root=None):
+    def __init__(self, code_presenter=None, ast_root=None, tab_name=None):
         super(AstTreePane, self).__init__()
         self.code_presenter = code_presenter
 
@@ -20,29 +21,10 @@ class AstTreePane(QtGui.QGroupBox):
 
         layout = QtGui.QVBoxLayout()
 
-        # button_box = QtGui.QGroupBox()
-        # button_layout = QtGui.QHBoxLayout()
-        # go_button = QtGui.QPushButton("Apply")
-        # go_button.clicked.connect(self.transform_presenter.apply_current_transform)
-        #
-        # open_button = QtGui.QPushButton("Load File")
-        # open_button.clicked.connect(self.load)
-        #
-        # package_button = QtGui.QPushButton("Load Package")
-        # package_button.clicked.connect(self.load_package)
-        #
-        # button_layout.addWidget(package_button)
-        # button_layout.addWidget(open_button)
-        # button_layout.addWidget(go_button)
-        #
-        # button_box.setLayout(button_layout)
-        #
-        # layout.addWidget(button_box)
-
         self.search_box = SearchLineEdit(on_changed=self.search_box_changed, on_next=self.search_next)
         layout.addWidget(self.search_box)
 
-        self.ast_tree_widget = AstTreeWidget(code_presenter=self.code_presenter, ast_root=ast_root)
+        self.ast_tree_widget = AstTreeWidget(code_presenter=self.code_presenter, ast_root=ast_root, tab_name=tab_name)
         layout.addWidget(self.ast_tree_widget)
 
         self.setLayout(layout)
@@ -118,10 +100,11 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
     expand_all_at_create = True
 
-    def __init__(self, code_presenter=None, ast_root=None):
+    def __init__(self, code_presenter=None, ast_root=None, tab_name='tab'):
         super(AstTreeWidget, self).__init__()
 
         self.code_presenter = code_presenter
+        self.tab_name = tab_name
 
         self.ast_root = ast_root
         self.setColumnCount(2)
@@ -175,11 +158,39 @@ class AstTreeWidget(QtGui.QTreeWidget):
 
     def show_with_dot(self):
         from ctree.visual.dot_manager import DotManager
-        start_node = self.currentItem().ast_node
-        if isinstance(start_node, list):
-            # TODO this parent does not work
-            start_node = start_node.parent
-        DotManager.dot_ast_to_browser(start_node, "ast_%s.png" % "tree")
+        # start_node = self.currentItem().ast_node
+        #
+        # def find_appropriate_node(node):
+        #     if not node:
+        #         return None
+        #     if isinstance(node, ast.AST):
+        #         return node
+        #     if hasattr(node, 'parent'):
+        #         return find_appropriate_node(node.parent)
+        #     return None
+        #
+        # start_node = find_appropriate_node(start_node)
+        start_item = self.currentItem()
+
+        def find_appropriate_node(item):
+            if not item:
+                return None
+            if hasattr(item, 'ast_node') and isinstance(item.ast_node, ast.AST):
+                return item.ast_node
+            if hasattr(item, 'parent'):
+                return find_appropriate_node(item.parent())
+            print("bad node %s" % item)
+            import pprint
+            pprint(dir(item))
+            return None
+
+        start_node = find_appropriate_node(start_item)
+        if not start_node:
+            self.code_presenter.show_error("Sorry, cannot find an ast node to begin graph")
+            return
+
+        file_name = os.path.join(tempfile.gettempdir(), 'tree_%s.png' % self.tab_name)
+        DotManager.dot_ast_to_browser(start_node, file_name)
 
     def make_root(self):
         """make the current item the displayed root of the tree"""
