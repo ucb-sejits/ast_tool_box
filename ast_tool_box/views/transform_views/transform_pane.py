@@ -117,8 +117,8 @@ class TransformPane(QtGui.QGroupBox):
             return
 
         print("setting file_name %s vs %s" % (file_name, self.current_editor_item))
-        if file_name and file_name != self.current_editor_item:
-            self.current_editor_item = transform_item.file_name
+        if transform_item and transform_item != self.current_editor_item:
+            self.current_editor_item = transform_item
             self.editor.setPlainText(source_text)
             self.editor.set_file_name(widget_item.source.file_name)
             self.editor.set_read_only(read_only)

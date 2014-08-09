@@ -258,7 +258,6 @@ class TransformFile(TransformCollection):
 
         self.ast_tree = None
         self.source_text = ''
-
         self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
         self.path = os.path.abspath(self.path)
 
@@ -327,13 +326,13 @@ class TransformPackage(TransformCollection):
     """
     def __init__(self, raw_package_name):
         super(TransformPackage, self).__init__(raw_package_name)
+        print (raw_package_name)
         self.file_name = raw_package_name
         self.base_name = raw_package_name.split(".")[0]
         self.source_text = ''
 
         self.load_error_info = None
         self.load_error_line_number = None
-
         self.path, self.package_name = Util.path_to_path_and_package(self.file_name)
         self.path = os.path.abspath(self.path)
 

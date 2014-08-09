@@ -24,7 +24,7 @@ class Util(object):
             if package_name.endswith(".py"):
                 package_name = ".".join(package_name.split(".")[:-1])
 
-        if Util.is_package(file_path):
+        if Util.is_package(package_name):
             file_path2, file_name2 = os.path.split(file_path)
             return Util.path_to_path_and_package(file_path2, ".".join([file_name2, package_name]))
         else:

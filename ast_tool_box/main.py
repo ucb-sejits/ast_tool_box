@@ -207,8 +207,8 @@ class AstToolBox(QtGui.QMainWindow):
         """ Opens a new file. Show the open file dialog if file_name is None.
         """
         if not file_name:
-            file_name = self._get_file_name_from_dialog()
-
+            file_name, _ = QtGui.QFileDialog.getOpenFileName(self, "Open Python Source", "", "Python Files (*.py)")
+            print (file_name)
         self.code_presenter.new_file(file_name)
 
     def about(self):
@@ -241,7 +241,7 @@ def main():
     remaining_argv = app.arguments()
 
     parser = argparse.ArgumentParser(description='Python abstract syntax tree viewer and transformer')
-    parser.add_argument('file_name', help='Python input file')
+    parser.add_argument('file_name', help='Python input file', nargs = '?')
     parser.add_argument('packages', metavar='P', nargs='*')
 
     parser.add_argument(

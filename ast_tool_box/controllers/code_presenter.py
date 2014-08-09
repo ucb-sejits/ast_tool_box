@@ -181,6 +181,8 @@ class CodePresenter(object):
         self.add_code_item(new_tree_item)
 
     def new_item_from_file(self, file_name):
+        if file_name == None:
+            return
         with open(file_name, "r") as file_handle:
             source_text = file_handle.read()
             new_code_item = code_model.FileItem(code=source_text, file_name=file_name)
