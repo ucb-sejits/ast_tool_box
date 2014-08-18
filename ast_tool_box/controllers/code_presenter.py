@@ -95,14 +95,14 @@ class CodePresenter(object):
             Code generates each file in the project
             """
             import ctree.nodes
-            assert isinstance(ast_root, ctree.nodes.Project), \
-                "apply_code_gen root of tree not Project is a %s" % ast_root
+            # assert isinstance(ast_root, ctree.nodes.Project), \
+            #     "apply_code_gen root of tree not Project is a %s" % ast_root
 
             # TODO: stay more in line with ctree and use ResolveGeneratedPathRefs
 
             # transform all files a combined source_text string
             combined_source = ""
-            if ast_root.files and len(ast_root.files) > 0:
+            if isinstance(ast_root, ctree.nodes.Project) and ast_root.files and len(ast_root.files) > 0:
                 for f in ast_root.files:
                     combined_source += "File %s\n" % f.name
                     combined_source += f.codegen()
