@@ -190,7 +190,7 @@ class TransformPane(QtGui.QGroupBox):
             settings.endGroup()
 
             print("Got package name %s" % package_name)
-            self.transform_presenter.load_transforms(package_name)
+            self.transform_presenter.load_files([package_name])
             self.update_view()
 
     def contextMenuEvent(self, event):

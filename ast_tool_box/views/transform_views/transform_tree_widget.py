@@ -85,7 +85,7 @@ class TransformTreeWidget(QtGui.QTreeWidget):
         sub_menu = QtGui.QMenu(self)
         sub_menu.setTitle("Available transformers")
 
-        for transform_item in self.transform_presenter.transform_presenter.transform_items:
+        for transform_item in self.transform_presenter.transform_items():
             sub_menu_action = TransformerAction(transform_item=transform_item, ast_tree_widget=self)
             sub_menu.addAction(sub_menu_action)
 
