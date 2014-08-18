@@ -81,7 +81,7 @@ class TransformPresenter(object):
         print("loading %s" % file_name)
         if not os.path.isfile(file_name):
             transform_package = TransformPackage(file_name)
-            if len(transform_package.node_transforms) > 0:
+            if len(transform_package.node_transforms) > 0 or len(transform_package.code_generators) > 0:
                 self.transform_collections.append(transform_package)
             else:
                 TransformPane.show_error("Cannot open %s" % file_name)
