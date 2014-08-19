@@ -124,6 +124,7 @@ class CodePane(QtGui.QGroupBox):
     def delete_at(self, index):
         item = self.code_splitter.widget(index)
         item.deleteLater()
+        self.code_presenter.delete_last_item()
         # item.destroy(destroyWindow=True, destroySubWindows=True)
         self.tab_bar.removeTab(index)
         #
