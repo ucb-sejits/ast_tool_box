@@ -102,6 +102,9 @@ class CodePresenter(object):
 
             # transform all files a combined source_text string
             combined_source = ""
+            from ast_tool_box.transformers.NonCtreeNodeConverter import NonCtreeNodeConverter
+            converter = NonCtreeNodeConverter()
+            ast_root = converter.visit(ast_root)
             if isinstance(ast_root, ctree.nodes.Project) and ast_root.files and len(ast_root.files) > 0:
                 for f in ast_root.files:
                     combined_source += "File %s\n" % f.name
