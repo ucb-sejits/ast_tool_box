@@ -19,11 +19,12 @@ setup(
         'ast_tool_box.transformers',
     ],
 
-    requires=[
+    install_requires=[
         'PySide (>=1.1.2)',
         'nose',
         'codegen',
-        'ctree'
+        'ctree',
+        'sphinx'
     ],
 
     entry_points={
