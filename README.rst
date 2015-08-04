@@ -29,8 +29,8 @@ Usage:
 
 #### Further links:
 
-The `Green Tree Snakes documentation on ASTs<http://greentreesnakes.readthedocs.org/>`_ is available
-for those who find the `Python ast module documentation<http://docs.python.org/3/library/ast>`_ too brief.
+The `Green Tree Snakes documentation on ASTs <http://greentreesnakes.readthedocs.org/>`_ is available
+for those who find the `Python ast module documentation <http://docs.python.org/3/library/ast>`_ too brief.
 
 Installation:
 =============
